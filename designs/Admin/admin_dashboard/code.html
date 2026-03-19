@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MundIAl 26 - Admin Tournament Configuration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-container": "#4f3100",
+              "on-tertiary-container": "#424a54",
+              "on-primary-fixed-variant": "#005225",
+              "secondary-fixed": "#ffddb4",
+              "primary-container": "#00d46a",
+              "primary": "#42f183",
+              "outline-variant": "#3c4a3d",
+              "surface-bright": "#3a3939",
+              "on-surface-variant": "#bbcbb9",
+              "background": "#131313",
+              "on-background": "#e5e2e1",
+              "surface-variant": "#353534",
+              "inverse-on-surface": "#313030",
+              "surface-container-high": "#2a2a2a",
+              "primary-fixed-dim": "#2ce377",
+              "inverse-primary": "#006d33",
+              "tertiary-container": "#b2b9c5",
+              "surface-tint": "#2ce377",
+              "surface-container-lowest": "#0e0e0e",
+              "secondary": "#ffb955",
+              "surface": "#131313",
+              "on-primary-fixed": "#00210b",
+              "primary-fixed": "#63ff94",
+              "tertiary-fixed-dim": "#c0c7d3",
+              "tertiary-fixed": "#dce3f0",
+              "on-secondary": "#452b00",
+              "surface-dim": "#131313",
+              "on-tertiary": "#2a313b",
+              "surface-container": "#201f1f",
+              "secondary-fixed-dim": "#ffb955",
+              "on-error": "#690005",
+              "outline": "#859585",
+              "surface-container-low": "#1c1b1b",
+              "on-surface": "#e5e2e1",
+              "surface-container-highest": "#353534",
+              "on-secondary-fixed": "#291800",
+              "on-error-container": "#ffdad6",
+              "tertiary": "#ced5e1",
+              "on-primary": "#003918",
+              "inverse-surface": "#e5e2e1",
+              "error-container": "#93000a",
+              "on-primary-container": "#005526",
+              "secondary-container": "#dc9100",
+              "on-tertiary-fixed-variant": "#404752",
+              "on-secondary-fixed-variant": "#633f00",
+              "on-tertiary-fixed": "#151c25",
+              "error": "#ffb4ab"
+            },
+            fontFamily: {
+              "headline": ["Bebas Neue"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        background-color: #131313;
+        color: #e5e2e1;
+        font-family: 'Inter', sans-serif;
+      }
+      .bebas { font-family: 'Bebas Neue', sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen pb-24 md:pb-0">
+<!-- Top Navigation Bar -->
+<header class="bg-[#131313]/70 backdrop-blur-md text-[#00D46A] font-['Bebas_Neue'] tracking-tight uppercase docked full-width top-0 z-50 shadow-2xl shadow-black/50 no-border bg-opacity-70 backdrop-blur-xl">
+<div class="hidden md:flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+<div class="text-2xl font-['Bebas_Neue'] text-white tracking-widest [&amp;&gt;span]:text-[#00D46A]">
+                MUND<span>IA</span>L 26
+            </div>
+<nav class="flex gap-8 items-center">
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Ranking</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Resultados</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Mi Quiniela</a>
+<a class="text-[#00D46A] border-b-2 border-[#00D46A] pb-1" href="#">Admin</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-white hover:text-[#42f183] transition-all duration-300">account_circle</button>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 pt-12 md:pt-24">
+<!-- Editorial Header -->
+<div class="mb-12">
+<h1 class="bebas text-6xl md:text-8xl text-white tracking-tighter leading-none mb-4">TOURNAMENT<br/><span class="text-primary">CONFIGURATION</span></h1>
+<div class="h-1 w-24 bg-primary"></div>
+</div>
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Column 1: Config & API -->
+<div class="lg:col-span-8 space-y-8">
+<!-- Section 1: Deadline -->
+<section class="bg-surface-container-low p-8 rounded-xl relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div>
+<h2 class="bebas text-3xl text-white mb-1">REGISTRATION DEADLINE</h2>
+<p class="text-on-surface-variant text-sm font-medium">When should participants stop submitting their quinielas?</p>
+</div>
+<div class="flex flex-wrap gap-4">
+<div class="flex flex-col">
+<label class="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Target Date</label>
+<input class="bg-surface-container-lowest border-none text-white rounded-lg focus:ring-1 focus:ring-primary px-4 py-3 font-mono" type="date" value="2026-06-11"/>
+</div>
+<div class="flex flex-col">
+<label class="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Target Time</label>
+<input class="bg-surface-container-lowest border-none text-white rounded-lg focus:ring-1 focus:ring-primary px-4 py-3 font-mono" type="time" value="18:00"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: API Sync Status -->
+<section class="bg-surface-container-low p-8 rounded-xl relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<div>
+<h2 class="bebas text-3xl text-white mb-1">API DATA SYNC</h2>
+<p class="text-on-surface-variant text-sm font-medium">External feed status from World Cup 2026 Official API</p>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold px-6 py-3 rounded-lg flex items-center gap-2 hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-sm">sync</span>
+                            SYNC NOW
+                        </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-high p-6 rounded-xl border border-white/5">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest block mb-2">Current Status</span>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-primary rounded-full animate-pulse shadow-[0_0_10px_rgba(66,241,131,0.5)]"></div>
+<span class="bebas text-2xl text-white">OPERATIONAL</span>
+</div>
+</div>
+<div class="bg-surface-container-high p-6 rounded-xl border border-white/5">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest block mb-2">Last Sync</span>
+<div class="bebas text-2xl text-white tracking-tight">14 JUN 2026 - 12:45</div>
+</div>
+<div class="bg-surface-container-high p-6 rounded-xl border border-white/5">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest block mb-2">Next Scheduled</span>
+<div class="bebas text-2xl text-white tracking-tight">IN 14 MINUTES</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Column 2: Tournament Stats -->
+<div class="lg:col-span-4">
+<section class="bg-surface-container-low p-8 rounded-xl h-full flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+<h2 class="bebas text-3xl text-white mb-8 border-b border-white/10 pb-4">REAL-TIME STATS</h2>
+<div class="space-y-10 flex-grow">
+<!-- Stat 1 -->
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-on-surface-variant font-semibold text-xs uppercase tracking-widest">Total Participants</span>
+<span class="bebas text-4xl text-primary leading-none">12,842</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%]"></div>
+</div>
+</div>
+<!-- Stat 2 -->
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-on-surface-variant font-semibold text-xs uppercase tracking-widest">Completions</span>
+<span class="bebas text-4xl text-white leading-none">9,103</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-white h-full w-[70%]"></div>
+</div>
+</div>
+<!-- Stat 3 -->
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-on-surface-variant font-semibold text-xs uppercase tracking-widest">Matches Synced</span>
+<span class="bebas text-4xl text-secondary leading-none">48 / 64</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[75%]"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-white/10">
+<div class="flex items-center gap-4 text-xs text-on-surface-variant italic">
+<span class="material-symbols-outlined text-sm">info</span>
+                            Data updates automatically every 60 seconds
+                        </div>
+</div>
+</section>
+</div>
+</div>
+<!-- System Logs / Asymmetric Section -->
+<div class="mt-8 mb-24 grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="bg-surface-container-low p-6 rounded-xl border border-white/5 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">security</span>
+</div>
+<div>
+<p class="bebas text-xl text-white">ACCESS CONTROL</p>
+<p class="text-xs text-on-surface-variant">3 active admin sessions detected</p>
+</div>
+</div>
+<button class="text-xs font-bold text-primary underline underline-offset-4 uppercase tracking-widest">Manage</button>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border border-white/5 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">database</span>
+</div>
+<div>
+<p class="bebas text-xl text-white">DB HEALTH</p>
+<p class="text-xs text-on-surface-variant">Response time: 42ms (Stable)</p>
+</div>
+</div>
+<button class="text-xs font-bold text-secondary underline underline-offset-4 uppercase tracking-widest">Logs</button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#131313]/80 backdrop-blur-lg z-50 rounded-t-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.4)] no-border">
+<a class="flex flex-col items-center justify-center text-gray-500 hover:bg-white/5" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-['Inter'] text-[10px] font-semibold uppercase">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 hover:bg-white/5" href="#">
+<span class="material-symbols-outlined">sports_score</span>
+<span class="font-['Inter'] text-[10px] font-semibold uppercase">Resultados</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 hover:bg-white/5" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-['Inter'] text-[10px] font-semibold uppercase">Ranking</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#00D46A] bg-[#42f183]/10 rounded-xl px-3 py-1" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Inter'] text-[10px] font-semibold uppercase">Admin</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 hover:bg-white/5" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Inter'] text-[10px] font-semibold uppercase">Perfil</span>
+</a>
+</nav>
+</body></html>
