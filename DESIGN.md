@@ -11,29 +11,34 @@
 
 | Token | Hex | Usage |
 |---|---|---|
-| `green-primary` | `#1a7a3e` | Primary buttons, active states, progress bars, accents |
-| `green-light` | `#22a34f` | Button hover, highlights |
+| `green-primary` | `#00D46A` | Primary buttons, active nav states, progress bars, key accents |
+| `green-dim` | `#00a854` | Button hover, secondary highlights |
 | `gold` | `#f5a623` | 1st place, trophies, special highlights |
 | `silver` | `#9ca3af` | 2nd place |
 | `bronze` | `#b45309` | 3rd place |
 | `red-accent` | `#e63946` | Alerts, live match indicator, danger actions |
-| `dark-bg` | `#1a1a2e` | Main background |
-| `dark-card` | `#16213e` | Card backgrounds |
-| `dark-border` | `#0f3460` | Card borders, dividers |
-| `white` | `#ffffff` | Primary text on dark backgrounds |
-| `gray-muted` | `#6b7280` | Secondary text, placeholders |
+| `dark-bg` | `#0d0d0d` | Main background — near black, like Filmin |
+| `dark-card` | `#161616` | Card backgrounds |
+| `dark-card-hover` | `#1e1e1e` | Card hover state |
+| `dark-border` | `#2a2a2a` | Borders and dividers — very subtle |
+| `white` | `#ffffff` | Primary text |
+| `gray-muted` | `#888888` | Secondary text, placeholders, captions |
+| `gray-dim` | `#555555` | Tertiary text, disabled states |
 
 ### Typography
 
+Filmin-inspired: clean and editorial. Bebas Neue used sparingly — only for scores and the logo. Everything else is Inter, with weight and size doing the heavy lifting instead of decorative fonts.
+
 | Role | Font | Weight | Size (desktop → mobile) |
 |---|---|---|---|
-| Display / Hero | Bebas Neue | 400 (naturally bold) | 64px → 40px |
-| Page title | Bebas Neue | 400 | 40px → 28px |
-| Section heading | Bebas Neue | 400 | 28px → 22px |
-| Card title | Inter | 700 | 18px → 16px |
-| Body | Inter | 400 | 16px → 14px |
-| Label / Caption | Inter | 500 | 13px → 12px |
-| Score / Number | Bebas Neue | 400 | varies |
+| Logo | Bebas Neue | 400 | 28px |
+| Score / Number display | Bebas Neue | 400 | varies (32–64px) |
+| Page title | Inter | 700 | 32px → 24px |
+| Section heading | Inter | 600 | 20px → 18px |
+| Card title | Inter | 600 | 16px → 15px |
+| Body | Inter | 400 | 15px → 14px |
+| Label / Caption | Inter | 400 | 13px → 12px |
+| Nav links | Inter | 500 | 14px |
 
 ### Spacing & Radius
 
@@ -45,10 +50,13 @@
 
 ### Shadows & Effects
 
-- Card shadow: `0 4px 24px rgba(0,0,0,0.4)`
-- Gold glow (1st place): `0 0 20px rgba(245,166,35,0.4)`
-- Green glow (active/live): `0 0 12px rgba(26,122,62,0.5)`
-- Background texture: subtle dark gradient or noise overlay on `dark-bg`
+Filmin-like: minimal shadows, no heavy textures. Depth comes from layering dark shades, not from dramatic effects.
+
+- Card shadow: `0 2px 12px rgba(0,0,0,0.6)` — subtle, tight
+- Gold glow (1st place only): `0 0 16px rgba(245,166,35,0.3)`
+- Green glow (active/live indicator): `0 0 8px rgba(0,212,106,0.4)`
+- Background: flat `#0d0d0d`, no texture — cleanliness is the aesthetic
+- Transitions: `150ms ease` on hover states, nothing flashy
 
 ### Iconography
 
@@ -72,9 +80,9 @@
 - Single-column layouts
 
 ### Background
-- Full-page dark background `#1a1a2e`
-- Subtle radial gradient or diagonal stripe pattern (very subtle, low opacity) to add texture
-- Cards float on top with `dark-card` background and `dark-border` border
+- Full-page flat `#0d0d0d` — no gradients, no patterns, no texture
+- Cards sit on this background with `dark-card` (`#161616`) — differentiated purely by shade, not by shadow or border
+- Borders (`#2a2a2a`) used only where structure is needed, not decoratively
 
 ---
 
@@ -82,12 +90,13 @@
 
 ### 3.1 Navigation — Top Bar (desktop)
 
-- Height: `64px`
-- Background: `dark-card` with bottom border `dark-border`
-- Left: Logo — "Mund**IA**l 26" with "IA" in `gold`, rest in `white`, Bebas Neue 28px
-- Right: nav links — Ranking, Resultados, Mi Quiniela, (Admin badge if admin role)
-- Active link: `green-primary` underline or highlight
-- Far right: user avatar (circle, 36px) with dropdown (Perfil, Cerrar sesión)
+- Height: `60px`
+- Background: `#0d0d0d` (same as page bg) with a very subtle `1px` bottom border in `dark-border`
+- Left: Logo — "Mund**IA**l 26" with "IA" in `green-primary`, rest in `white`, Bebas Neue 28px
+- Right: nav links in Inter 500 14px — Ranking, Resultados, Mi Quiniela, (+ Admin if admin role)
+- Inactive links: `gray-muted`, hover: `white` (150ms transition)
+- Active link: `white` + `green-primary` 2px underline offset below
+- Far right: user avatar (circle, 32px) with dropdown (Perfil, Cerrar sesión)
 
 ### 3.2 Navigation — Bottom Bar (mobile)
 
@@ -101,22 +110,27 @@
 
 | Variant | Background | Text | Border |
 |---|---|---|---|
-| Primary | `green-primary` | white | none |
-| Primary hover | `green-light` | white | none |
-| Secondary | transparent | white | `dark-border` |
-| Danger | `red-accent` | white | none |
+| Primary | `green-primary` | `#0d0d0d` (dark text on green) | none |
+| Primary hover | `green-dim` | `#0d0d0d` | none |
+| Secondary | transparent | `white` | `1px solid #2a2a2a` |
+| Secondary hover | `#1e1e1e` | `white` | `1px solid #2a2a2a` |
+| Danger | `red-accent` | `white` | none |
 | Ghost | transparent | `gray-muted` | none |
+| Ghost hover | transparent | `white` | none |
 
-- Height: `44px` (touch-friendly), `px-6`
+- Height: `40px`, `px-5`, Inter 500 14px
+- Border radius: `6px` — slightly more refined than before
 - Loading state: spinner replacing text, same background
+- No uppercase — sentence case only (Filmin-like)
 
 ### 3.4 Cards
 
-- Background: `dark-card`
-- Border: `1px solid dark-border`
-- Border radius: `12px`
-- Padding: `24px` desktop, `16px` mobile
-- Hover (if interactive): border color shifts to `green-primary`
+- Background: `#161616`
+- Border: `1px solid #2a2a2a` — very understated, just enough to separate
+- Border radius: `8px` — clean, not overly rounded
+- Padding: `20px` desktop, `16px` mobile
+- Hover (if interactive): background shifts to `#1e1e1e`, border stays — no color flash
+- No heavy shadows — layered darkness does the separation work
 
 ### 3.5 Inputs & Forms
 
@@ -177,7 +191,7 @@
 
 **Layout:** Full-screen, vertically centered card (max-width `420px`)
 
-**Background:** Stadium-inspired — dark gradient from `#1a1a2e` to `#0f3460` with a subtle radial green glow from the center bottom (simulating pitch lights)
+**Background:** Flat `#0d0d0d` — no gradient. The card itself provides all the contrast. Filmin-style: the login page looks like the rest of the app, not a separate landing experience.
 
 **Card contents (top to bottom):**
 1. Logo: "Mund**IA**l 26" Bebas Neue 48px + tagline "La quiniela del Mundial" Inter 14px `gray-muted`
