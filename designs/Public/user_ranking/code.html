@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#3a3939",
+              "surface": "#131313",
+              "tertiary-container": "#b2b9c5",
+              "on-background": "#e5e2e1",
+              "error": "#ffb4ab",
+              "on-tertiary": "#2a313b",
+              "surface-container": "#201f1f",
+              "surface-tint": "#2ce377",
+              "surface-container-highest": "#353534",
+              "primary-fixed": "#63ff94",
+              "secondary-fixed": "#ffddb4",
+              "secondary-fixed-dim": "#ffb955",
+              "on-primary-fixed": "#00210b",
+              "on-error-container": "#ffdad6",
+              "primary-container": "#00d46a",
+              "on-tertiary-fixed": "#151c25",
+              "tertiary-fixed-dim": "#c0c7d3",
+              "surface-variant": "#353534",
+              "error-container": "#93000a",
+              "background": "#131313",
+              "inverse-primary": "#006d33",
+              "on-secondary-container": "#4f3100",
+              "on-error": "#690005",
+              "primary-fixed-dim": "#2ce377",
+              "inverse-on-surface": "#313030",
+              "on-tertiary-fixed-variant": "#404752",
+              "on-secondary": "#452b00",
+              "surface-dim": "#131313",
+              "surface-container-low": "#1c1b1b",
+              "on-surface": "#e5e2e1",
+              "on-secondary-fixed": "#291800",
+              "tertiary-fixed": "#dce3f0",
+              "secondary": "#ffb955",
+              "primary": "#42f183",
+              "tertiary": "#ced5e1",
+              "on-primary-container": "#005526",
+              "outline": "#859585",
+              "on-tertiary-container": "#424a54",
+              "outline-variant": "#3c4a3d",
+              "on-primary": "#003918",
+              "inverse-surface": "#e5e2e1",
+              "surface-container-high": "#2a2a2a",
+              "on-surface-variant": "#bbcbb9",
+              "on-primary-fixed-variant": "#005225",
+              "on-secondary-fixed-variant": "#633f00",
+              "secondary-container": "#dc9100",
+              "surface-container-lowest": "#0e0e0e"
+            },
+            fontFamily: {
+              "headline": ["Bebas Neue"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #0d0d0d; color: #e5e2e1; font-family: 'Inter', sans-serif; }
+        .bebas { font-family: 'Bebas Neue', cursive; }
+        .glass-effect { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .gold-glow { box-shadow: 0 0 40px rgba(255, 221, 180, 0.15); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="min-h-screen pb-24 md:pb-0">
+<!-- TopNavBar -->
+<nav class="bg-[#131313]/70 backdrop-blur-md text-[#00D46A] font-['Bebas_Neue'] tracking-tight uppercase docked full-width top-0 z-50 no-border bg-opacity-70 backdrop-blur-xl shadow-2xl shadow-black/50 hidden md:flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto fixed left-0 right-0">
+<div class="text-2xl font-['Bebas_Neue'] text-white tracking-widest [&amp;&gt;span]:text-[#00D46A]">Mund<span>IAl</span> 26</div>
+<div class="flex gap-8 items-center">
+<a class="text-[#00D46A] border-b-2 border-[#00D46A] pb-1 transition-all duration-300" href="#">Ranking</a>
+<a class="text-gray-400 hover:text-white transition-colors hover:text-[#42f183] transition-all duration-300" href="#">Resultados</a>
+<a class="text-gray-400 hover:text-white transition-colors hover:text-[#42f183] transition-all duration-300" href="#">Mi Quiniela</a>
+<a class="text-gray-400 hover:text-white transition-colors hover:text-[#42f183] transition-all duration-300" href="#">Admin</a>
+<div class="ml-4 cursor-pointer active:opacity-80 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-white" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="max-w-5xl mx-auto px-6 pt-8 md:pt-32 pb-12">
+<!-- Header Section -->
+<header class="mb-12">
+<h1 class="bebas text-[40px] leading-none tracking-tight text-white mb-1 uppercase">Clasificación</h1>
+<p class="text-on-surface-variant font-label text-sm uppercase tracking-wider">Mundial 2026 · Actualizado hace 5 minutos</p>
+</header>
+<!-- Podium Section (Editorial Asymmetric Layout) -->
+<section class="grid grid-cols-3 items-end gap-2 md:gap-6 mb-16 max-w-3xl mx-auto">
+<!-- 2nd Place -->
+<div class="flex flex-col items-center">
+<div class="relative mb-4">
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-surface-container-high border-2 border-outline-variant/30">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Portrait of a young man smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBw1ObfvO-sRMvUTJex_XyBc8KR-9eL2GjSg6lX7H0rEuKIUpswGkw79Q83wmr2UkBFPDmLOa5WOVIjmbLFX4xuKmyAUTNvJkloG5yeCGqnojnoLWWkAMnQp5wpRu_vPcEySgVj3ikzW7IwDy-SgD-V41TvUQpMMUEPI7QXBWPpUf_MxDj3Uip6KVbwv3DF6eCxjVciHM_W8-Xr5-7uc0v9PYkIG2wcQSW5pyJvS6uXnSghAt90dQ6nD6XZKKNZ8MpY4AMVyp0vDSk"/>
+</div>
+<div class="absolute -bottom-2 -right-1 bg-surface-container-highest text-secondary-fixed text-[10px] font-bold px-2 py-0.5 rounded-full border border-outline-variant/20">2º</div>
+</div>
+<div class="text-center">
+<p class="font-body font-bold text-sm md:text-[18px] text-on-surface mb-1">M. Rossi</p>
+<p class="bebas text-2xl md:text-[36px] leading-none text-white">2,840</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tighter">Puntos</p>
+</div>
+<div class="w-full h-24 bg-surface-container-low rounded-t-xl mt-4 opacity-40"></div>
+</div>
+<!-- 1st Place (Hero) -->
+<div class="flex flex-col items-center z-10">
+<div class="relative mb-6">
+<div class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden p-1 bg-gradient-to-tr from-secondary to-primary gold-glow">
+<div class="w-full h-full rounded-full overflow-hidden border-4 border-[#0d0d0d]">
+<img alt="Winner Avatar" class="w-full h-full object-cover" data-alt="Portrait of a smiling professional man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDxO9TOUyVVKSTum0D_Vj5ng3gEfGxBrS_ZYIyVg74TN4quh1ybkj85lcLKiEJ1MD66bCpsjH5f8wt1PgOcvlaGDm5kPwehB5WQwdFOkdFhCtdm-PQVipIqgI57S8yertCi9IkgxYLr0XeakSRdsVAxCRDFadbeJb_yhxLSrWYYcYxzYQ3VwyoQCa6aVkvKUNuADdgCMgcoHomaSP_sVO1eL9i319WFhL4PgtlaEBAah7dEAlTOrZOIG8quDKDfELiNWs0PrWnWS0"/>
+</div>
+</div>
+<div class="absolute -top-4 left-1/2 -translate-x-1/2">
+<span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="absolute -bottom-2 right-2 bg-secondary text-on-secondary-fixed text-xs font-bold px-3 py-1 rounded-full shadow-lg">1º</div>
+</div>
+<div class="text-center">
+<p class="font-body font-bold text-base md:text-[20px] text-white mb-1">Carlos J.</p>
+<p class="bebas text-4xl md:text-[48px] leading-none text-primary">3,120</p>
+<p class="text-[12px] text-primary uppercase font-bold tracking-widest">Líder Global</p>
+</div>
+<div class="w-full h-40 bg-gradient-to-b from-surface-container-high to-surface-container-low rounded-t-2xl mt-4 relative">
+<div class="absolute inset-x-0 top-0 h-1 bg-primary/30"></div>
+</div>
+</div>
+<!-- 3rd Place -->
+<div class="flex flex-col items-center">
+<div class="relative mb-4">
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-surface-container-high border-2 border-outline-variant/30">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Portrait of a young woman smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7e8fuo0fDwB_PV1yfXSq6QIfNTZO5VRVcrzw0ReyE2JL3aV-QXEvKadJEJ6h18-2nMgIS_sy4t6E_yWqy00fgNZpRRFmDYlltRQpw66343ov9IE8sk8LJ0MIW8VQjfwDwXYvkG9K7vFdhlN_dqus0q0nYr4Alm6pgp2MFVNnxL6_RJxb4pl3Q9yC0lj_cHuqenVP3BfiTSySQad6jYio2o6UDq2WxTvFEDYocPnZcAvKJi3FeQa3iSlwVkZxwlMHs0k2V7fdmpZg"/>
+</div>
+<div class="absolute -bottom-2 -right-1 bg-surface-container-highest text-orange-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-outline-variant/20">3º</div>
+</div>
+<div class="text-center">
+<p class="font-body font-bold text-sm md:text-[18px] text-on-surface mb-1">S. Chen</p>
+<p class="bebas text-2xl md:text-[36px] leading-none text-white">2,715</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tighter">Puntos</p>
+</div>
+<div class="w-full h-20 bg-surface-container-low rounded-t-xl mt-4 opacity-30"></div>
+</div>
+</section>
+<!-- Ranking Table -->
+<section class="space-y-2">
+<!-- Table Header -->
+<div class="flex items-center px-6 py-3 text-on-surface-variant text-[10px] font-bold uppercase tracking-[0.2em]">
+<div class="w-10">#</div>
+<div class="flex-1">Jugador</div>
+<div class="w-24 text-right">Puntos</div>
+</div>
+<!-- Row: User (Highlighted) -->
+<div class="group flex items-center bg-[#161616] rounded-xl p-4 border-l-4 border-primary shadow-lg transition-transform hover:scale-[1.01] cursor-pointer">
+<div class="w-10 bebas text-xl text-primary">14</div>
+<div class="flex flex-1 items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20 bg-surface-container-highest">
+<img alt="My Profile" class="w-full h-full object-cover" data-alt="User profile photo avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7X0LzqapHDkVOsCEEY-uRpYZyM-wE2YJdcu_KTgXatu0d-8bPmCC6lf9-iOy_MMwwqWK8Z5wdC1R5_R5SMiiH6ig-EZta5tlnlTBg-ifXPH8WAy4RVXpuRx-Dlf6FfDYdKkT2sPkWKcuISCZoO88co2HsInyw1ZLUOmV1CaV4p9qKwrDy7pReNahp2Uo_oGhPntD0ebOS1-8hC-eVEyHKS73HlSBcpAGmsi8W0k9tVHlonWgeKldheqAQ2YsAb8EkCP4RlrPx_mo"/>
+</div>
+<div>
+<p class="font-body font-bold text-white text-sm">Tú (Diego G.)</p>
+<p class="text-[10px] text-primary font-semibold uppercase tracking-tight">↑ 2 posiciones hoy</p>
+</div>
+</div>
+<div class="w-24 text-right">
+<p class="bebas text-2xl text-white">1,945</p>
+</div>
+</div>
+<!-- Standard Rows -->
+<div class="flex flex-col space-y-2">
+<!-- Row 4 -->
+<div class="group flex items-center bg-[#161616] rounded-xl p-4 transition-all hover:bg-surface-container-high cursor-pointer">
+<div class="w-10 bebas text-xl text-on-surface-variant group-hover:text-white">4</div>
+<div class="flex flex-1 items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="Player" class="w-full h-full object-cover" data-alt="Portrait of a bearded man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8uJmOXE9lh_ZPGjWvNofQBJkzkGxs78SUMI1j6WCkD-TtHpL5KOmdPl5c7s9_pOlgTplgvIGYGjGCTbMmGGj3C2fN7__xCeARAdmFB46YwT5P_Ieeo-BH6I4vQNRUh9kZqBQwwl8GnFdWZFtAXsoHGdOGq6UG8UAyuMBzoe1FzTnMVyUXi7ZdIIaMw6GBI7ooKqr6l3eoLGXXEbvAkV43KXOHQXot3IttEYt8eqLeMzqrzq-TnWZxTeNBM9Uanr8pT_EdKlzrIBs"/>
+</div>
+<p class="font-body font-medium text-on-surface text-sm">Alejandro V.</p>
+</div>
+<div class="w-24 text-right">
+<p class="bebas text-2xl text-on-surface group-hover:text-white">2,650</p>
+</div>
+</div>
+<!-- Row 5 -->
+<div class="group flex items-center bg-[#161616] rounded-xl p-4 transition-all hover:bg-surface-container-high cursor-pointer">
+<div class="w-10 bebas text-xl text-on-surface-variant group-hover:text-white">5</div>
+<div class="flex flex-1 items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="Player" class="w-full h-full object-cover" data-alt="Portrait of a woman with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAT76fssapBDrKCakgFGsv4aXSWKSBuZQD-pBLzk2FQ7ArLAAHrWg-nFYMfLX9gLNFu1MPTfOjU5lQ2nLGqtEPJpPESZSlxbIvconuMwrVH77K2to8rO8n_JWKNZrza3JHAI7O9OqyPLn-RER-zpBNuugiboNTHjZBd2p1ruOANPndAwwtyZ_SGWNIguMo4-COo-33F9UR7qXLzvIhqVXSYpZxdGlhi2RXxWnqvc1iLuWyT6SuP8P4UYeILER4GMw0pRsP9UGzm2eo"/>
+</div>
+<p class="font-body font-medium text-on-surface text-sm">Elena Sanz</p>
+</div>
+<div class="w-24 text-right">
+<p class="bebas text-2xl text-on-surface group-hover:text-white">2,590</p>
+</div>
+</div>
+<!-- Row 6 -->
+<div class="group flex items-center bg-[#161616] rounded-xl p-4 transition-all hover:bg-surface-container-high cursor-pointer">
+<div class="w-10 bebas text-xl text-on-surface-variant group-hover:text-white">6</div>
+<div class="flex flex-1 items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="Player" class="w-full h-full object-cover" data-alt="Portrait of a young man outdoors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPdwm2W7uImAMKhxcidnWlpoGnP4NwsodhOy-ZtJs_KOS4pmsuLPlMPkLTjinviWolHzT095_noPXu2XXBmb041qpqVfLMxWbhGjUqDngzilM9_6_IRfj031DdjtGN7CTnf_DFiPYOKScehuLk6B1kC27AScLgftL56m-whCeKTwwYLEEUM0dZ_r54GmNa9pEQf3vGi0lCbAvbRaJa2PavctTHFuwq2qtj-kKdftPJuEPUzPTUEQm1u4bf1ZYyM7LRM1US3jCJKgw"/>
+</div>
+<p class="font-body font-medium text-on-surface text-sm">Roberto L.</p>
+</div>
+<div class="w-24 text-right">
+<p class="bebas text-2xl text-on-surface group-hover:text-white">2,480</p>
+</div>
+</div>
+<!-- Row 7 -->
+<div class="group flex items-center bg-[#161616] rounded-xl p-4 transition-all hover:bg-surface-container-high cursor-pointer">
+<div class="w-10 bebas text-xl text-on-surface-variant group-hover:text-white">7</div>
+<div class="flex flex-1 items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="Player" class="w-full h-full object-cover" data-alt="Portrait of a young woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANFs0N2KfGXdt7kt5uQ5SAmJPl4UJ70e-UrM_f4_ud_X2Iiyhz6BY-vpekWBMUBfdFmp8RJrQ2yLlUIJlEoJckvCDT4YQiI3vMwjUCVXH-Hk1J-eT2W0woWsbNI7TaeL-vsatRebQfNVuooHE8Lb2AGj03Zfw9IVK7nD5TnIP3n_2sCoqGBVuo0GWfEEPbh4jiYG8lN-UB5RPV10GxdIfjMsZ4pgzQCqDeSmvi0a7-rk1WWSOXPW5816REgtZieGhIDNMF_tbnfYY"/>
+</div>
+<p class="font-body font-medium text-on-surface text-sm">Laura M.</p>
+</div>
+<div class="w-24 text-right">
+<p class="bebas text-2xl text-on-surface group-hover:text-white">2,310</p>
+</div>
+</div>
+</div>
+<!-- Load More CTA -->
+<button class="w-full py-6 text-on-surface-variant font-label text-[10px] uppercase tracking-[0.3em] hover:text-primary transition-colors">
+                Ver clasificación completa
+            </button>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#131313]/80 backdrop-blur-lg z-50 rounded-t-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.4)]">
+<a class="flex flex-col items-center justify-center text-gray-500 hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Inter'] text-[10px] font-semibold uppercase mt-1">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="sports_score">sports_score</span>
+<span class="font-['Inter'] text-[10px] font-semibold uppercase mt-1">Resultados</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#00D46A] bg-[#42f183]/10 rounded-xl px-3 py-1 scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard" style="font-variation-settings: 'FILL' 1;">leaderboard</span>
+<span class="font-['Inter'] text-[10px] font-semibold uppercase mt-1">Ranking</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="edit_calendar">edit_calendar</span>
+<span class="font-['Inter'] text-[10px] font-semibold uppercase mt-1">Quiniela</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Inter'] text-[10px] font-semibold uppercase mt-1">Perfil</span>
+</a>
+</nav>
+</body></html>
