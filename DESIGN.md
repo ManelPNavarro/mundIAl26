@@ -224,7 +224,7 @@ Filmin-like: minimal shadows, no heavy textures. Depth comes from layering dark 
 **States:**
 - Validation errors shown inline below each field
 - Password mismatch error on confirm field
-- Success: brief "¡Cuenta creada!" toast, redirect to `/quiniela`
+- Success: brief "¡Cuenta creada!" toast, redirect to `/predictions`
 
 ---
 
@@ -252,7 +252,7 @@ Filmin-like: minimal shadows, no heavy textures. Depth comes from layering dark 
 
 ---
 
-### 4.4 `/resultados` — Results
+### 4.4 `/results` — Results
 
 **Header:**
 - "Resultados" Bebas Neue 40px
@@ -280,7 +280,7 @@ Filmin-like: minimal shadows, no heavy textures. Depth comes from layering dark 
 
 ---
 
-### 4.5 `/quiniela` — Predictions
+### 4.5 `/predictions` — Predictions
 
 **Pre-deadline state (form):**
 
@@ -323,7 +323,7 @@ Filmin-like: minimal shadows, no heavy textures. Depth comes from layering dark 
 
 ---
 
-### 4.6 `/admin/usuarios` — User Management
+### 4.6 `/admin/users` — User Management
 
 **Header:** "Gestión de Usuarios" + "Nuevo usuario" button (top right)
 
@@ -343,7 +343,7 @@ Filmin-like: minimal shadows, no heavy textures. Depth comes from layering dark 
 
 ---
 
-### 4.7 `/admin/puntuacion` — Scoring Rules
+### 4.7 `/admin/scoring` — Scoring Rules
 
 **Header:** "Reglas de Puntuación"
 **Subtitle:** "Los cambios se aplicarán a todos los usuarios al guardar."
@@ -366,7 +366,7 @@ Mejor portero            [  3  ] puntos
 
 ---
 
-### 4.8 `/admin/torneo` — Tournament Config
+### 4.8 `/admin/tournament` — Tournament Config
 
 **Section 1 — Deadline:**
 - "Fecha límite de quinielas"
@@ -391,7 +391,7 @@ Mejor portero            [  3  ] puntos
 
 ### Registration → First prediction
 ```
-/register → success toast → /quiniela (tab 1, progress 0%)
+/register → success toast → /predictions (tab 1, progress 0%)
 → fill matches → auto-save → progress updates
 → submit when 100% complete → confirmation screen
 ```

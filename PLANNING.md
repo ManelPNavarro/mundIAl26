@@ -10,7 +10,8 @@
 Web app for coworkers to participate in a World Cup 2026 prediction pool. Each participant fills in their predictions **before the tournament starts** (no changes allowed afterwards). The app automatically calculates points as real results come in via API. A real-time leaderboard keeps the competition alive.
 
 **Target users:** 20–100 coworkers
-**Language:** Spanish
+**UI language:** Spanish — all labels, copy, and user-facing text are in Spanish
+**Code language:** English — all routes, endpoints, variable names, function names, database columns, env vars, and file names must be in English
 **Style:** Football-themed, bold & fun (energetic, strong typography, stadium colors)
 **Platforms:** Responsive — desktop for filling in predictions, mobile for checking the leaderboard
 
@@ -60,7 +61,7 @@ Key data the data model must reflect:
 - Redirect based on role: regular user → predictions / admin → dashboard
 - Design: full-screen with stadium background image, centered card
 
-### 4.2 `/quiniela` — Fill in predictions
+### 4.2 `/predictions` — Fill in predictions
 - **Only accessible before the tournament starts** (deadline: June 11, 2026, configurable by admin)
 - After the deadline: read-only view of the user's predictions
 - The user fills in:
@@ -75,7 +76,7 @@ Key data the data model must reflect:
 - Progress indicator (% completed)
 - Validation: cannot submit until everything is filled in
 
-### 4.3 `/resultados` — Real results
+### 4.3 `/results` — Real results
 - Shows World Cup matches with real results (fetched from the API)
 - Grouped by phase (Groups, Round of 32, Round of 16…)
 - Match status: Scheduled / Live / Finished
@@ -92,14 +93,14 @@ Key data the data model must reflect:
 ### 4.5 `/admin` — Admin panel
 Only accessible to users with `admin` role.
 
-#### `/admin/usuarios`
+#### `/admin/users`
 - List all users (name, email, role, status)
 - Create user manually
 - Edit user data and role
 - Delete user (with confirmation)
 - Activate/deactivate user (to block access without deleting)
 
-#### `/admin/puntuacion`
+#### `/admin/scoring`
 - Configure points for each type of correct prediction:
   - Exact match result (scoreline)
   - Correct winner/draw
@@ -112,7 +113,7 @@ Only accessible to users with `admin` role.
 - Simple form with numeric fields and save button
 - Changes trigger a full recalculation of all points
 
-#### `/admin/torneo`
+#### `/admin/tournament`
 - Set the deadline for submitting predictions
 - View API sync status
 - Force manual results sync
@@ -241,7 +242,7 @@ value (text)
 | `top_scorer` | Correct top scorer | 3 pts |
 | `best_goalkeeper` | Correct best goalkeeper | 3 pts |
 
-> All values are configurable by the admin from `/admin/puntuacion`.
+> All values are configurable by the admin from `/admin/scoring`.
 
 ---
 
@@ -261,7 +262,7 @@ value (text)
 - Vercel Cron Jobs (free on free tier) to call this endpoint every 15 minutes during the tournament
 - The endpoint updates the `matches` table with real results
 - After updating results, recalculates points in the `scores` table
-- Admins can also force a manual sync from `/admin/torneo`
+- Admins can also force a manual sync from `/admin/tournament`
 
 ---
 
@@ -337,13 +338,13 @@ mundIAl26/
 │   │   ├── login/page.tsx
 │   │   └── register/page.tsx
 │   ├── (app)/
-│   │   ├── quiniela/page.tsx
-│   │   ├── resultados/page.tsx
+│   │   ├── predictions/page.tsx
+│   │   ├── results/page.tsx
 │   │   ├── ranking/page.tsx
 │   │   └── admin/
-│   │       ├── usuarios/page.tsx
-│   │       ├── puntuacion/page.tsx
-│   │       └── torneo/page.tsx
+│   │       ├── users/page.tsx
+│   │       ├── scoring/page.tsx
+│   │       └── tournament/page.tsx
 │   ├── api/
 │   │   ├── sync-results/route.ts
 │   │   └── recalculate-scores/route.ts
@@ -351,7 +352,7 @@ mundIAl26/
 ├── components/
 │   ├── ui/          (shadcn components)
 │   ├── ranking/
-│   ├── quiniela/
+│   ├── predictions/
 │   └── admin/
 ├── lib/
 │   ├── supabase.ts
