@@ -1,5 +1,5 @@
 -- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- uuid-ossp not needed; using gen_random_uuid() (built-in since Postgres 13)
 
 -- Create enums
 CREATE TYPE user_role AS ENUM ('user', 'admin');
@@ -21,13 +21,13 @@ CREATE TABLE users (
 
 -- Groups table (16 groups: A–P)
 CREATE TABLE groups (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE
 );
 
 -- Teams table
 CREATE TABLE teams (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   short_name TEXT NOT NULL,
   flag_url TEXT,
@@ -39,7 +39,7 @@ CREATE INDEX idx_teams_group_id ON teams(group_id);
 
 -- Matches table
 CREATE TABLE matches (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   api_id INTEGER UNIQUE,
   phase match_phase NOT NULL,
   group_id UUID REFERENCES groups(id),
@@ -59,7 +59,7 @@ CREATE INDEX idx_matches_status ON matches(status);
 
 -- Players table
 CREATE TABLE players (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   team_id UUID NOT NULL REFERENCES teams(id),
   position player_position NOT NULL,
@@ -71,7 +71,7 @@ CREATE INDEX idx_players_position ON players(position);
 
 -- Predictions table (one per user)
 CREATE TABLE predictions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
   submitted_at TIMESTAMPTZ,
   is_complete BOOLEAN NOT NULL DEFAULT false,
@@ -85,7 +85,7 @@ CREATE INDEX idx_predictions_user_id ON predictions(user_id);
 
 -- Match predictions
 CREATE TABLE match_predictions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   prediction_id UUID NOT NULL REFERENCES predictions(id) ON DELETE CASCADE,
   match_id UUID NOT NULL REFERENCES matches(id),
   home_score INTEGER NOT NULL,
@@ -98,7 +98,7 @@ CREATE INDEX idx_match_predictions_match_id ON match_predictions(match_id);
 
 -- Group predictions
 CREATE TABLE group_predictions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   prediction_id UUID NOT NULL REFERENCES predictions(id) ON DELETE CASCADE,
   group_id UUID NOT NULL REFERENCES groups(id),
   first_team_id UUID NOT NULL REFERENCES teams(id),
@@ -111,7 +111,7 @@ CREATE INDEX idx_group_predictions_prediction_id ON group_predictions(prediction
 
 -- Scoring rules
 CREATE TABLE scoring_rules (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   rule_key TEXT NOT NULL UNIQUE,
   points INTEGER NOT NULL,
   label TEXT NOT NULL
@@ -119,7 +119,7 @@ CREATE TABLE scoring_rules (
 
 -- Scores (cached, recalculable)
 CREATE TABLE scores (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
   total_points INTEGER NOT NULL DEFAULT 0,
   breakdown JSONB NOT NULL DEFAULT '{}',
