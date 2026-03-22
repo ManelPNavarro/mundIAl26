@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MundIAL 26 - Admin Scoring Configuration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;500;600;700&amp;family=Epilogue:wght@700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#452b00",
+                        "background": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "on-surface-variant": "#bbcbb9",
+                        "on-background": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "primary-fixed": "#63ff94",
+                        "surface-container-lowest": "#0e0e0e",
+                        "error-container": "#93000a",
+                        "outline": "#859585",
+                        "on-secondary-container": "#4f3100",
+                        "tertiary-fixed-dim": "#c0c7d3",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary-container": "#424a54",
+                        "on-secondary-fixed": "#291800",
+                        "on-primary-fixed-variant": "#005225",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#dce3f0",
+                        "secondary-container": "#dc9100",
+                        "tertiary": "#ced5e1",
+                        "surface-container": "#201f1f",
+                        "error": "#ffb4ab",
+                        "primary-fixed-dim": "#2ce377",
+                        "on-primary-container": "#005526",
+                        "surface-container-highest": "#353534",
+                        "surface-variant": "#353534",
+                        "tertiary-container": "#b2b9c5",
+                        "secondary-fixed-dim": "#ffb955",
+                        "on-primary": "#003918",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-bright": "#3a3939",
+                        "on-tertiary-fixed-variant": "#404752",
+                        "outline-variant": "#3c4a3d",
+                        "secondary-fixed": "#ffddb4",
+                        "on-tertiary-fixed": "#151c25",
+                        "surface": "#131313",
+                        "primary": "#42f183",
+                        "inverse-surface": "#e5e2e1",
+                        "secondary": "#ffb955",
+                        "primary-container": "#00d46a",
+                        "on-primary-fixed": "#00210b",
+                        "inverse-primary": "#006d33",
+                        "on-secondary-fixed-variant": "#633f00",
+                        "inverse-on-surface": "#313030",
+                        "surface-tint": "#2ce377",
+                        "on-tertiary": "#2a313b"
+                    },
+                    fontFamily: {
+                        "headline": ["Epilogue"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bebas { font-family: 'Bebas Neue', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased">
+<!-- TopAppBar Component -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/70 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full max-w-none">
+<div class="flex items-center gap-8">
+<div class="text-2xl font-black text-white italic bebas tracking-tight">
+                Mund<span class="text-[#00D46A]">IA</span>L 26
+            </div>
+<!-- Competition Switcher (Active Requirement) -->
+<div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-high text-sm font-medium border border-white/5 cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[#00D46A] text-lg" data-icon="public">public</span>
+<span>World Cup 2026</span>
+<span class="material-symbols-outlined text-xs" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-gray-400 hover:text-[#00D46A] transition-colors duration-300">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-gray-400 hover:text-[#00D46A] transition-colors duration-300">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- SideNavBar Component -->
+<aside class="fixed left-0 h-full w-64 border-r border-white/5 bg-[#1c1b1b] hidden md:flex flex-col py-8 z-40 mt-16">
+<div class="px-6 mb-8">
+<h2 class="font-['Bebas_Neue'] text-xl text-white tracking-wider">MundIAL 26</h2>
+<p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Editorial Excellence</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-medium text-sm">Home</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="sports_soccer">sports_soccer</span>
+<span class="font-medium text-sm">Matches</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="newspaper">newspaper</span>
+<span class="font-medium text-sm">News</span>
+</a>
+<a class="flex items-center gap-3 bg-[#2a2a2a] text-[#00D46A] border-l-4 border-[#00D46A] px-4 py-3 ml-0 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-medium text-sm">Predictions</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="workspace_premium">workspace_premium</span>
+<span class="font-medium text-sm">Premium</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full py-3 bg-surface-container-high rounded-lg text-white font-bold text-xs uppercase tracking-widest hover:bg-surface-variant transition-colors border border-white/5">
+                Upgrade to Pro
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 pb-12 px-6 lg:px-12">
+<div class="max-w-5xl mx-auto">
+<!-- Page Header -->
+<div class="mb-12">
+<h1 class="bebas text-5xl md:text-7xl text-white tracking-tight leading-none mb-4">
+                    Game Scoring <span class="text-primary">Configuration</span>
+</h1>
+<p class="text-on-surface-variant max-w-2xl font-medium">
+                    Establish the mathematical DNA of the World Cup 2026. Set point distributions for match results, positional accuracy, and knockout progression.
+                </p>
+</div>
+<!-- Bento Grid Interface -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Card 1: Match Accuracy -->
+<div class="md:col-span-8 bg-surface-container-low rounded-xl p-8 relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="bebas text-2xl text-white tracking-wide">Match Day Rewards</h3>
+<p class="text-xs text-gray-500 uppercase tracking-widest">Core gameplay points</p>
+</div>
+<span class="material-symbols-outlined text-primary-container/30 text-5xl" data-icon="sports_score">sports_score</span>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between group/row p-4 rounded-lg hover:bg-surface-container-high transition-colors">
+<div>
+<label class="block text-sm font-semibold text-on-surface">Exact Score</label>
+<span class="text-xs text-gray-500">Correct goals for both teams</span>
+</div>
+<div class="flex items-center gap-4">
+<input class="w-20 bg-surface-container-lowest border-none rounded-lg text-center font-bold text-primary focus:ring-1 focus:ring-primary/50" type="number" value="10"/>
+<span class="text-xs font-bold text-gray-600 uppercase">PTS</span>
+</div>
+</div>
+<div class="flex items-center justify-between group/row p-4 rounded-lg hover:bg-surface-container-high transition-colors">
+<div>
+<label class="block text-sm font-semibold text-on-surface">Outcome (W/D/L)</label>
+<span class="text-xs text-gray-500">Correct winner or draw result</span>
+</div>
+<div class="flex items-center gap-4">
+<input class="w-20 bg-surface-container-lowest border-none rounded-lg text-center font-bold text-primary focus:ring-1 focus:ring-primary/50" type="number" value="5"/>
+<span class="text-xs font-bold text-gray-600 uppercase">PTS</span>
+</div>
+</div>
+<div class="flex items-center justify-between group/row p-4 rounded-lg hover:bg-surface-container-high transition-colors">
+<div>
+<label class="block text-sm font-semibold text-on-surface">Goal Difference</label>
+<span class="text-xs text-gray-500">Exact spread between scores</span>
+</div>
+<div class="flex items-center gap-4">
+<input class="w-20 bg-surface-container-lowest border-none rounded-lg text-center font-bold text-primary focus:ring-1 focus:ring-primary/50" type="number" value="3"/>
+<span class="text-xs font-bold text-gray-600 uppercase">PTS</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Tournament Meta (Asymmetric Layout) -->
+<div class="md:col-span-4 bg-surface-container-high rounded-xl p-6 flex flex-col justify-between">
+<div>
+<h3 class="bebas text-xl text-white tracking-wide mb-2">Tournament Meta</h3>
+<p class="text-xs text-gray-500 uppercase tracking-widest mb-6">Seasonal Bonuses</p>
+<div class="space-y-4">
+<div class="bg-surface-container-lowest p-4 rounded-lg">
+<label class="block text-[10px] font-bold text-gray-500 uppercase tracking-tighter mb-1">Group Position</label>
+<div class="flex items-end justify-between">
+<span class="text-lg font-bold text-white tracking-tight">Top 2 Match</span>
+<span class="text-primary font-bold">+15</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-lg">
+<label class="block text-[10px] font-bold text-gray-500 uppercase tracking-tighter mb-1">Golden Boot Winner</label>
+<div class="flex items-end justify-between">
+<span class="text-lg font-bold text-white tracking-tight">Exact Player</span>
+<span class="text-primary font-bold">+50</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8">
+<div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full w-2/3 bg-primary"></div>
+</div>
+<p class="text-[10px] text-gray-500 mt-2">Complexity Index: High Accuracy</p>
+</div>
+</div>
+<!-- Card 3: Advanced Scoring Logic (Full Width Horizontal) -->
+<div class="md:col-span-12 bg-surface-container-low rounded-xl p-8 flex flex-col md:flex-row items-center gap-12">
+<div class="flex-shrink-0">
+<div class="w-32 h-32 rounded-full bg-surface-container-high border-4 border-primary/20 flex items-center justify-center relative">
+<span class="material-symbols-outlined text-primary text-5xl" data-icon="auto_awesome">auto_awesome</span>
+<div class="absolute -bottom-2 -right-2 bg-primary text-on-primary text-[10px] font-bold px-2 py-1 rounded-full">AI TIER</div>
+</div>
+</div>
+<div class="flex-1">
+<h3 class="bebas text-3xl text-white tracking-wide mb-2">The Multiplier Logic</h3>
+<p class="text-sm text-on-surface-variant mb-6 leading-relaxed">
+                            Define dynamic scaling for knockout stages. Points earned in Round of 16, Quarter-Finals, and beyond can be multiplied by a global factor to reward late-stage tournament knowledge.
+                        </p>
+<div class="flex flex-wrap gap-4">
+<div class="px-6 py-3 bg-surface-container-lowest rounded-xl border border-white/5 flex flex-col">
+<span class="text-[10px] text-gray-500 uppercase font-bold">R16 Factor</span>
+<span class="text-xl font-bold text-white">x 1.5</span>
+</div>
+<div class="px-6 py-3 bg-surface-container-lowest rounded-xl border border-white/5 flex flex-col">
+<span class="text-[10px] text-gray-500 uppercase font-bold">QF Factor</span>
+<span class="text-xl font-bold text-white">x 2.0</span>
+</div>
+<div class="px-6 py-3 bg-surface-container-lowest rounded-xl border border-white/5 flex flex-col">
+<span class="text-[10px] text-gray-500 uppercase font-bold">Final Factor</span>
+<span class="text-xl font-bold text-white">x 5.0</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Global Actions -->
+<div class="mt-12 flex items-center justify-end gap-4">
+<button class="px-8 py-4 rounded-xl font-bold text-sm text-white hover:text-primary transition-colors">
+                    Discard Changes
+                </button>
+<button class="px-12 py-4 rounded-xl bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold text-sm tracking-widest uppercase shadow-[0px_20px_40px_rgba(0,212,106,0.15)] hover:scale-105 transition-transform active:scale-95">
+                    Save Configuration
+                </button>
+</div>
+</div>
+</main>
+<!-- Footer Component -->
+<footer class="md:ml-64 w-full py-12 px-8 border-t border-white/5 bg-[#0d0d0d] flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-col items-center md:items-start gap-2">
+<div class="text-lg font-bold text-white bebas italic tracking-tighter">
+                Mund<span class="text-[#00D46A]">IA</span>L 26
+            </div>
+<p class="font-['Inter'] text-[10px] tracking-wider uppercase text-gray-500">
+                © 2026 MundIAL Editorial Platform. All rights reserved.
+            </p>
+</div>
+<div class="flex gap-8">
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">About Us</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">Terms of Service</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">Contact</a>
+</div>
+</footer>
+</body></html>

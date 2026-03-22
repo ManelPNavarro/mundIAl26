@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MundIAL 26 | Admin User Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary": "#452b00",
+              "background": "#131313",
+              "on-surface": "#e5e2e1",
+              "on-surface-variant": "#bbcbb9",
+              "on-background": "#e5e2e1",
+              "surface-dim": "#131313",
+              "primary-fixed": "#63ff94",
+              "surface-container-lowest": "#0e0e0e",
+              "error-container": "#93000a",
+              "outline": "#859585",
+              "on-secondary-container": "#4f3100",
+              "tertiary-fixed-dim": "#c0c7d3",
+              "surface-container-high": "#2a2a2a",
+              "on-tertiary-container": "#424a54",
+              "on-secondary-fixed": "#291800",
+              "on-primary-fixed-variant": "#005225",
+              "on-error": "#690005",
+              "on-error-container": "#ffdad6",
+              "tertiary-fixed": "#dce3f0",
+              "secondary-container": "#dc9100",
+              "tertiary": "#ced5e1",
+              "surface-container": "#201f1f",
+              "error": "#ffb4ab",
+              "primary-fixed-dim": "#2ce377",
+              "on-primary-container": "#005526",
+              "surface-container-highest": "#353534",
+              "surface-variant": "#353534",
+              "tertiary-container": "#b2b9c5",
+              "secondary-fixed-dim": "#ffb955",
+              "on-primary": "#003918",
+              "surface-container-low": "#1c1b1b",
+              "surface-bright": "#3a3939",
+              "on-tertiary-fixed-variant": "#404752",
+              "outline-variant": "#3c4a3d",
+              "secondary-fixed": "#ffddb4",
+              "on-tertiary-fixed": "#151c25",
+              "surface": "#131313",
+              "primary": "#42f183",
+              "inverse-surface": "#e5e2e1",
+              "secondary": "#ffb955",
+              "primary-container": "#00d46a",
+              "on-primary-fixed": "#00210b",
+              "inverse-primary": "#006d33",
+              "on-secondary-fixed-variant": "#633f00",
+              "inverse-on-surface": "#313030",
+              "surface-tint": "#2ce377",
+              "on-tertiary": "#2a313b"
+            },
+            fontFamily: {
+              "headline": ["Bebas Neue"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(28, 27, 27, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/70 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full max-w-none">
+<div class="flex items-center gap-8">
+<h1 class="text-2xl font-black text-white italic font-['Bebas_Neue'] tracking-tight">
+                Mund<span class="text-[#00D46A]">IA</span>L 26
+            </h1>
+<!-- Competition Switcher -->
+<div class="hidden md:flex items-center gap-4 px-3 py-1.5 bg-surface-container-high rounded-full group cursor-pointer border border-white/5">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="sports_soccer">sports_soccer</span>
+<span class="text-xs font-bold tracking-widest uppercase">World Cup 2026</span>
+<span class="material-symbols-outlined text-xs text-gray-500" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center gap-8">
+<a class="text-gray-400 font-['Inter'] font-medium text-sm hover:text-[#00D46A] transition-colors duration-300" href="#">Home</a>
+<a class="text-gray-400 font-['Inter'] font-medium text-sm hover:text-[#00D46A] transition-colors duration-300" href="#">Matches</a>
+<a class="text-[#00D46A] font-bold font-['Inter'] text-sm" href="#">Admin</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-white hover:text-[#00D46A] transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-white hover:text-[#00D46A] transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Desktop Only) -->
+<aside class="hidden md:flex fixed left-0 h-full w-64 bg-[#1c1b1b] flex-col py-8 z-40 mt-16 border-r border-white/5">
+<div class="px-6 mb-10">
+<span class="text-xs font-bold tracking-[0.2em] text-gray-500 uppercase">Management</span>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-gray-400 px-6 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200 ease-in-out font-['Inter'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 bg-[#2a2a2a] text-[#00D46A] border-l-4 border-[#00D46A] px-6 py-3 ml-0 transition-all duration-200 ease-in-out font-['Inter'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>User Management</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-6 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200 ease-in-out font-['Inter'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>System Config</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-6 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200 ease-in-out font-['Inter'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Audit Logs</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<div class="bg-surface-container-high p-4 rounded-xl border border-white/5">
+<p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2 font-bold">Admin Level</p>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-xs font-bold">Super Administrator</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 pb-20 px-6 md:px-12 min-h-screen">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<h2 class="font-headline text-5xl md:text-7xl text-white tracking-tighter uppercase mb-2">User Directory</h2>
+<p class="text-gray-400 max-w-xl">Manage platform access, monitor participant engagement, and invite editorial contributors to the Mundial ecosystem.</p>
+</div>
+<button class="bg-gradient-to-tr from-primary to-primary-container text-on-primary font-bold px-8 py-4 rounded-lg flex items-center gap-3 hover:scale-105 transition-transform duration-300 shadow-[0px_20px_40px_rgba(0,212,106,0.15)] group">
+<span class="material-symbols-outlined group-hover:rotate-90 transition-transform duration-500" data-icon="add">add</span>
+<span class="tracking-widest uppercase text-sm">Invite New User</span>
+</button>
+</div>
+<!-- Filters & Search -->
+<div class="flex flex-wrap items-center gap-4 mb-8">
+<div class="relative flex-1 min-w-[300px]">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-xl py-4 pl-12 pr-4 focus:ring-1 focus:ring-primary text-sm text-white placeholder-gray-600" placeholder="Search by name, email or invite code..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="bg-surface-container-high px-4 py-3 rounded-lg text-xs font-bold flex items-center gap-2 border border-white/5 hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span> Status
+                </button>
+<button class="bg-surface-container-high px-4 py-3 rounded-lg text-xs font-bold flex items-center gap-2 border border-white/5 hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="sort">sort</span> Date Joined
+                </button>
+</div>
+</div>
+<!-- Minimalist Editorial Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-white/5 text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold">
+<th class="pb-6 pl-4">User Details</th>
+<th class="pb-6">Games</th>
+<th class="pb-6">Role</th>
+<th class="pb-6">Status</th>
+<th class="pb-6">Invite Code</th>
+<th class="pb-6 pr-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/[0.03]">
+<!-- Table Row 1 -->
+<tr class="group hover:bg-white/[0.02] transition-colors">
+<td class="py-6 pl-4">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover border-2 border-primary/20" data-alt="Portrait of a young man smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcI_bnm31cGotQqSuJlMkUq86UmBGl7rI4U29ISgv9kiSC_MBemp8lzBTaUZtrZf2fo8uzvxX2r1nvnfS2HN8fmCVDWgt7i9nQDDsvfSKY7VkDmVKcyYTPSJZOURaiMukly7-ww0oDDPyOlIWRuTlgA3pqicQhlm-sNsezj_Y0yjHJ79lsZl-HypGhDmToyoIws8h3fd52B2Y3g1VCcHecP_jy_a2lQ2aNv9mS2LF7G-3z67XBvApoD8onEgmyus5YTuXk5_8GOmc"/>
+<div>
+<p class="text-white font-bold text-sm">Lucas Bellingham</p>
+<p class="text-gray-500 text-xs">l.bellingham@mundial.com</p>
+</div>
+</div>
+</td>
+<td class="py-6">
+<span class="font-headline text-2xl text-white tracking-tight">42</span>
+</td>
+<td class="py-6">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-primary/20">Admin</span>
+</td>
+<td class="py-6">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="text-xs font-medium text-on-surface">Active</span>
+</div>
+</td>
+<td class="py-6">
+<code class="text-xs bg-surface-container-high px-2 py-1 rounded border border-white/5 text-gray-400">WC26-XJ92</code>
+</td>
+<td class="py-6 pr-4 text-right">
+<button class="text-gray-500 hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Table Row 2 -->
+<tr class="group hover:bg-white/[0.02] transition-colors">
+<td class="py-6 pl-4">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover border-2 border-white/10" data-alt="Portrait of a female journalist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs5S5pT7kUlh52UODLNwlrte9S67Fxbmd2loEdop_Ey62jPc94OVM_XnBHufjKG7A_Xpv3WRdFhgFYmRV88L4dtqeUn0kbskgzXtdAytXd8U8vLFHv923m9q0-9Ou0lLVoQ-C0TZb2pocKrF7iHr2vpxe_MMTIz20JzDSFmklXu2rhyYH2ToPZ_77w5c7upkwhmdOxn0IbmrJlhwG6Ye1gWr02EAr76nsePP0SGo6ytkF9DWJ0rljBt37aWzQXs5GX4EbigTCk680"/>
+<div>
+<p class="text-white font-bold text-sm">Elena Rodriguez</p>
+<p class="text-gray-500 text-xs">e.rodriguez@sports.io</p>
+</div>
+</div>
+</td>
+<td class="py-6">
+<span class="font-headline text-2xl text-white tracking-tight">18</span>
+</td>
+<td class="py-6">
+<span class="bg-white/5 text-gray-400 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-white/10">User</span>
+</td>
+<td class="py-6">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="text-xs font-medium text-on-surface">Active</span>
+</div>
+</td>
+<td class="py-6">
+<code class="text-xs bg-surface-container-high px-2 py-1 rounded border border-white/5 text-gray-400">WC26-PK21</code>
+</td>
+<td class="py-6 pr-4 text-right">
+<button class="text-gray-500 hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Table Row 3 -->
+<tr class="group hover:bg-white/[0.02] transition-colors">
+<td class="py-6 pl-4">
+<div class="flex items-center gap-4 opacity-50">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center border-2 border-white/10">
+<span class="material-symbols-outlined text-gray-500" data-icon="person">person</span>
+</div>
+<div>
+<p class="text-white font-bold text-sm">Marcus Thorne</p>
+<p class="text-gray-500 text-xs">m.thorne@vanguard.co</p>
+</div>
+</div>
+</td>
+<td class="py-6">
+<span class="font-headline text-2xl text-gray-600 tracking-tight">0</span>
+</td>
+<td class="py-6">
+<span class="bg-white/5 text-gray-400 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-white/10">User</span>
+</td>
+<td class="py-6">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span>
+<span class="text-xs font-medium text-gray-600">Inactive</span>
+</div>
+</td>
+<td class="py-6">
+<code class="text-xs bg-surface-container-high px-2 py-1 rounded border border-white/5 text-gray-600">INV-PENDING</code>
+</td>
+<td class="py-6 pr-4 text-right">
+<button class="text-gray-500 hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+<!-- Modal: Invite New User (Simulated State: Visible Overlay for Demo) -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/80 backdrop-blur-sm pointer-events-none opacity-0 invisible" id="invite-modal">
+<div class="bg-surface-container-low w-full max-w-lg rounded-2xl shadow-2xl border border-white/5 p-8 relative pointer-events-auto overflow-hidden">
+<!-- Decorative Green Blur -->
+<div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-[80px]"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-headline text-3xl text-white tracking-tight uppercase">Send Invitation</h3>
+<p class="text-gray-500 text-sm">A unique access link will be generated for the user.</p>
+</div>
+<button class="text-gray-500 hover:text-white">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<div class="space-y-6">
+<div>
+<label class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2">Recipient Email</label>
+<input class="w-full bg-surface-container-highest border border-white/5 rounded-lg py-4 px-4 text-white focus:ring-1 focus:ring-primary outline-none" placeholder="e.g. journalist@stadium.com" type="email"/>
+</div>
+<div class="p-4 bg-surface-container-highest rounded-xl border border-dashed border-white/10">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] uppercase tracking-widest text-primary font-bold">Generated Link</span>
+<button class="text-primary hover:text-primary-container flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="content_copy">content_copy</span>
+<span class="text-[10px] font-bold uppercase">Copy</span>
+</button>
+</div>
+<p class="text-xs text-gray-400 truncate">mundial.io/invite/join?token=77a28e91-d3c5-4b0d-9b7e-99f8d1c9e421</p>
+</div>
+<div class="flex gap-4 pt-4">
+<button class="flex-1 bg-surface-container-highest text-white font-bold py-4 rounded-lg border border-white/5 hover:bg-surface-bright transition-colors uppercase tracking-widest text-xs">
+                            Cancel
+                        </button>
+<button class="flex-1 bg-gradient-to-tr from-primary to-primary-container text-on-primary font-bold py-4 rounded-lg shadow-lg hover:opacity-90 transition-opacity uppercase tracking-widest text-xs">
+                            Send Invite
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 border-t border-white/5 bg-[#0d0d0d]">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6 w-full max-w-7xl mx-auto">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="text-lg font-bold text-white font-headline tracking-widest">Mund<span class="text-primary">IA</span>L</span>
+<p class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500">© 2026 MundIAL Editorial Platform. All rights reserved.</p>
+</div>
+<div class="flex items-center gap-8">
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">About Us</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">Terms of Service</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">Contact</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-500 hover:text-primary cursor-pointer hover:border-primary transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="language">language</span>
+</div>
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-500 hover:text-primary cursor-pointer hover:border-primary transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="public">public</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

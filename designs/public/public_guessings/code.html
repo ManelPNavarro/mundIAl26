@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MundIAL 26 - Mi Quiniela</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;500;600;700;800&amp;family=Epilogue:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary": "#452b00",
+              "background": "#131313",
+              "on-surface": "#e5e2e1",
+              "on-surface-variant": "#bbcbb9",
+              "on-background": "#e5e2e1",
+              "surface-dim": "#131313",
+              "primary-fixed": "#63ff94",
+              "surface-container-lowest": "#0e0e0e",
+              "error-container": "#93000a",
+              "outline": "#859585",
+              "on-secondary-container": "#4f3100",
+              "tertiary-fixed-dim": "#c0c7d3",
+              "surface-container-high": "#2a2a2a",
+              "on-tertiary-container": "#424a44",
+              "on-secondary-fixed": "#291800",
+              "on-primary-fixed-variant": "#005225",
+              "on-error": "#690005",
+              "on-error-container": "#ffdad6",
+              "tertiary-fixed": "#dce3f0",
+              "secondary-container": "#dc9100",
+              "tertiary": "#ced5e1",
+              "surface-container": "#201f1f",
+              "error": "#ffb4ab",
+              "primary-fixed-dim": "#2ce377",
+              "on-primary-container": "#005526",
+              "surface-container-highest": "#353534",
+              "surface-variant": "#353534",
+              "tertiary-container": "#b2b9c5",
+              "secondary-fixed-dim": "#ffb955",
+              "on-primary": "#003918",
+              "surface-container-low": "#1c1b1b",
+              "surface-bright": "#3a3939",
+              "on-tertiary-fixed-variant": "#404752",
+              "outline-variant": "#3c4a3d",
+              "secondary-fixed": "#ffddb4",
+              "on-tertiary-fixed": "#151c25",
+              "surface": "#131313",
+              "primary": "#42f183",
+              "inverse-surface": "#e5e2e1",
+              "secondary": "#ffb955",
+              "primary-container": "#00d46a",
+              "on-primary-fixed": "#00210b",
+              "inverse-primary": "#006d33",
+              "on-secondary-fixed-variant": "#633f00",
+              "inverse-on-surface": "#313030",
+              "surface-tint": "#2ce377",
+              "on-tertiary": "#2a313b"
+            },
+            fontFamily: {
+              "headline": ["Epilogue"],
+              "body": ["Inter"],
+              "label": ["Inter"],
+              "bebas": ["Bebas Neue"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bebas-tight { font-family: 'Bebas Neue'; letter-spacing: -0.02em; }
+        .glass-header { background: rgba(19, 19, 19, 0.7); backdrop-filter: blur(20px); }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 glass-header">
+<div class="flex justify-between items-center px-6 h-16 w-full max-w-none">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black text-white italic font-bebas">Mund<span class="text-[#00D46A]">IA</span>L 26</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-gray-400 hover:text-[#00D46A] transition-colors duration-300 font-['Inter'] font-medium text-sm" href="#">Home</a>
+<a class="text-gray-400 hover:text-[#00D46A] transition-colors duration-300 font-['Inter'] font-medium text-sm" href="#">Matches</a>
+<a class="text-gray-400 hover:text-[#00D46A] transition-colors duration-300 font-['Inter'] font-medium text-sm" href="#">News</a>
+<a class="text-[#00D46A] font-bold font-['Inter'] font-medium text-sm" href="#">Predictions</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-surface-container-high px-4 py-1.5 rounded-full flex items-center gap-2 border border-white/5">
+<span class="material-symbols-outlined text-sm text-[#00D46A]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<span class="text-xs font-bold uppercase tracking-wider">Premium</span>
+</div>
+<span class="material-symbols-outlined text-white cursor-pointer hover:text-[#00D46A] transition-colors">notifications</span>
+<span class="material-symbols-outlined text-white cursor-pointer hover:text-[#00D46A] transition-colors">account_circle</span>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Desktop Only) -->
+<aside class="fixed left-0 h-full w-64 bg-[#1c1b1b] hidden lg:flex flex-col py-8 z-40 mt-16 shadow-2xl shadow-black/50">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 p-3 bg-surface-container-high rounded-xl border border-white/5">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container">sports_soccer</span>
+</div>
+<div>
+<p class="text-xs text-gray-400 uppercase tracking-tighter">Current Event</p>
+<p class="font-bebas text-lg leading-none">World Cup 2026</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-gray-500">unfold_more</span>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-['Inter'] font-medium text-sm">Home</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">sports_soccer</span>
+<span class="font-['Inter'] font-medium text-sm">Matches</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">newspaper</span>
+<span class="font-['Inter'] font-medium text-sm">News</span>
+</a>
+<a class="flex items-center gap-3 bg-[#2a2a2a] text-[#00D46A] border-l-4 border-[#00D46A] px-4 py-3 ml-0 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="font-['Inter'] font-medium text-sm">Predictions</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">workspace_premium</span>
+<span class="font-['Inter'] font-medium text-sm">Premium</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<button class="w-full bg-gradient-to-tr from-primary to-primary-container text-on-primary-fixed font-bold py-3 rounded-xl uppercase tracking-widest text-xs shadow-[0px_20px_40px_rgba(0,212,106,0.15)]">
+                Upgrade to Pro
+            </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="lg:ml-64 pt-24 px-6 pb-24 max-w-6xl mx-auto">
+<!-- Hero Title Section -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<span class="text-primary font-bold uppercase tracking-widest text-xs mb-2 block">Personal Dashboard</span>
+<h1 class="text-5xl md:text-7xl font-bebas text-white leading-none tracking-tight">MI QUINIELA</h1>
+<p class="text-gray-400 mt-4 max-w-md font-body">Predict the results of the World Cup 2026 and compete for the global championship title. High stakes, pure editorial excellence.</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-2xl flex flex-col items-center justify-center min-w-[200px] border border-white/5">
+<span class="text-gray-500 uppercase text-[10px] tracking-[0.2em] font-bold mb-2">Global Rank</span>
+<span class="text-5xl font-bebas text-white leading-none">#1,242</span>
+<div class="mt-2 flex items-center gap-1 text-primary text-xs font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>+14 today</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Progress and Tabs -->
+<section class="mb-10">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+<div class="md:col-span-8">
+<div class="flex items-center justify-between mb-3">
+<span class="text-white text-sm font-bold uppercase tracking-tighter">Completion Progress</span>
+<span class="text-primary font-bebas text-xl">12/48 MATCHES</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container" style="width: 25%"></div>
+</div>
+</div>
+<div class="md:col-span-4 flex justify-end gap-2">
+<button class="bg-surface-container-high text-white p-3 rounded-xl hover:bg-surface-container-highest transition-colors border border-white/5">
+<span class="material-symbols-outlined">share</span>
+</button>
+<button class="bg-surface-container-high text-white p-3 rounded-xl hover:bg-surface-container-highest transition-colors border border-white/5">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+<!-- Custom Tab Interface -->
+<div class="mt-12 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+<button class="px-8 py-3 bg-[#2a2a2a] text-[#00D46A] border-b-2 border-[#00D46A] whitespace-nowrap font-bebas text-xl tracking-wide">GROUP STAGE</button>
+<button class="px-8 py-3 text-gray-500 hover:text-white transition-colors whitespace-nowrap font-bebas text-xl tracking-wide">ROUND OF 16</button>
+<button class="px-8 py-3 text-gray-500 hover:text-white transition-colors whitespace-nowrap font-bebas text-xl tracking-wide">QUARTER FINALS</button>
+<button class="px-8 py-3 text-gray-500 hover:text-white transition-colors whitespace-nowrap font-bebas text-xl tracking-wide">SEMI FINALS</button>
+<button class="px-8 py-3 text-gray-500 hover:text-white transition-colors whitespace-nowrap font-bebas text-xl tracking-wide">FINAL</button>
+</div>
+</section>
+<!-- Match Prediction Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Match Card 1 -->
+<div class="bg-surface-container-low rounded-2xl overflow-hidden group relative border border-white/5">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="p-8">
+<div class="flex justify-between items-center mb-8">
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Group A • June 11, 2026</span>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-primary">Open for Guess</span>
+</div>
+</div>
+<div class="flex items-center justify-between gap-4">
+<!-- Team Home -->
+<div class="flex flex-col items-center gap-4 flex-1">
+<div class="w-20 h-20 bg-surface-container-highest rounded-2xl flex items-center justify-center p-4">
+<img alt="USA Flag" class="w-full h-auto" data-alt="National flag of the United States of America" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkUF4vwo6CjnzxrNs239xbDlcv75uuYxD_JC0phxQstNxdwyEeIdwU83cXWyzbpDNpSVYwnleepFPutgAE34CuB8h39Wfc-MlhqER1WwOiqo9gYpT8nsQB_smwvqHNgPPbbHMg2oP7kWg1OToCGHFRKabAngxhcHoYUwH-MIDgZYmPMHcIN4Zrd7_V3teM53SASNXEq_SgsQA5hRqgi82fTYfXvwF0pdXJqREQGQkdO6UCjEuOnTgZSGmhu9dMDF4T7oBSkXffsDo"/>
+</div>
+<span class="font-bebas text-2xl tracking-wide text-white">USA</span>
+</div>
+<!-- Score Inputs -->
+<div class="flex items-center gap-3">
+<input class="w-16 h-20 bg-surface-container-high border-none rounded-xl text-center font-bebas text-5xl text-white focus:ring-2 focus:ring-primary transition-all placeholder:text-gray-700" placeholder="0" type="number"/>
+<span class="font-bebas text-3xl text-gray-600">VS</span>
+<input class="w-16 h-20 bg-surface-container-high border-none rounded-xl text-center font-bebas text-5xl text-white focus:ring-2 focus:ring-primary transition-all placeholder:text-gray-700" placeholder="0" type="number"/>
+</div>
+<!-- Team Away -->
+<div class="flex flex-col items-center gap-4 flex-1">
+<div class="w-20 h-20 bg-surface-container-highest rounded-2xl flex items-center justify-center p-4">
+<img alt="Mexico Flag" class="w-full h-auto" data-alt="National flag of Mexico" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTV9QdfRcUY3W4t76325uDw3z1JvUdF6Qnhfs_VTMutqMzn9JtiS5iqHT__zGsoSa-gMRbQyBkCbeZl39oJBFjaY2AKMeeWBLvnp71-uO4St4FGl-4cT0WxlBcQr1dGjYfF3cG7C9o2uLK0cE-Hbi0gyh67tu5ciKgDmTNwN8komaCRCHxcsFRi1K5umErGCxvGNXiGkxBk7vuLlt6tXg6wD-DKUVQ8mNLA5hPCdB_JgA7w_wWMC0LMLXMT_sr93afngoY1CTU9D0"/>
+</div>
+<span class="font-bebas text-2xl tracking-wide text-white">MEXICO</span>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
+<div class="text-xs text-gray-500 font-medium">Predicted by 84% of your friends</div>
+<button class="text-xs font-bold text-primary uppercase tracking-widest hover:underline">Expert Analysis</button>
+</div>
+</div>
+</div>
+<!-- Match Card 2 -->
+<div class="bg-surface-container-low rounded-2xl overflow-hidden group relative border border-white/5">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="p-8">
+<div class="flex justify-between items-center mb-8">
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Group B • June 12, 2026</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-gray-500" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Guess Saved</span>
+</div>
+</div>
+<div class="flex items-center justify-between gap-4">
+<!-- Team Home -->
+<div class="flex flex-col items-center gap-4 flex-1">
+<div class="w-20 h-20 bg-surface-container-highest rounded-2xl flex items-center justify-center p-4">
+<img alt="Brazil Flag" class="w-full h-auto" data-alt="National flag of Brazil" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClCRM3DnJqjjyRQaMT7TWf6iTuoeo_0Usxvm2p67GKOT_hW-CvC_D_Zuq_UE74B7lRCUJnZQX8eZmJ0otFlMRG8_w4bOB_hRb59RCpSJHxN9X8vbgunldAhPoEYegwvIqEG3STcVspfnu8Ccex3pAsoRcRvyuX54Z_2udPxdDF4Fa0hXKdPhJF72tRiMO4_WHrkUtjRZi9wFw13ceLMAhzwB-vn-L6EYbqxxkAQBnR64e7HPrQiT7DeiTcJ-bSpS2JI_yXBvKFJrs"/>
+</div>
+<span class="font-bebas text-2xl tracking-wide text-white">BRAZIL</span>
+</div>
+<!-- Score Inputs -->
+<div class="flex items-center gap-3">
+<input class="w-16 h-20 bg-surface-container-high border-none rounded-xl text-center font-bebas text-5xl text-primary focus:ring-2 focus:ring-primary transition-all" type="number" value="3"/>
+<span class="font-bebas text-3xl text-gray-600">VS</span>
+<input class="w-16 h-20 bg-surface-container-high border-none rounded-xl text-center font-bebas text-5xl text-primary focus:ring-2 focus:ring-primary transition-all" type="number" value="1"/>
+</div>
+<!-- Team Away -->
+<div class="flex flex-col items-center gap-4 flex-1">
+<div class="w-20 h-20 bg-surface-container-highest rounded-2xl flex items-center justify-center p-4">
+<img alt="France Flag" class="w-full h-auto" data-alt="National flag of France" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_EVIQs8BGtyHy_5Pr6IG2YCLV1Z56Dl99yXlLPS8sXVAJvcXgpnDSWW73M0vZgDEO7OqsTtWPEzbS9wrmQ2b91Qzikhol2wEh3UHLxYsbcY8NyydXUul4T04vgNJvKPitLdCtxlvXOApR3WFxEbbn3Ecp0aJXTGV__hEKkrqIcHGmO0Zo2PVY7L-FDvEDrGPzAUYLe1ROJOTres8X34x9pcSaldj4oxaF5nC4yh-nJdTiUB4ZV82myinLZtLZ1KZiHCzKgDAt7hY"/>
+</div>
+<span class="font-bebas text-2xl tracking-wide text-white">FRANCE</span>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
+<div class="text-xs text-gray-500 font-medium">Points Potential: <span class="text-white">500 XP</span></div>
+<button class="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-white transition-colors">Edit Prediction</button>
+</div>
+</div>
+</div>
+<!-- Bento Card: Trending -->
+<div class="bg-surface-container-high rounded-2xl p-8 border border-white/5 md:col-span-2">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-bebas text-3xl text-white">Trending Picks</h3>
+<div class="flex -space-x-3">
+<img alt="Avatar 1" class="w-10 h-10 rounded-full border-2 border-background" data-alt="User avatar 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYVTfUCT8XWlyZdpS5OfJ_FaF0PGAfscK5eYCQzt-fWdGL8XAuH7b0sbGVdNOkyTOFfjFWfA-WukcbPUyOU8oMDejlgvaQvAGdyAhqUn4tUi4lwx9Jhjtpw5LWtkJHnVpBx1dtPpZrIiV1FfRnZbERNn85aMjOu_IT6gCt_lLVZ0En65S9FiZLvx_sgtedIEgZaUBuPfmDhLdstiEKhitfplwHBxuD0Mot93vmH_OTPTbFdbPk3aZISOTey8-kKjA8MEybp46N3vA"/>
+<img alt="Avatar 2" class="w-10 h-10 rounded-full border-2 border-background" data-alt="User avatar 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXQbtnxqhk4ZN12ApQQI9WHiMheidltXGDn8FnSevSUdrLAiXxI-pz271MB-KUQTY06BxAhhTNvl9kerFvqsjwb9P_Ap5tad-bzzICP8i-ypozwQRx9CGJHEbeuJFUqGH4NGitoNHJogX0S5w4yMdvbjbjE2yZW_miBMkAPzVAxB0cuPC0yprvmh5uL_Pn3t3Z-rJO0YKY-XkBcb8uuEv79hF5hzfiE1bzMihKoRRL5nncdtv_zQil84u9yn_m6nuKEyggzua6ZEU"/>
+<img alt="Avatar 3" class="w-10 h-10 rounded-full border-2 border-background" data-alt="User avatar 3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZFGyeV4nDne-JSLNs9yCzj5BCMMrCSmvFgK7f_12mO83Hr_WAQgUs8EAzSTJhp09ImnGc0ilmgINL9kP8maU6uj9EXnrR9y5BoFNYKZ1hT_yXWbRIstkLr7wK8zBHJv1JoyPFdENmo_yhs1vbSMmrOsbbPOFb5Hozs5TDGSnXYtNwyFD5kNrjsH5zCvy5Cc5OcXICV3pRa61k1uh5-r5gnlOma8BSm-5YtTk9VKCgtuYIzXKQi9BaO1U_udBHLYujM20xOI-D2Sg"/>
+<div class="w-10 h-10 rounded-full border-2 border-background bg-primary-container text-on-primary-container flex items-center justify-center text-[10px] font-bold">+2k</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-low p-4 rounded-xl">
+<p class="text-[10px] uppercase tracking-widest text-gray-500 mb-2 font-bold">Most Predicted Winner</p>
+<p class="text-2xl font-bebas text-white">ARGENTINA (62%)</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl">
+<p class="text-[10px] uppercase tracking-widest text-gray-500 mb-2 font-bold">Hot Score Prediction</p>
+<p class="text-2xl font-bebas text-white">2 - 1 OVERALL</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl">
+<p class="text-[10px] uppercase tracking-widest text-gray-500 mb-2 font-bold">Underdog Alert</p>
+<p class="text-2xl font-bebas text-[#ffb955]">MOROCCO (12%)</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky FAB for Submission (Contextual for Predictions Page) -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+<button class="bg-gradient-to-tr from-primary to-primary-container text-on-primary-fixed font-bold px-10 py-4 rounded-full uppercase tracking-widest text-sm shadow-[0px_20px_40px_rgba(0,212,106,0.3)] flex items-center gap-3 active:scale-95 transition-transform">
+                Save All Predictions
+                <span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 border-t border-white/5 bg-[#0d0d0d] mt-24">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6 w-full max-w-6xl mx-auto">
+<div class="flex flex-col gap-2">
+<span class="text-2xl font-black text-white italic font-bebas">Mund<span class="text-[#00D46A]">IA</span>L 26</span>
+<p class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500">© 2026 MundIAL Editorial Platform. All rights reserved.</p>
+</div>
+<nav class="flex gap-8">
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">About Us</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">Terms of Service</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors" href="#">Contact</a>
+</nav>
+</div>
+</footer>
+<!-- Mobile Bottom Navigation -->
+<div class="md:hidden fixed bottom-0 w-full bg-[#131313]/90 backdrop-blur-xl border-t border-white/5 z-50">
+<div class="flex justify-around items-center h-16">
+<a class="flex flex-col items-center text-gray-400" href="#">
+<span class="material-symbols-outlined">home</span>
+</a>
+<a class="flex flex-col items-center text-gray-400" href="#">
+<span class="material-symbols-outlined">sports_soccer</span>
+</a>
+<a class="flex flex-col items-center text-[#00D46A]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">insights</span>
+</a>
+<a class="flex flex-col items-center text-gray-400" href="#">
+<span class="material-symbols-outlined">newspaper</span>
+</a>
+<a class="flex flex-col items-center text-gray-400" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+</a>
+</div>
+</div>
+</body></html>

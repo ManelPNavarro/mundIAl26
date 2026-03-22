@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | mundIAl26</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-variant": "#353534",
+                        "surface-dim": "#131313",
+                        "on-secondary-fixed": "#291800",
+                        "tertiary-fixed-dim": "#c0c7d3",
+                        "secondary-fixed-dim": "#ffb955",
+                        "secondary-container": "#dc9100",
+                        "primary": "#42f183",
+                        "on-tertiary-fixed-variant": "#404752",
+                        "on-primary-fixed": "#00210b",
+                        "on-surface": "#e5e2e1",
+                        "primary-container": "#00d46a",
+                        "surface-tint": "#2ce377",
+                        "on-tertiary-fixed": "#151c25",
+                        "secondary-fixed": "#ffddb4",
+                        "error": "#ffb4ab",
+                        "outline": "#859585",
+                        "surface-bright": "#3a3939",
+                        "tertiary": "#ced5e1",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-container": "#b2b9c5",
+                        "secondary": "#ffb955",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-background": "#e5e2e1",
+                        "on-secondary-fixed-variant": "#633f00",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-fixed": "#dce3f0",
+                        "background": "#131313",
+                        "outline-variant": "#3c4a3d",
+                        "on-primary": "#003918",
+                        "on-tertiary": "#2a313b",
+                        "error-container": "#93000a",
+                        "on-secondary-container": "#4f3100",
+                        "primary-fixed": "#63ff94",
+                        "on-primary-container": "#005526",
+                        "inverse-on-surface": "#313030",
+                        "surface-container-low": "#1c1b1b",
+                        "primary-fixed-dim": "#2ce377",
+                        "on-tertiary-container": "#424a54",
+                        "on-surface-variant": "#bbcbb9",
+                        "surface-container": "#201f1f",
+                        "on-error": "#690005",
+                        "inverse-primary": "#006d33",
+                        "on-secondary": "#452b00",
+                        "on-primary-fixed-variant": "#005225",
+                        "surface": "#131313",
+                        "surface-container-highest": "#353534"
+                    },
+                    fontFamily: {
+                        "headline": ["Bebas Neue"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pitch-black-bg {
+            background-color: #050505;
+        }
+        .editorial-gradient {
+            background: linear-gradient(135deg, #42f183 0%, #00d46a 100%);
+        }
+        .glass-panel {
+            background: rgba(28, 27, 27, 0.6);
+            backdrop-filter: blur(24px);
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(66, 241, 131, 0.3);
+        }
+    </style>
+</head>
+<body class="pitch-black-bg text-on-surface font-body min-h-screen flex flex-col items-center justify-center p-6 selection:bg-primary selection:text-on-primary">
+<!-- Suppressed Nav Shells per "Relevance Check" Rule for Transactional Pages -->
+<main class="w-full max-w-[440px] flex flex-col items-center">
+<!-- Brand Identity Section -->
+<div class="mb-12 text-center">
+<h1 class="font-headline text-6xl tracking-tighter uppercase mb-2">
+                mund<span class="text-primary text-glow">IA</span>l26
+            </h1>
+<p class="font-label text-on-surface-variant text-sm tracking-widest uppercase">
+                Editorial Admin Console
+            </p>
+</div>
+<!-- Login Container -->
+<div class="w-full surface-container-low rounded-xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+<!-- Subtle Tonal Shift Ornament -->
+<div class="absolute top-0 left-0 w-1 h-full editorial-gradient opacity-80"></div>
+<div class="mb-8">
+<h2 class="font-headline text-3xl text-on-surface mb-1">WELCOME BACK</h2>
+<p class="text-on-surface-variant text-sm">Access the digital stadium curator suite.</p>
+</div>
+<form class="space-y-6" onsubmit="return false;">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="block font-label text-xs font-semibold text-on-surface-variant tracking-wider uppercase" for="email">
+                        Email Address
+                    </label>
+<div class="relative group">
+<input class="w-full bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary/50 rounded-lg py-4 px-4 text-on-surface placeholder:text-on-surface-variant/40 transition-all outline-none" id="email" name="email" placeholder="editor@mundial26.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="block font-label text-xs font-semibold text-on-surface-variant tracking-wider uppercase" for="password">
+                            Password
+                        </label>
+<a class="text-[10px] text-primary hover:underline uppercase tracking-tighter" href="#">Forgot?</a>
+</div>
+<div class="relative group">
+<input class="w-full bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary/50 rounded-lg py-4 px-4 text-on-surface placeholder:text-on-surface-variant/40 transition-all outline-none" id="password" name="password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<!-- Primary Action -->
+<div class="pt-4">
+<button class="w-full editorial-gradient text-on-primary-fixed font-headline text-xl py-4 rounded-lg tracking-widest hover:brightness-110 active:scale-[0.98] transition-all shadow-[0px_10px_30px_rgba(0,212,106,0.2)]" type="submit">
+                        ENTRAR
+                    </button>
+</div>
+</form>
+<!-- Registration Link -->
+<div class="mt-10 pt-8 border-t border-outline-variant/10 text-center">
+<p class="text-on-surface-variant text-xs">
+                    New to the editorial team? 
+                    <a class="text-on-surface font-semibold hover:text-primary transition-colors ml-1 uppercase tracking-tighter underline underline-offset-4" href="#">
+                        Request Access
+                    </a>
+</p>
+</div>
+</div>
+<!-- Footer Visual Decor -->
+<div class="mt-16 opacity-10 flex gap-4 grayscale">
+<div class="w-16 h-16 rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Abstract aerial view of green soccer pitch" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsBdsTQPQW62oi6R1ATdvsBTHTJEosLnGjkx_JyW1mh6E7ig-WrFTyQXhk-lOPUsgHftRZlhNPTVetKMtVvqYGXjycBLkYFmjPPwfj2nivRxZen90-80UNC_XDR7yYuI048JAmGFecz91hnDVk9ZEblj9ZZ2upf_rkn6V5YZEP2v93aleOIRGT2UnobWxlrm_kxNxwGl-C-W0bo195R9dHpcRnyPXxQA3A2xJOZcy9pPdrJSpez3KtdZaWaO5WnJ3IezURx0ROfxs"/>
+</div>
+<div class="w-16 h-16 rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Blurry stadium floodlights in dark night" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBUsczYvYdkDAp2Gx74zA_mypKYZfDylVPvq50CSg4ld77bQNPntYKBzHnA8PgDGUSK2hdc6_TIsOcZ3MznejCsYeXdU0x22PJPMRxVHpBG0ELIuax2vyqQU1gyUzRtaa1EBK-40wUzJK4RZa2yCtmosboNV00Y6P1a9_8Q0QnuSMDzJZPO9Lrh7GRoAIQYWm952yGe_iBAbm0a1CWBeimyPCl74SU8in_VQT8vSiapif349W2j839f8OYw5jZVOIkMBZYIHLQhSw"/>
+</div>
+<div class="w-16 h-16 rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up of black soccer ball texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHScOcYQEphGSEL_tt4bri3RJiS1j0Eb68tTZ7-4ck2m5RXU2oQJWXM3mbpXRtxMnddqkHDAjL47L2Le6sOvt7a5oOa2V9UsG_i0lAnAJhoM1HOXbKUHyNNDUsN7NDBIaO3gM0XTrpMUGSodFvjDXfFjD4JykZYJ57FSUHLmyYFyfQSzPMqYy8ZWyfSsB7bvE7eiI8CBVo36v8VixeQkVs6paneQpEWOzhok6Cuy18O9QG3sNyewq1F7dWTVoFDdrMwJIp9h974Ds"/>
+</div>
+</div>
+<div class="mt-8 text-center">
+<p class="text-[10px] text-on-surface-variant/40 tracking-[0.2em] uppercase">
+                © 2024 mundIAl26 Editorial Team. All Rights Reserved.
+            </p>
+</div>
+</main>
+<!-- Contextual Element: Hidden Background Texture -->
+<div class="fixed inset-0 pointer-events-none z-[-1] opacity-[0.03]">
+<svg height="100%" width="100%">
+<filter id="noise">
+<feturbulence basefrequency="0.65" numoctaves="3" stitchtiles="stitch" type="fractalNoise"></feturbulence>
+<fecolormatrix type="saturate" values="0"></fecolormatrix>
+</filter>
+<rect filter="url(#noise)" height="100%" width="100%"></rect>
+</svg>
+</div>
+</body></html>

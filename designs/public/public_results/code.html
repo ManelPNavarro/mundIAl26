@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #131313;
+            color: #e5e2e1;
+            margin: 0;
+        }
+        .font-bebas {
+            font-family: 'Bebas_Neue', 'Bebas Neue', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        /* Custom scrollbar for a cleaner editorial look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #131313;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-variant": "#353534",
+                        "surface-dim": "#131313",
+                        "on-secondary-fixed": "#291800",
+                        "tertiary-fixed-dim": "#c0c7d3",
+                        "secondary-fixed-dim": "#ffb955",
+                        "secondary-container": "#dc9100",
+                        "primary": "#42f183",
+                        "on-tertiary-fixed-variant": "#404752",
+                        "on-primary-fixed": "#00210b",
+                        "on-surface": "#e5e2e1",
+                        "primary-container": "#00d46a",
+                        "surface-tint": "#2ce377",
+                        "on-tertiary-fixed": "#151c25",
+                        "secondary-fixed": "#ffddb4",
+                        "error": "#ffb4ab",
+                        "outline": "#859585",
+                        "surface-bright": "#3a3939",
+                        "tertiary": "#ced5e1",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-container": "#b2b9c5",
+                        "secondary": "#ffb955",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-background": "#e5e2e1",
+                        "on-secondary-fixed-variant": "#633f00",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-fixed": "#dce3f0",
+                        "background": "#131313",
+                        "outline-variant": "#3c4a3d",
+                        "on-primary": "#003918",
+                        "on-tertiary": "#2a313b",
+                        "error-container": "#93000a",
+                        "on-secondary-container": "#4f3100",
+                        "primary-fixed": "#63ff94",
+                        "on-primary-container": "#005526",
+                        "inverse-on-surface": "#313030",
+                        "surface-container-low": "#1c1b1b",
+                        "primary-fixed-dim": "#2ce377",
+                        "on-tertiary-container": "#424a54",
+                        "on-surface-variant": "#bbcbb9",
+                        "surface-container": "#201f1f",
+                        "on-error": "#690005",
+                        "inverse-primary": "#006d33",
+                        "on-secondary": "#452b00",
+                        "on-primary-fixed-variant": "#005225",
+                        "surface": "#131313",
+                        "surface-container-highest": "#353534"
+                    },
+                    fontFamily: {
+                        "headline": ["Bebas Neue"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col z-40 bg-[#131313] dark:bg-[#131313] h-screen w-64 border-r border-white/10">
+<div class="p-8">
+<h1 class="text-2xl font-bebas tracking-tighter text-[#00D46A] uppercase">mundIAl26</h1>
+<p class="text-[10px] text-gray-500 font-medium tracking-[0.2em] uppercase mt-1">Editorial Admin Console</p>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<!-- Dashboard (Inactive) -->
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white transition-colors hover:bg-[#1c1b1b] rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<!-- User Management (Inactive) -->
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white transition-colors hover:bg-[#1c1b1b] rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-sm font-medium">User Management</span>
+</a>
+<!-- Match Management (Active - Logic: Results page maps to Matches) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-[#1c1b1b] text-[#00D46A] border-l-4 border-[#00D46A] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="sports_soccer">sports_soccer</span>
+<span class="text-sm font-medium">Match Management</span>
+</a>
+<!-- Analytics (Inactive) -->
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white transition-colors hover:bg-[#1c1b1b] rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-sm font-medium">Analytics</span>
+</a>
+<!-- Settings (Inactive) -->
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white transition-colors hover:bg-[#1c1b1b] rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-6">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed py-3 rounded-lg font-bebas tracking-wider text-sm hover:opacity-90 transition-opacity">
+                NEW MATCH PREDICTION
+            </button>
+</div>
+</aside>
+<!-- TopAppBar -->
+<header class="sticky top-0 w-full flex justify-between items-center px-8 py-4 z-30 ml-64 bg-[#131313]/70 backdrop-blur-xl border-b border-white/5">
+<div class="flex items-center gap-8">
+<span class="font-bebas text-2xl text-primary tracking-tight">RESULTADOS</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-sm font-semibold tracking-wide text-gray-400 hover:text-white transition-colors" href="#">LIGAS</a>
+<a class="text-sm font-semibold tracking-wide text-primary font-bold" href="#">TORNEOS</a>
+<a class="text-sm font-semibold tracking-wide text-gray-400 hover:text-white transition-colors" href="#">NOTICIAS</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors" data-icon="search">search</span>
+<input class="bg-surface-container-lowest border-none rounded-full py-2 pl-10 pr-4 text-xs focus:ring-1 focus:ring-primary w-64 transition-all" placeholder="Buscar partido..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-gray-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="Admin User Profile Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_bGS9UkD-ORn-pAXzB14Gko7zc2kOnQi4JeNOoZXH5yrIP2NcmFKsg6R_DaGRrfuhKrjA6lQY5GEl07Z855Ggbr5JqgWJXNGbiymPV_NteFDI18MFVSIlIIlQs-WBJp3qrBaAPTXdJCmRuVESAqSu1ZxYMrLSMyMkeYDxp0pOfR7XelAGtOZbtlhtrWEcPvpeuPBW4r7mp0eWdtuhkQASP92IDdFMZIhEad7TEkaklkZXHrVHsCEQLX7xaaIgPXb6BH0DJ7dhVd8"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 p-8 min-h-screen">
+<!-- Filters / Tabs Section -->
+<div class="mb-12">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h2 class="font-bebas text-5xl tracking-tighter text-white">COPA DEL MUNDO 2026</h2>
+<p class="text-sm text-gray-500 font-medium mt-1">Sigue el camino a la gloria eterna.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-lg text-xs font-semibold hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="calendar_today">calendar_today</span>
+                        HOY
+                    </button>
+<button class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-lg text-xs font-semibold hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+                        FILTRAR
+                    </button>
+</div>
+</div>
+<!-- Phase Tabs -->
+<div class="flex gap-2 p-1 bg-surface-container-low rounded-xl w-fit">
+<button class="px-6 py-2.5 rounded-lg text-xs font-bold tracking-widest bg-primary text-on-primary-fixed uppercase transition-all">Grupos</button>
+<button class="px-6 py-2.5 rounded-lg text-xs font-bold tracking-widest text-gray-500 hover:text-white uppercase transition-all">Octavos</button>
+<button class="px-6 py-2.5 rounded-lg text-xs font-bold tracking-widest text-gray-500 hover:text-white uppercase transition-all">Cuartos</button>
+<button class="px-6 py-2.5 rounded-lg text-xs font-bold tracking-widest text-gray-500 hover:text-white uppercase transition-all">Semis</button>
+<button class="px-6 py-2.5 rounded-lg text-xs font-bold tracking-widest text-gray-500 hover:text-white uppercase transition-all">Final</button>
+</div>
+</div>
+<!-- Matches Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+<!-- Live Match Card -->
+<div class="relative bg-surface-container-low rounded-xl p-8 overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-2">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+</span>
+<span class="text-[10px] font-bold tracking-widest text-red-500 uppercase">En Juego — 72'</span>
+</div>
+<span class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Grupo A</span>
+</div>
+<div class="flex items-center justify-between">
+<!-- Team 1 -->
+<div class="flex flex-col items-center gap-4 flex-1">
+<div class="w-16 h-16 rounded-full bg-surface-container-high p-3 flex items-center justify-center border border-white/5">
+<img class="w-full h-auto rounded-sm" data-alt="Flag of Mexico" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7y3ZrS1a7jYSadwfczqr8ROhAVEprSi5hzIG3HKKHxIlllqykaiiPUml23jdmZ2eAnw5JxUHxkHRyeia5uVsr5UcjreMjefwuOVhMQHg_teBHbdboPJU1d6Oi6vvZML6br7QsoqhJnPizZaaipOleTCclep_ZuW1US1JqLewzdftl0I2taYhq7Jv5Ee70E-L__7DBFblHRVdbyyEBkpTFWAJXSIgGliL6yn0YQgUrycfb_VSYfw2XN94faVk6SCMjYuhvgeskEDc"/>
+</div>
+<span class="font-bebas text-2xl tracking-tight uppercase">MÉXICO</span>
+</div>
+<!-- Score -->
+<div class="flex flex-col items-center px-8">
+<div class="flex items-center gap-6">
+<span class="font-bebas text-7xl text-white tracking-tighter">2</span>
+<span class="font-bebas text-4xl text-gray-700 tracking-tighter">:</span>
+<span class="font-bebas text-7xl text-white tracking-tighter">1</span>
+</div>
+<div class="mt-2 bg-surface-container-high px-3 py-1 rounded-full">
+<span class="text-[10px] font-bold tracking-tighter text-primary">EN VIVO</span>
+</div>
+</div>
+<!-- Team 2 -->
+<div class="flex flex-col items-center gap-4 flex-1">
+<div class="w-16 h-16 rounded-full bg-surface-container-high p-3 flex items-center justify-center border border-white/5">
+<img class="w-full h-auto rounded-sm" data-alt="Flag of United States" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCimNiEy0Sx9T2v5kUXP0b2WP_ZrYPz34JmcG7zLvqgyM0eWqJ6SRZ6TPwbUNmMuajpYKePSFwHMVDiM9DjpKfQDKCN7PesxUaL2LducDWz50y9Q6T2DDhoZkSsA9EvI4Yato7TpZAqHUJLcpLTDwmwPWbAjIgxbJwDpDlTYwRk3dO7kMEPk3mPv0al2k2AtHH2r1Sshb75-elj00STuhhogjWVAuA9gPNBDlAxskGM0QttDIqPOkgoLEFSyYoTWIQlz_Cr7EX-ZY"/>
+</div>
+<span class="font-bebas text-2xl tracking-tight uppercase">USA</span>
+</div>
+</div>
+</div>
+<!-- Finished Match Card -->
+<div class="bg-surface-container-low rounded-xl p-8 overflow-hidden group hover:bg-surface-container transition-colors">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Finalizado</span>
+</div>
+<span class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Grupo B</span>
+</div>
+<div class="flex items-center justify-between opacity-80 group-hover:opacity-100 transition-opacity">
+<!-- Team 1 -->
+<div class="flex flex-col items-center gap-4 flex-1">
+<div class="w-16 h-16 rounded-full bg-surface-container-high p-3 flex items-center justify-center border border-white/5">
+<img class="w-full h-auto rounded-sm" data-alt="Flag of Spain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkEjwCUoB4I59tr1oxIzDdlhedw9vc9jPn2KWqiVwKVLEEQNJJ8WU_u9kbuMZ5vfj9Wy5Rfkcl2cdOBQwWLVNqSbRIKApEFO7xJXtxMzr82lC6wguhxXkNkAF6hwWMP326SiHzCFtLQpGw_3LXe5VxsVYJK8uZz8Us46cKhL-h9BjQOnIE4JS0ouyht-K-cNcYf4Muy5BXimmHFf1REMMdKF9afDhoPAPl9-MnKG6bGAT9aAfy0nEskQYx6M76y9xzLvnMXj6eDTE"/>
+</div>
+<span class="font-bebas text-2xl tracking-tight uppercase">ESPAÑA</span>
+</div>
+<!-- Score -->
+<div class="flex flex-col items-center px-8">
+<div class="flex items-center gap-6">
+<span class="font-bebas text-7xl text-white tracking-tighter">3</span>
+<span class="font-bebas text-4xl text-gray-800 tracking-tighter">:</span>
+<span class="font-bebas text-7xl text-white tracking-tighter">0</span>
+</div>
+</div>
+<!-- Team 2 -->
+<div class="flex flex-col items-center gap-4 flex-1">
+<div class="w-16 h-16 rounded-full bg-surface-container-high p-3 flex items-center justify-center border border-white/5">
+<img class="w-full h-auto rounded-sm" data-alt="Flag of Japan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2dswqoa2lxgCem8tIyj7O_ud4q2DyhztGzYchQXbnxiJVDnLCIIzL-NsgxFQGHgxtzWqgh69AMYT7EEqPNc0a6s-wjceqNAPVsH1ShZWXNpzQMlY5VdZSJLk8hY6I7jQdyeEpKCBA_v9Rt3UsjbHF4ctfhO9GNAcpLvNIO6ScBdRHS_kzoH2tTFOWrzgO8VGnuDphPdYjQ4gMIaD6rznjqHMC-Tyf89adWiFUuqjpqby79wFLR6zoqBEIWm5lDFoN5qnzJ7Inhfk"/>
+</div>
+<span class="font-bebas text-2xl tracking-tight uppercase">JAPÓN</span>
+</div>
+</div>
+</div>
+<!-- Finished Match Card 2 -->
+<div class="bg-surface-container-low rounded-xl p-8 overflow-hidden group hover:bg-surface-container transition-colors">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Finalizado</span>
+</div>
+<span class="text-[10px] font-bold tracking-widest text-gray-500 uppercase">Grupo A</span>
+</div>
+<div class="flex items-center justify-between opacity-80 group-hover:opacity-100 transition-opacity">
+<!-- Team 1 -->
+<div class="flex flex-col items-center gap-4 flex-1">
+<div class="w-16 h-16 rounded-full bg-surface-container-high p-3 flex items-center justify-center border border-white/5">
+<img class="w-full h-auto rounded-sm" data-alt="Flag of Brazil" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBv_ZoyvouLiNItSFKHrXXvtK9zgbmAvSnvftT1JKTUOx1osmXT523mI0tBJ2lMU1brfEDJDvtpv788UntuO837qVsGmI4iUyDTxp8WzExvTGLuEKd27Ogd-pj7RGveZNVZ9mPLGtf8yIo55Dnzs07qaZ43ess_p3oamP7kZ0-EsPlZqwdyfLZK_vNv6OedafeQFUQ63FkxSgrgU4ueK1sWvLBVGQhzC2w-SSpehdJkVsdaNriDb7_sWwVageV0UjMWpa_U4AVAOlk"/>
+</div>
+<span class="font-bebas text-2xl tracking-tight uppercase">BRASIL</span>
+</div>
+<!-- Score -->
+<div class="flex flex-col items-center px-8">
+<div class="flex items-center gap-6">
+<span class="font-bebas text-7xl text-white tracking-tighter">1</span>
+<span class="font-bebas text-4xl text-gray-800 tracking-tighter">:</span>
+<span class="font-bebas text-7xl text-white tracking-tighter">1</span>
+</div>
+</div>
+<!-- Team 2 -->
+<div class="flex flex-col items-center gap-4 flex-1">
+<div class="w-16 h-16 rounded-full bg-surface-container-high p-3 flex items-center justify-center border border-white/5">
+<img class="w-full h-auto rounded-sm" data-alt="Flag of France" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxITpVg3CQNI_C9UkVDRMUCEpuw61gKyl8MiR9T-e-9L1ehoB1jDn7o0thMFpkMr7wOKNs_ZR1r8B3kWragZZURut_wVwddO-eFHvZ7OrMb2UArv_mTwVvax_5RxWpyPdR-6cm_6RGQlWDvVBS16Sqzp7EasPM45GgKbk_IsczXitIHzRWf_QgWQmNJDHKqze8iQ3Jf1lZhOGhgao9416R7HrvsDQ1yEdd4eoEW6686SSo6La5fYTTThUVyVNITj9EzKf4U5I1Kq8"/>
+</div>
+<span class="font-bebas text-2xl tracking-tight uppercase">FRANCIA</span>
+</div>
+</div>
+</div>
+<!-- Featured Editorial Bento Item -->
+<div class="bg-surface-container-low rounded-xl p-0 overflow-hidden relative group">
+<img class="w-full h-full object-cover absolute inset-0 opacity-40 group-hover:scale-105 transition-transform duration-700" data-alt="Action shot of a football stadium under lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmiFb-vxB3aVe68EPi91AMN0CTc0hvNmKzWYMP08lSCRzPfdd6uv1EgKnGRe8qdA9BP6V15gW4ffTgfRJLaEzMHD2UIyXwGftqQFxR3Vls6_Z9eF1GH9NyGqzYA5Et8_ZVe_alo9RnozfrjfUiybtddqsCw8TehCwXK-_OdkzJFIhpXvIRQKwWWBBHofWVC2jqnqp3fygq1PgW9ky79uBwAF_QAktdSgYRzvcMCmn_vPkW-9040CYtgE0yCkiZ1KJxoyjSwe7dkBc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+<div class="relative p-8 flex flex-col justify-end h-full min-h-[320px]">
+<span class="text-primary text-[10px] font-bold tracking-[0.3em] uppercase mb-2">Destacado</span>
+<h3 class="font-bebas text-4xl leading-none text-white max-w-xs mb-4">EL ANÁLISIS DE LA JORNADA: SORPRESAS EN EL GRUPO A</h3>
+<p class="text-xs text-gray-400 font-medium max-w-sm mb-6">Expertos debaten sobre el desempeño táctico de las selecciones americanas tras los resultados de hoy.</p>
+<button class="flex items-center gap-2 text-white font-bold text-[10px] tracking-widest uppercase group-hover:gap-4 transition-all">
+                        LEER CRÓNICA
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Secondary Section: Standing Snippet -->
+<section class="mt-16">
+<h4 class="font-bebas text-2xl tracking-tight text-white mb-6">POSICIONES GRUPO A</h4>
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<table class="w-full text-left text-sm border-separate border-spacing-0">
+<thead class="bg-surface-container-high">
+<tr>
+<th class="px-6 py-4 font-bold text-[10px] tracking-widest text-gray-400 uppercase">Pos</th>
+<th class="px-6 py-4 font-bold text-[10px] tracking-widest text-gray-400 uppercase">Equipo</th>
+<th class="px-6 py-4 font-bold text-[10px] tracking-widest text-gray-400 uppercase">PJ</th>
+<th class="px-6 py-4 font-bold text-[10px] tracking-widest text-gray-400 uppercase">GF</th>
+<th class="px-6 py-4 font-bold text-[10px] tracking-widest text-gray-400 uppercase">GC</th>
+<th class="px-6 py-4 font-bold text-[10px] tracking-widest text-gray-400 uppercase text-right">Pts</th>
+</tr>
+</thead>
+<tbody>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-6 py-4 border-b border-white/5 font-bebas text-lg">01</td>
+<td class="px-6 py-4 border-b border-white/5">
+<div class="flex items-center gap-3">
+<img class="w-5 h-auto rounded-sm" data-alt="Mexico Flag Small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBD7RwRFl3A9WMuN8xyx_3WSwxa3Usjq2lXOln6T15sdR1Kue4t53R8oAI1RV_tKOGZkT0QRGanCOLQnLh2Tb7_z6OPDV-hndTY58zvwSbm7Z5U0nizNMpFymhFOcXBzEjGt7ZcXpbPmuVXVwwFu_YTvH0ViNRBdt1gIRWqMVKZSlXeSYkm5Soa0ux48Bkl5bZvRawAjQDcketRG9QNwabtFYFs5ko1t-GcmX1yddlomZ-f2ll43ngJkvwFmk6jTO2xmIptTyVmcKU"/>
+<span class="font-bold tracking-tight">México</span>
+</div>
+</td>
+<td class="px-6 py-4 border-b border-white/5 text-gray-400">2</td>
+<td class="px-6 py-4 border-b border-white/5 text-gray-400">4</td>
+<td class="px-6 py-4 border-b border-white/5 text-gray-400">1</td>
+<td class="px-6 py-4 border-b border-white/5 text-right font-bold text-primary">6</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-6 py-4 border-b border-white/5 font-bebas text-lg">02</td>
+<td class="px-6 py-4 border-b border-white/5">
+<div class="flex items-center gap-3">
+<img class="w-5 h-auto rounded-sm" data-alt="Brazil Flag Small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOnMmKFH9y_jLl7FxF4OPnulSLa3d8urIJG0rlRip62lk1X7PeMCfpKR7xFC4GHyAwFxJIriHa35LF242CDiIxj563pL5O_QyLrAwoL6_bEMvH6gmHabABUdomOMY1UK4idWtfroLvO9zu0qljbjQGoH1eNXnKYa6DHCDChmp-w-2LgwGjV3R2Fv3HZ5bxoRik3sBcxz5aEJ0M1Znyx8A9WmOgRxCQhWn8veKp_SeFVOnfxzDoCMwxVFtbBtZOMHf2kzrytcnGxI4"/>
+<span class="font-bold tracking-tight">Brasil</span>
+</div>
+</td>
+<td class="px-6 py-4 border-b border-white/5 text-gray-400">2</td>
+<td class="px-6 py-4 border-b border-white/5 text-gray-400">3</td>
+<td class="px-6 py-4 border-b border-white/5 text-gray-400">1</td>
+<td class="px-6 py-4 border-b border-white/5 text-right font-bold text-primary">4</td>
+</tr>
+</tbody>
+</table>
+<div class="p-4 flex justify-center bg-surface-container/30">
+<button class="text-[10px] font-bold tracking-widest text-gray-500 hover:text-white uppercase transition-colors">VER TABLA COMPLETA</button>
+</div>
+</div>
+</section>
+</main>
+</body></html>

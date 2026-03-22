@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;500;600;700;800&amp;family=Epilogue:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary": "#452b00",
+              "background": "#131313",
+              "on-surface": "#e5e2e1",
+              "on-surface-variant": "#bbcbb9",
+              "on-background": "#e5e2e1",
+              "surface-dim": "#131313",
+              "primary-fixed": "#63ff94",
+              "surface-container-lowest": "#0e0e0e",
+              "error-container": "#93000a",
+              "outline": "#859585",
+              "on-secondary-container": "#4f3100",
+              "tertiary-fixed-dim": "#c0c7d3",
+              "surface-container-high": "#2a2a2a",
+              "on-tertiary-container": "#424a54",
+              "on-secondary-fixed": "#291800",
+              "on-primary-fixed-variant": "#005225",
+              "on-error": "#690005",
+              "on-error-container": "#ffdad6",
+              "tertiary-fixed": "#dce3f0",
+              "secondary-container": "#dc9100",
+              "tertiary": "#ced5e1",
+              "surface-container": "#201f1f",
+              "error": "#ffb4ab",
+              "primary-fixed-dim": "#2ce377",
+              "on-primary-container": "#005526",
+              "surface-container-highest": "#353534",
+              "surface-variant": "#353534",
+              "tertiary-container": "#b2b9c5",
+              "secondary-fixed-dim": "#ffb955",
+              "on-primary": "#003918",
+              "surface-container-low": "#1c1b1b",
+              "surface-bright": "#3a3939",
+              "on-tertiary-fixed-variant": "#404752",
+              "outline-variant": "#3c4a3d",
+              "secondary-fixed": "#ffddb4",
+              "on-tertiary-fixed": "#151c25",
+              "surface": "#131313",
+              "primary": "#42f183",
+              "inverse-surface": "#e5e2e1",
+              "secondary": "#ffb955",
+              "primary-container": "#00d46a",
+              "on-primary-fixed": "#00210b",
+              "inverse-primary": "#006d33",
+              "on-secondary-fixed-variant": "#633f00",
+              "inverse-on-surface": "#313030",
+              "surface-tint": "#2ce377",
+              "on-tertiary": "#2a313b"
+            },
+            fontFamily: {
+              "headline": ["Epilogue"],
+              "body": ["Inter"],
+              "label": ["Inter"],
+              "display": ["Bebas Neue"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bebas { font-family: 'Bebas Neue', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/70 backdrop-blur-xl">
+<div class="flex justify-between items-center px-6 h-16 w-full max-w-none">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black text-white italic bebas tracking-tight">
+                    Mund<span class="text-[#00D46A]">IAL</span> 26
+                </span>
+<!-- Competition Switcher -->
+<nav class="hidden md:flex items-center gap-6">
+<button class="text-[#00D46A] font-bold text-sm tracking-wider flex items-center gap-2">
+                        WORLD CUP 2026
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<a class="text-gray-400 hover:text-[#00D46A] transition-colors duration-300 text-sm font-medium uppercase tracking-widest" href="#">Matches</a>
+<a class="text-gray-400 hover:text-[#00D46A] transition-colors duration-300 text-sm font-medium uppercase tracking-widest" href="#">News</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-white hover:text-[#00D46A] transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-white hover:text-[#00D46A] transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 h-full w-64 bg-[#1c1b1b] border-r border-white/5 hidden lg:flex flex-col py-8 z-40">
+<div class="px-6 mb-10">
+<h2 class="font-['Bebas_Neue'] text-xl text-white tracking-wider">MundIAL 26</h2>
+<p class="text-gray-500 text-[10px] uppercase tracking-[0.2em]">Editorial Excellence</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-gray-400 px-6 py-3 hover:bg-[#2a2a2a]/50 hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-medium text-sm">Home</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-6 py-3 hover:bg-[#2a2a2a]/50 hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="sports_soccer">sports_soccer</span>
+<span class="font-medium text-sm">Matches</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-6 py-3 hover:bg-[#2a2a2a]/50 hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="newspaper">newspaper</span>
+<span class="font-medium text-sm">News</span>
+</a>
+<a class="flex items-center gap-3 bg-[#2a2a2a] text-[#00D46A] border-l-4 border-[#00D46A] px-6 py-3 ml-0 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-medium text-sm">Predictions</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-6 py-3 hover:bg-[#2a2a2a]/50 hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="workspace_premium">workspace_premium</span>
+<span class="font-medium text-sm">Premium</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-bold py-3 rounded-lg text-xs uppercase tracking-widest shadow-lg shadow-primary/10 hover:opacity-90 transition-all">
+                Upgrade to Pro
+            </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="lg:ml-64 pt-24 pb-12 px-6 md:px-12">
+<div class="max-w-6xl mx-auto">
+<!-- Header Section -->
+<header class="mb-12">
+<div class="flex items-center gap-3 mb-2">
+<span class="w-8 h-[2px] bg-primary"></span>
+<span class="text-primary text-xs font-bold uppercase tracking-[0.3em]">Season 2026</span>
+</div>
+<h1 class="text-6xl md:text-8xl bebas text-white leading-none tracking-tighter">GLOBAL LEADERBOARD</h1>
+<p class="text-gray-400 mt-4 max-w-xl text-sm leading-relaxed border-l border-white/10 pl-6">
+                    Tracking the elite predictors of the 2026 campaign. Scores are calculated based on outcome accuracy, goal margins, and high-risk performance.
+                </p>
+</header>
+<!-- Podium Section -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end mb-20">
+<!-- Rank 2 -->
+<div class="order-2 md:order-1">
+<div class="relative group surface-container-low rounded-xl p-8 pt-16 flex flex-col items-center transition-all duration-500 hover:bg-surface-container-high border-b-4 border-silver/30">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full overflow-hidden border-4 border-surface shadow-2xl">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of a man in sport jersey" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN9TDEAvrBWCxdYh_GHtd-wluqTFNiGE9NkeOpx6JGqk2fMuvFSLBRdt_r4Qj2AFMrzF9MEAi2UoYg7MUsmC0PzGGuprE-uE91ZI4nhsXjWzo-cfhzIWfn1179ltRI6AS_tXgV6_IinujcXsbn6KnO0UzI5kxVUeTAvmTUqBXwtr7JqIXslOPZ8Q0KAbIMoyzrDIO7HbulCeoiggCjep-kxD7Xn0_NC6gt-OYrYse1otZQobHL1IYZX3Y55xbsVMY1Hzxbg9PyEc8"/>
+</div>
+<span class="bebas text-4xl text-gray-400 mb-1">02</span>
+<h3 class="font-bold text-white text-lg">MARCUS.V</h3>
+<div class="flex items-center gap-2 mt-4 bg-surface-container-highest px-4 py-1 rounded-full">
+<span class="text-primary bebas text-2xl">8,940</span>
+<span class="text-[10px] text-gray-500 uppercase tracking-tighter">PTS</span>
+</div>
+<div class="mt-4 flex items-center gap-1 text-primary text-xs font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                            +120
+                        </div>
+</div>
+</div>
+<!-- Rank 1 (Featured) -->
+<div class="order-1 md:order-2 scale-105 z-10">
+<div class="relative group bg-gradient-to-b from-surface-container-high to-surface-container-low rounded-xl p-10 pt-20 flex flex-col items-center shadow-[0px_40px_80px_rgba(0,0,0,0.6)] border-b-4 border-primary">
+<div class="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full overflow-hidden border-4 border-primary shadow-[0_0_30px_rgba(66,241,131,0.3)]">
+<img class="w-full h-full object-cover" data-alt="Modern editorial portrait of a woman competing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDorFKd-wKE0U5r-4kxl918dPrFNympnZh7jEslZApMgcLUyLuzA_dHWwgzHG_5M4fQadPlZ5DNZ0FrvB0lsX120nwQ3FcQdn4ZEGfn_oHWXOtCijE7LFQhf9hrQHVWSIMTKWVrNGkvrzAP0o5vpG4Vj1kRMm8XA0SwHuJIiZ6UmjucCtiD4pjmX4VEjzfC2TKQ5znJDzXxR7MK-Goz6fVseEHF5tvMUDjcozx2PrI0rJuWOhIU1yskPAOh6aSLd_oLphOCesHDNC8"/>
+</div>
+<div class="absolute top-4 right-4 text-primary">
+<span class="material-symbols-outlined text-4xl" data-weight="fill">workspace_premium</span>
+</div>
+<span class="bebas text-6xl text-primary mb-1">01</span>
+<h3 class="font-extrabold text-white text-2xl tracking-tight">ELENA_STR</h3>
+<div class="flex items-center gap-3 mt-6 bg-primary/10 border border-primary/20 px-6 py-2 rounded-full">
+<span class="text-primary bebas text-4xl">12,450</span>
+<span class="text-xs text-primary/70 uppercase font-bold">PTS</span>
+</div>
+<div class="mt-6 flex items-center gap-2 text-primary bg-primary/5 px-4 py-1 rounded-full text-sm font-bold">
+<span class="material-symbols-outlined">trending_up</span>
+                            STREAK: 12W
+                        </div>
+</div>
+</div>
+<!-- Rank 3 -->
+<div class="order-3">
+<div class="relative group surface-container-low rounded-xl p-8 pt-16 flex flex-col items-center transition-all duration-500 hover:bg-surface-container-high border-b-4 border-orange-900/30">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full overflow-hidden border-4 border-surface shadow-2xl">
+<img class="w-full h-full object-cover" data-alt="Portrait of a young man smiling in urban setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTR31pjeJ6Du46m7ak3qmOydApZnGb--fVwhNkUVYJaNSs4C_3oLbejpniz-9_sst-CESa6rz1icMP6LA8hrWppCDr07Psmbu8Z2cjz78geM2XRYo94nD4QU9wv1WQixS55gPpxURy-k2cLDajY-FzQWH83_s8Iuu26Yuyt-NUlyTKVsE-OIGhy5NsrGohlrvP9xlNKXeMYsnhylDS59HTnYCi-e9y-IzhZwHK6KZFozLuj4sFLaKvw9So29qDhLic5ag6EhOM2vk"/>
+</div>
+<span class="bebas text-4xl text-gray-500 mb-1">03</span>
+<h3 class="font-bold text-white text-lg">JULIAN_K</h3>
+<div class="flex items-center gap-2 mt-4 bg-surface-container-highest px-4 py-1 rounded-full">
+<span class="text-primary bebas text-2xl">7,210</span>
+<span class="text-[10px] text-gray-500 uppercase tracking-tighter">PTS</span>
+</div>
+<div class="mt-4 flex items-center gap-1 text-error text-xs font-bold">
+<span class="material-symbols-outlined text-sm">trending_down</span>
+                            -45
+                        </div>
+</div>
+</div>
+</section>
+<!-- Minimalist Table Section -->
+<section class="mb-20">
+<div class="flex justify-between items-end mb-8">
+<h2 class="bebas text-4xl text-white tracking-tight">Rankings 04 — 100</h2>
+<div class="flex gap-2">
+<button class="bg-surface-container-high px-4 py-2 rounded-lg text-xs font-bold text-white hover:bg-primary hover:text-on-primary transition-all">WEEKLY</button>
+<button class="bg-surface-container-high px-4 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition-all">ALL TIME</button>
+</div>
+</div>
+<div class="overflow-hidden bg-surface-container-low/30 rounded-xl backdrop-blur-sm">
+<table class="w-full text-left">
+<thead>
+<tr class="border-b border-white/5">
+<th class="px-6 py-5 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Rank</th>
+<th class="px-6 py-5 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Player</th>
+<th class="px-6 py-5 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Accuracy</th>
+<th class="px-6 py-5 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] text-right">Points</th>
+<th class="px-6 py-5 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] text-center">Trend</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<!-- Row 4 -->
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 bebas text-2xl text-gray-500">04</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-white/10 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User avatar icon placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAepi8990mZlbpYH8uREqM-C7e4udO5qLp0je_WOTtLoCvamMARnO2fYgjbugSM2mlD3xPNI_oacgBqfuzo7TLypKi385tsNn8WEwqrMKU_F0q2RNmeKhnotXZI_2-9WZJnpY-0XgFau6cqBnrWshckmLERkGNMlpbIKDEAoHpQjg43FKUJe_72nM02E_cfz-l_Y365LtU4VwWU_RwoMhaK_NsSGHFtJpE1IOsN9Khmu-fLrnqZbqz5-9tRWiOVdcNyZb-LKfZ_nAc"/>
+</div>
+<span class="font-bold text-white text-sm tracking-tight">THOMAS_MULLER_X</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[88%]"></div>
+</div>
+<span class="text-xs font-bold text-gray-400">88%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right bebas text-xl text-white">6,840</td>
+<td class="px-6 py-4 text-center">
+<span class="material-symbols-outlined text-primary" data-icon="trending_up">trending_up</span>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 bebas text-2xl text-gray-500">05</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-white/10 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User avatar icon placeholder female" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1AdL90BzHiF-FjfDaO8KBAGb9N1Mk2P9fl7jwX7fZffWaQB5BbpwnTU4uqcScV5GORR08y9F3hbnv9jwayI2h4DAQbKhaCLdNIsj_p-DJhqpsD0j9ST4yeldCPwhUJy902Npf_elMzgtN3LHH9U__hddVPWJLPneKUIgrjvxZtB2htSnmxOHtEW85cC5MTVbYqo-6dhCUGEeyJnJn40qI3fewiO_enhY0EU7PPREYDcw1QCW_zEoCt0q5lHl7_6Ahq3mn348jzUg"/>
+</div>
+<span class="font-bold text-white text-sm tracking-tight">SOFIA.SPORT</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[82%]"></div>
+</div>
+<span class="text-xs font-bold text-gray-400">82%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right bebas text-xl text-white">6,410</td>
+<td class="px-6 py-4 text-center">
+<span class="material-symbols-outlined text-gray-500" data-icon="trending_flat">trending_flat</span>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 bebas text-2xl text-gray-500">06</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-white/10 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User avatar icon placeholder male" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8bCw1sFinrfOKjqP1kpM03VSFAdjEly4WqaN-9N9N0IRRcdcqE4wKCH9_wbP36DweK37_swUmdFMWCH87tOKUSdzQz2mp2ZdSuBO3HcaUIvFmJ8vijr8yFKLucbQb9e0WxnIRzY7DYPMDL7wI9to-gG4phWv-toCb-_Kc9_5cYqB9_Hl8sUxuB0c27VDruGeRn7_8-AuUVaFOUTu7IO9eq57cE9FMz2Wa-L1XtfPV45OFGUgroPeQuLWjhxyWs7QrdsbXtlVjfcs"/>
+</div>
+<span class="font-bold text-white text-sm tracking-tight">DARK_HORSE</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[79%]"></div>
+</div>
+<span class="text-xs font-bold text-gray-400">79%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right bebas text-xl text-white">5,900</td>
+<td class="px-6 py-4 text-center">
+<span class="material-symbols-outlined text-error" data-icon="trending_down">trending_down</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-8 flex justify-center">
+<button class="group flex items-center gap-3 text-gray-500 hover:text-white transition-all">
+<span class="text-[10px] font-black uppercase tracking-[0.3em]">Show Full Leaderboard</span>
+<span class="material-symbols-outlined text-sm group-hover:translate-y-1 transition-transform">expand_more</span>
+</button>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="lg:ml-64 bg-[#0d0d0d] w-full py-12 px-8 border-t border-white/5">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6 w-full max-w-6xl mx-auto">
+<div class="flex flex-col gap-2">
+<span class="text-lg font-bold text-white bebas tracking-widest italic">
+                    Mund<span class="text-[#00D46A]">IAL</span> 26
+                </span>
+<p class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500">
+                    © 2026 MundIAL Editorial Platform. All rights reserved.
+                </p>
+</div>
+<div class="flex gap-8">
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors underline-offset-4" href="#">About Us</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors underline-offset-4" href="#">Terms of Service</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors underline-offset-4" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500 hover:text-[#00D46A] transition-colors underline-offset-4" href="#">Contact</a>
+</div>
+</div>
+</footer>
+<!-- Mobile Nav Bar -->
+<nav class="lg:hidden fixed bottom-0 w-full bg-surface-container-low/90 backdrop-blur-lg flex justify-around items-center h-16 border-t border-white/5 px-4 z-50">
+<button class="flex flex-col items-center gap-1 text-gray-500">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] uppercase font-bold">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#00D46A]">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-[10px] uppercase font-bold">Ranks</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-500">
+<span class="material-symbols-outlined">sports_soccer</span>
+<span class="text-[10px] uppercase font-bold">Live</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-500">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[10px] uppercase font-bold">Profile</span>
+</button>
+</nav>
+</body></html>

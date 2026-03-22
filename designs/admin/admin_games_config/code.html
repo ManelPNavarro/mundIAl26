@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MundIAL 26 - Games Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Inter:wght@400;500;600;700;800&amp;family=Epilogue:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary": "#452b00",
+              "background": "#131313",
+              "on-surface": "#e5e2e1",
+              "on-surface-variant": "#bbcbb9",
+              "on-background": "#e5e2e1",
+              "surface-dim": "#131313",
+              "primary-fixed": "#63ff94",
+              "surface-container-lowest": "#0e0e0e",
+              "error-container": "#93000a",
+              "outline": "#859585",
+              "on-secondary-container": "#4f3100",
+              "tertiary-fixed-dim": "#c0c7d3",
+              "surface-container-high": "#2a2a2a",
+              "on-tertiary-container": "#424a54",
+              "on-secondary-fixed": "#291800",
+              "on-primary-fixed-variant": "#005225",
+              "on-error": "#690005",
+              "on-error-container": "#ffdad6",
+              "tertiary-fixed": "#dce3f0",
+              "secondary-container": "#dc9100",
+              "tertiary": "#ced5e1",
+              "surface-container": "#201f1f",
+              "error": "#ffb4ab",
+              "primary-fixed-dim": "#2ce377",
+              "on-primary-container": "#005526",
+              "surface-container-highest": "#353534",
+              "surface-variant": "#353534",
+              "tertiary-container": "#b2b9c5",
+              "secondary-fixed-dim": "#ffb955",
+              "on-primary": "#003918",
+              "surface-container-low": "#1c1b1b",
+              "surface-bright": "#3a3939",
+              "on-tertiary-fixed-variant": "#404752",
+              "outline-variant": "#3c4a3d",
+              "secondary-fixed": "#ffddb4",
+              "on-tertiary-fixed": "#151c25",
+              "surface": "#131313",
+              "primary": "#42f183",
+              "inverse-surface": "#e5e2e1",
+              "secondary": "#ffb955",
+              "primary-container": "#00d46a",
+              "on-primary-fixed": "#00210b",
+              "inverse-primary": "#006d33",
+              "on-secondary-fixed-variant": "#633f00",
+              "inverse-on-surface": "#313030",
+              "surface-tint": "#2ce377",
+              "on-tertiary": "#2a313b"
+            },
+            fontFamily: {
+              "headline": ["Epilogue"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bebas { font-family: 'Bebas Neue', cursive; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/70 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full max-w-none">
+<div class="text-2xl font-black text-white italic tracking-tighter bebas">
+            Mund<span class="text-[#00D46A]">IA</span>L 26
+        </div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex gap-8 text-sm font-['Bebas_Neue'] tracking-tight text-white uppercase">
+<a class="text-gray-400 hover:text-[#00D46A] transition-colors duration-300" href="#">Home</a>
+<a class="text-[#00D46A] font-bold" href="#">Matches</a>
+<a class="text-gray-400 hover:text-[#00D46A] transition-colors duration-300" href="#">News</a>
+<a class="text-gray-400 hover:text-[#00D46A] transition-colors duration-300" href="#">Predictions</a>
+<a class="text-gray-400 hover:text-[#00D46A] transition-colors duration-300" href="#">Premium</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-white hover:text-[#00D46A] transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-white hover:text-[#00D46A] transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Hidden on mobile) -->
+<aside class="hidden md:flex fixed left-0 h-full w-64 bg-[#1c1b1b] border-r border-white/5 flex-col py-8 z-40 mt-16">
+<div class="px-6 mb-8">
+<h2 class="font-['Bebas_Neue'] text-xl text-white tracking-wider">MundIAL 26</h2>
+<p class="text-gray-500 text-[10px] uppercase tracking-[0.2em]">Editorial Excellence</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200 ease-in-out font-['Inter'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span>Home</span>
+</a>
+<a class="flex items-center gap-3 bg-[#2a2a2a] text-[#00D46A] border-l-4 border-[#00D46A] px-4 py-3 ml-0 transition-all duration-200 ease-in-out font-['Inter'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="sports_soccer">sports_soccer</span>
+<span>Matches</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200 ease-in-out font-['Inter'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="newspaper">newspaper</span>
+<span>News</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200 ease-in-out font-['Inter'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span>Predictions</span>
+</a>
+<a class="flex items-center gap-3 text-gray-400 px-4 py-3 hover:bg-[#2a2a2a]/50 transition-all duration-200 ease-in-out font-['Inter'] font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="workspace_premium">workspace_premium</span>
+<span>Premium</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-bold py-3 rounded-lg text-xs tracking-widest uppercase shadow-[0px_20px_40px_rgba(0,212,106,0.15)]">
+                Upgrade to Pro
+            </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="md:ml-64 pt-24 pb-20 px-6 min-h-screen">
+<!-- Header Section -->
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<h1 class="bebas text-5xl md:text-7xl text-white leading-none tracking-tight">GAMES MANAGEMENT</h1>
+<p class="text-gray-500 mt-2 font-medium tracking-wide">Configure and monitor independent tournament ecosystems.</p>
+</div>
+<button class="inline-flex items-center justify-center gap-2 bg-white text-black font-bold px-8 py-4 rounded-lg text-sm tracking-widest uppercase hover:bg-primary transition-colors duration-300">
+<span class="material-symbols-outlined text-lg" data-icon="add">add</span>
+                CREATE NEW GAME
+            </button>
+</div>
+<!-- Dashboard Grid (Asymmetric Bento) -->
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Featured/Active Game Card -->
+<div class="md:col-span-8 group relative overflow-hidden bg-surface-container-low rounded-xl p-8 border border-white/5 transition-all hover:bg-surface-container-high">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+<div class="flex flex-col md:flex-row justify-between gap-8 h-full">
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-6">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold tracking-widest uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-primary mr-2 animate-pulse"></span>
+                                Active
+                            </span>
+<span class="text-gray-500 text-[10px] font-bold tracking-widest uppercase">ID: FIFA-WC26-001</span>
+</div>
+<h3 class="bebas text-4xl text-white mb-2">World Cup 2026</h3>
+<p class="text-gray-400 text-sm max-w-md mb-8">The flagship international tournament. Global reach with tiered prediction brackets and live scoring integration.</p>
+<div class="flex items-center gap-8">
+<div>
+<p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Participants</p>
+<p class="bebas text-2xl text-white">1,240,850</p>
+</div>
+<div>
+<p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Active Pools</p>
+<p class="bebas text-2xl text-white">12,402</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col justify-between items-end gap-4 min-w-[200px]">
+<div class="w-32 h-32 bg-surface-container-highest rounded-xl flex items-center justify-center border border-white/5">
+<img alt="Tournament Logo" class="w-20 h-20 opacity-80" data-alt="Official logo for World Cup 2026 tournament" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCI1RxSyDrG0MsyLsXH2l6ZD7y9xIV430BpikeRh1Eap6wqBvy7FehzV4W0jjpsXLD4QCoXT1_sHrbUYy0Qf0bkTJFDuDFjn1MZuoUybAs_MMY6ypBKpd0KOyyEjJPM6rXnS4ykuv26pbdxfoz5-mNmMtfkrh5dDSei86EDGE-zQ4ANKd6vmE5YLQ-EPszDpwRgD3KEfvQTACgk6loxx7oWOsxuTC5ibtvepeVQtY9R-trUjpWXQmmTI1CRgLwrA_r3jAIOA3vddA"/>
+</div>
+<div class="flex flex-wrap gap-2 justify-end">
+<button class="p-3 bg-surface-container-highest text-white rounded-lg hover:text-primary transition-colors border border-white/5" title="Edit Game">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-3 bg-surface-container-highest text-white rounded-lg hover:text-primary transition-colors border border-white/5" title="Configure Scoring">
+<span class="material-symbols-outlined" data-icon="settings_suggest">settings_suggest</span>
+</button>
+<button class="p-3 bg-surface-container-highest text-error rounded-lg hover:bg-error/10 transition-colors border border-white/5" title="Delete">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Stats/Summary Mini Card -->
+<div class="md:col-span-4 bg-surface-container-low rounded-xl p-8 border border-white/5 flex flex-col justify-center">
+<p class="text-[10px] text-gray-500 uppercase tracking-[0.2em] mb-4">Network Overview</p>
+<div class="space-y-6">
+<div class="flex justify-between items-center pb-4 border-b border-white/5">
+<span class="text-sm text-on-surface">Total Managed Games</span>
+<span class="bebas text-2xl text-white">14</span>
+</div>
+<div class="flex justify-between items-center pb-4 border-b border-white/5">
+<span class="text-sm text-on-surface">Active Tournaments</span>
+<span class="bebas text-2xl text-primary">06</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-on-surface">Avg. User Retention</span>
+<span class="bebas text-2xl text-secondary">88%</span>
+</div>
+</div>
+</div>
+<!-- Smaller Game Cards -->
+<div class="md:col-span-4 bg-surface-container-low rounded-xl p-6 border border-white/5 transition-all hover:bg-surface-container-high relative">
+<div class="flex justify-between items-start mb-6">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-highest text-gray-400 text-[9px] font-bold tracking-widest uppercase">
+                        Finished
+                    </span>
+<button class="text-gray-500 hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<div class="flex items-center gap-4 mb-6">
+<div class="w-14 h-14 bg-surface-container-highest rounded-lg flex items-center justify-center border border-white/5">
+<img alt="UCL 24" class="w-10 h-10 opacity-60" data-alt="Champions League 24-25 logo minimalist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm9UMQqrBLU5Po089I76xj1liGR6ThWXqTvE3mOacMUju-70qSnej3pxtLmUbqrpqPDIrsl51qt0pc02pKq1A1DdSL1v1MVpToOiWePvh_E9DeYNP3s6tZmz9w7TnAAGFraXJqKwBSO0sDUVvKEtHHUv8Ljc_5xP6rlV-y1bvVpGhvo9quexb-3o0IgOWHBtLf7oNSs8kS3JJGraBo26uu1r4U8ic3KXM6ctURRfyPAF7PjayyGfuubfI0yjzsHPAR8NP1HcFcLTc"/>
+</div>
+<div>
+<h4 class="bebas text-2xl text-white">Champions League 24/25</h4>
+<p class="text-[10px] text-gray-500 uppercase tracking-widest">Ended June 2025</p>
+</div>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[9px] text-gray-500 uppercase tracking-widest">Total Participants</p>
+<p class="bebas text-xl text-white">856,200</p>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-gray-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2 text-gray-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="analytics">analytics</span>
+</button>
+</div>
+</div>
+</div>
+<div class="md:col-span-4 bg-surface-container-low rounded-xl p-6 border border-white/5 transition-all hover:bg-surface-container-high relative">
+<div class="flex justify-between items-start mb-6">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-secondary/10 text-secondary text-[9px] font-bold tracking-widest uppercase">
+                        Upcoming
+                    </span>
+<button class="text-gray-500 hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<div class="flex items-center gap-4 mb-6">
+<div class="w-14 h-14 bg-surface-container-highest rounded-lg flex items-center justify-center border border-white/5">
+<img alt="PL 25" class="w-10 h-10 opacity-80" data-alt="Premier League logo minimalist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPunbmlJcteGRSSzpwqFKjGEqZlIrsNZaM4e-2kX4Hq7iF7ZsNl1HA3ib18TOUrUlf_Ej6pCqHkcqX10FQU7yIvB3zt_L21DE5KwKrt9wXtHym7KwptqiopfTn8z5iadiK7ASy3x84TuFAsBfux8Sk5mtxyIr9zBKN7H17JuAExlZ04z1S-QmJAatHejIzQRl-3CtLI9AGyu7QjG6daW7U36hZy58SFvjIgZeyx726-w80F8jNRvw_ydcmzho6bgPtFAPvbbJPjf4"/>
+</div>
+<div>
+<h4 class="bebas text-2xl text-white">Premier League 25/26</h4>
+<p class="text-[10px] text-gray-500 uppercase tracking-widest">Starts Aug 2025</p>
+</div>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[9px] text-gray-500 uppercase tracking-widest">Preregistered</p>
+<p class="bebas text-xl text-white">42,100</p>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-gray-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-gray-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="campaign">campaign</span>
+</button>
+</div>
+</div>
+</div>
+<div class="md:col-span-4 bg-surface-container-low rounded-xl p-6 border border-white/5 transition-all hover:bg-surface-container-high relative">
+<div class="flex justify-between items-start mb-6">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-bold tracking-widest uppercase">
+                        Active
+                    </span>
+<button class="text-gray-500 hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<div class="flex items-center gap-4 mb-6">
+<div class="w-14 h-14 bg-surface-container-highest rounded-lg flex items-center justify-center border border-white/5">
+<img alt="Copa Lib" class="w-10 h-10 opacity-80" data-alt="Copa Libertadores tournament logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0fcI46Lvfowe919xLRZnp9jnZtvfSUkoMs0xT9rBjLmWW7ku-jITVWj5cu8gwiyI_N86Fo5LPzagWbRAEnwqMvXoElLi9u5lPknOB0_lGO8Lcp3hS9gfwPsrxXsZvXEQ5jJP7T9Irear3fsiA433FDVVjoNsUCxgF7uR3vHIxCQkhBYU30obc4FPNlPD_CwA_-aGSXOKMh2Ouh_7dZe9ePIGePRh8z7IUMW40Y-cgIrxmrbZPyfanmFOCDfgERx3eOh6Dxv_4YqQ"/>
+</div>
+<div>
+<h4 class="bebas text-2xl text-white">Copa Libertadores</h4>
+<p class="text-[10px] text-gray-500 uppercase tracking-widest">Final Phase</p>
+</div>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[9px] text-gray-500 uppercase tracking-widest">Live Participants</p>
+<p class="bebas text-xl text-white">215,800</p>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-gray-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="settings_suggest">settings_suggest</span>
+</button>
+<button class="p-2 text-gray-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="notifications_active">notifications_active</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Empty State / Placeholder for New Game -->
+<div class="md:col-span-12 border-2 border-dashed border-white/10 rounded-xl p-12 flex flex-col items-center justify-center group hover:border-primary/40 transition-all cursor-pointer">
+<div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-gray-500 group-hover:text-primary text-3xl" data-icon="add_circle">add_circle</span>
+</div>
+<p class="bebas text-xl text-gray-500 group-hover:text-white transition-colors tracking-widest">Draft New Tournament Ecosystem</p>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 border-t border-white/5 bg-[#0d0d0d] flex flex-col md:flex-row justify-between items-center gap-6 w-full mt-20">
+<div class="text-lg font-bold text-white tracking-tighter bebas">
+            Mund<span class="text-[#00D46A]">IA</span>L
+        </div>
+<div class="flex gap-8 font-['Inter'] text-xs tracking-wider uppercase">
+<a class="text-gray-500 hover:text-[#00D46A] underline-offset-4 opacity-100 hover:opacity-80" href="#">About Us</a>
+<a class="text-gray-500 hover:text-[#00D46A] underline-offset-4 opacity-100 hover:opacity-80" href="#">Terms of Service</a>
+<a class="text-gray-500 hover:text-[#00D46A] underline-offset-4 opacity-100 hover:opacity-80" href="#">Privacy Policy</a>
+<a class="text-gray-500 hover:text-[#00D46A] underline-offset-4 opacity-100 hover:opacity-80" href="#">Contact</a>
+</div>
+<p class="font-['Inter'] text-xs tracking-wider uppercase text-gray-500">
+            © 2026 MundIAL Editorial Platform. All rights reserved.
+        </p>
+</footer>
+</body></html>
