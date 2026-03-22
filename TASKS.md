@@ -50,7 +50,40 @@ CRON_SECRET=
 
 ---
 
-## Phase 2 — Supabase Setup
+## Phase 2 — Multi-Competition Architecture
+
+### Task 2.0 — Competitions data model
+Add to `supabase/migrations/001_initial_schema.sql` (before all other tables):
+
+- `competitions` table: `id`, `name`, `slug` (unique), `api_competition_code`, `status` (enum: upcoming|active|finished), `season`, `logo_url`, `predictions_deadline`, `created_at`
+- `user_competitions` junction: `user_id` + `competition_id` + `joined_at`, PK (user_id, competition_id)
+- `sync_logs` table: `id`, `competition_id`, `started_at`, `finished_at`, `status` (enum: running|success|error), `matches_updated`, `error_message`, `triggered_by` (enum: cron|manual)
+- Add `competition_id` FK to: `groups`, `teams`, `players`, `matches`, `predictions`, `scores`
+- Change `predictions` unique constraint from `(user_id)` to `(user_id, competition_id)`
+- Change `scores` unique constraint from `(user_id)` to `(user_id, competition_id)`
+- Change `scoring_rules` unique constraint from `(rule_key)` to `(competition_id, rule_key)`
+- RLS: users can only see competitions they belong to (via `user_competitions`); admins see all
+
+### Task 2.0b — Competition context (React)
+`lib/context/competition-context.tsx`
+- `CompetitionProvider`: stores active competition in state + `localStorage`
+- `useCompetition()` hook: returns `{ activeCompetition, setActiveCompetition, competitions }`
+- Fetches user's competitions on mount from `/api/competitions`
+- Wrap `app/(app)/layout.tsx` with this provider
+
+### Task 2.0c — Competition switcher component
+`components/layout/competition-switcher.tsx`
+- Pill dropdown: logo + name + ChevronDown
+- Dropdown list: all user competitions with status badges
+- On select: calls `setActiveCompetition()`, re-fetches page data via SWR mutate
+- Mobile: renders as a compact banner below the page header
+- Design spec: `DESIGN.md §3.11`
+
+**Status:** [ ] Not started
+
+---
+
+## Phase 3 — Supabase Setup
 
 ### Task 2.1 — Supabase client helpers
 - `lib/supabase/client.ts` — browser client (`createBrowserClient`)
@@ -277,10 +310,36 @@ Reference: `designs/Admin/admin_dashboard/screen.png` + `code.html`
 
 `app/(app)/admin/tournament/page.tsx`
 - Large two-line header "TOURNAMENT / CONFIGURATION" (second line green)
-- Registration Deadline: date + time pickers, Save button
-- API Sync section: "SYNC NOW" button, status cards (CURRENT STATUS | LAST SYNC | NEXT SCHEDULED)
+- Competition selector at top (manage multiple competitions)
+- Per-competition: Registration Deadline (date + time pickers + Save), status
 - Stats panel (right): TOTAL PARTICIPANTS | COMPLETIONS | MATCHES SYNCED (X/104) with progress bars
-- Bottom: ACCESS CONTROL + DB HEALTH cards
+- Bottom: ACCESS CONTROL + links to DB and API pages
+
+### Task 8.5 — Admin Logs page
+`app/(app)/admin/logs/page.tsx`
+- Filter bar: type (Sync | Error | Users | System) + competition dropdown + date range
+- Log table: timestamp | type badge | competition | message | detail
+- Row expand: inline detail / stack trace
+- Auto-refresh toggle (polls every 30s)
+- Data: `sync_logs` + auth events via Supabase
+- Design spec: `DESIGN.md §4.9`
+
+### Task 8.6 — Admin Database page
+`app/(app)/admin/database/page.tsx`
+- DB health card: status, response time (ping Supabase), connection info
+- Table stats: row counts for all tables (server-side query via service role)
+- Last migration applied
+- Read-only SQL runner: textarea → POST `/api/admin/query` → result table
+- `/api/admin/query/route.ts`: service role client, reject non-SELECT statements
+- Design spec: `DESIGN.md §4.10`
+
+### Task 8.7 — Admin API page
+`app/(app)/admin/api/page.tsx`
+- Football API status: ping football-data.org, show latency + rate limit headers
+- Per-competition sync cards: last sync, matches progress, "Sincronizar ahora" button
+- Sync button calls `/api/sync-results?competition={slug}` and shows result
+- Last API response preview: collapsible JSON block
+- Design spec: `DESIGN.md §4.11`
 
 **Status:** [ ] Not started
 
@@ -296,11 +355,17 @@ Reference: `designs/Admin/admin_dashboard/screen.png` + `code.html`
 
 ### Task 9.2 — Sync results route
 `app/api/sync-results/route.ts`
-- GET handler (Vercel Cron)
-- Fetch from football-data.org → upsert `matches` by `api_id`
-- Trigger score recalculation after sync
-- Update `settings.last_sync_at`
+- GET handler — called by cron-job.org (external cron, not Vercel Cron)
+- Query param: `?competition=wc2026` (competition slug)
 - Auth: verify `Authorization: Bearer ${CRON_SECRET}`
+- Steps:
+  1. Look up competition by slug → get `api_competition_code`
+  2. Insert `sync_logs` row with status `running`
+  3. Fetch from football-data.org using `api_competition_code`
+  4. Upsert `matches` by `api_id`, scoped to `competition_id`
+  5. Trigger score recalculation
+  6. Update `sync_logs` row: status=success, `matches_updated`, `finished_at`
+  7. On error: update `sync_logs` row with status=error, `error_message`
 
 ### Task 9.3 — Scoring engine
 `lib/scoring.ts`
@@ -314,13 +379,12 @@ Reference: `designs/Admin/admin_dashboard/screen.png` + `code.html`
 - Calls `recalculateAllScores()`
 - Returns `{ recalculated: N, durationMs: X }`
 
-### Task 9.5 — Vercel Cron
-`vercel.json`:
-```json
-{
-  "crons": [{ "path": "/api/sync-results", "schedule": "*/15 * * * *" }]
-}
-```
+### Task 9.5 — External Cron (cron-job.org)
+No Vercel Cron (Hobby plan limitation). Instead, configure one cron-job.org job per active competition:
+- URL: `https://your-app.vercel.app/api/sync-results?competition={slug}`
+- Schedule: every 15 minutes
+- Header: `Authorization: Bearer {CRON_SECRET}`
+- Document active jobs in `README.md` under "Cron Jobs"
 
 **Status:** [ ] Not started
 
@@ -413,4 +477,4 @@ Always read `code.html` before implementing each page.
 
 ---
 
-*Generated: 2026-03-19*
+*Generated: 2026-03-19 | Last updated: 2026-03-22*

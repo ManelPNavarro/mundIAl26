@@ -7,13 +7,14 @@
 
 ## 1. Overview
 
-Web app for coworkers to participate in a World Cup 2026 prediction pool. Each participant fills in their predictions **before the tournament starts** (no changes allowed afterwards). The app automatically calculates points as real results come in via API. A real-time leaderboard keeps the competition alive.
+Web app for coworkers to participate in football prediction pools. Supports **multiple competitions simultaneously** (World Cup 2026, Champions League, etc.). Each participant joins one or more competitions, fills in their predictions before each tournament starts (no changes allowed afterwards), and competes on a per-competition leaderboard. The app automatically calculates points as real results come in via API.
 
 **Target users:** 20–100 coworkers
 **UI language:** Spanish — all labels, copy, and user-facing text are in Spanish
 **Code language:** English — all routes, endpoints, variable names, function names, database columns, env vars, and file names must be in English
 **Style:** Football-themed, bold & fun (energetic, strong typography, stadium colors)
 **Platforms:** Responsive — desktop for filling in predictions, mobile for checking the leaderboard
+**Multi-competition:** Users can belong to multiple competitions and switch between them via a competition picker in the navbar
 
 ---
 
@@ -101,7 +102,7 @@ Only accessible to users with `admin` role.
 - Activate/deactivate user (to block access without deleting)
 
 #### `/admin/scoring`
-- Configure points for each type of correct prediction:
+- Configure points per competition for each type of correct prediction:
   - Exact match result (scoreline)
   - Correct winner/draw
   - Correct group position (exact position)
@@ -114,13 +115,65 @@ Only accessible to users with `admin` role.
 - Changes trigger a full recalculation of all points
 
 #### `/admin/tournament`
-- Set the deadline for submitting predictions
-- View API sync status
-- Force manual results sync
+- Manage competitions: create, edit, enable/disable
+- Per-competition: set predictions deadline, view API sync status, force manual sync
+- Competition selector at the top of the page
+
+#### `/admin/logs`
+- Activity log: API syncs (timestamp, competition, matches updated, duration, status)
+- Error log: failed syncs, API errors, scoring errors
+- User activity log: registrations, logins, prediction submissions
+- Filterable by type, competition, date range
+- Auto-refreshes every 30 seconds
+
+#### `/admin/database`
+- Table row counts (users, predictions, matches, scores, etc.)
+- DB health indicator (connection status, response time)
+- Last migration applied
+- Quick read-only SQL query runner (for admins only)
+
+#### `/admin/api`
+- Football API status: current plan, rate limit, remaining requests today
+- Per-competition sync status: last sync time, next scheduled, matches synced / total
+- Manual sync button per competition
+- API response preview (last raw response)
 
 ---
 
 ## 5. Data Model (Supabase / PostgreSQL)
+
+### `competitions`
+```
+id (uuid, PK)
+name (text)                        -- "World Cup 2026", "Champions League 2025/26"
+slug (text, unique)                -- "wc2026", "cl2526"
+api_competition_code (text)        -- "WC", "CL" — football-data.org competition code
+status (enum: 'upcoming' | 'active' | 'finished')
+season (text)                      -- "2026", "2025/26"
+logo_url (text, nullable)
+predictions_deadline (timestamptz) -- moved from settings to per-competition
+created_at (timestamptz)
+```
+
+### `user_competitions` (junction — which users are in which competition)
+```
+user_id (uuid, FK → users)
+competition_id (uuid, FK → competitions)
+joined_at (timestamptz)
+PRIMARY KEY (user_id, competition_id)
+```
+
+### `sync_logs`
+```
+id (uuid, PK)
+competition_id (uuid, FK → competitions)
+started_at (timestamptz)
+finished_at (timestamptz, nullable)
+status (enum: 'running' | 'success' | 'error')
+matches_updated (integer, default 0)
+error_message (text, nullable)
+triggered_by (enum: 'cron' | 'manual')
+```
 
 ### `users`
 ```
@@ -137,22 +190,25 @@ created_at (timestamp)
 ```
 id (uuid, PK)
 name (text)
-short_name (text)  -- e.g. "ESP"
+short_name (text)          -- e.g. "ESP"
 flag_url (text)
 group_id (uuid, FK → groups)
-api_id (integer)   -- ID in football-data.org
+competition_id (uuid, FK → competitions)
+api_id (integer)           -- ID in football-data.org
 ```
 
 ### `groups`
 ```
 id (uuid, PK)
-name (text)   -- "Group A", "Group B"...
+name (text)                -- "Group A", "Group B"...
+competition_id (uuid, FK → competitions)
 ```
 
 ### `matches`
 ```
 id (uuid, PK)
 api_id (integer, unique)   -- ID in football-data.org
+competition_id (uuid, FK → competitions)
 phase (enum: 'group' | 'round_of_32' | 'round_of_16' | 'quarter' | 'semi' | 'third_place' | 'final')
 group_id (uuid, FK → groups, nullable)
 home_team_id (uuid, FK → teams, nullable)
@@ -168,14 +224,17 @@ match_date (timestamp)
 id (uuid, PK)
 name (text)
 team_id (uuid, FK → teams)
+competition_id (uuid, FK → competitions)
 position (enum: 'goalkeeper' | 'defender' | 'midfielder' | 'forward')
 api_id (integer, nullable)
 ```
 
-### `predictions` (one prediction entry per user)
+### `predictions` (one prediction entry per user per competition)
 ```
 id (uuid, PK)
-user_id (uuid, FK → users, unique)
+user_id (uuid, FK → users)
+competition_id (uuid, FK → competitions)
+UNIQUE (user_id, competition_id)
 submitted_at (timestamp, nullable)  -- null if not yet submitted
 is_complete (boolean, default false)
 tournament_winner_team_id (uuid, FK → teams, nullable)
@@ -206,15 +265,19 @@ third_team_id (uuid, FK → teams)
 ### `scoring_rules`
 ```
 id (uuid, PK)
-rule_key (text, unique)  -- e.g. "exact_score", "correct_winner", "group_classification"...
+competition_id (uuid, FK → competitions)
+rule_key (text)    -- e.g. "exact_score", "correct_winner", "group_classification"...
 points (integer)
-label (text)   -- human-readable description for the admin
+label (text)       -- human-readable description for the admin
+UNIQUE (competition_id, rule_key)
 ```
 
-### `scores` (cached calculated points, recalculable)
+### `scores` (cached calculated points per user per competition, recalculable)
 ```
 id (uuid, PK)
 user_id (uuid, FK → users)
+competition_id (uuid, FK → competitions)
+UNIQUE (user_id, competition_id)
 total_points (integer)
 breakdown (jsonb)  -- breakdown by category
 last_calculated_at (timestamp)
@@ -224,7 +287,8 @@ last_calculated_at (timestamp)
 ```
 key (text, PK)
 value (text)
--- e.g. key='predictions_deadline', value='2026-06-10T23:59:59Z'
+-- global settings: e.g. key='registration_open', value='true'
+-- competition-specific settings moved to competitions table
 ```
 
 ---
@@ -253,25 +317,35 @@ value (text)
 **Auth:** API key in environment variable (`FOOTBALL_DATA_API_KEY`)
 
 ### Endpoints to use
-- `GET /v4/competitions/WC/matches` — all World Cup matches
-- `GET /v4/competitions/WC/teams` — all teams
-- `GET /v4/competitions/WC/standings` — group standings
+- `GET /v4/competitions/{code}/matches` — all matches for a competition
+- `GET /v4/competitions/{code}/teams` — all teams
+- `GET /v4/competitions/{code}/standings` — group standings
+
+Competition codes: `WC` (World Cup), `CL` (Champions League), `PD` (La Liga), etc.
 
 ### Sync strategy
-- **Next.js API Route** (`/api/sync-results`) called periodically
-- Vercel Cron Jobs (free on free tier) to call this endpoint every 15 minutes during the tournament
-- The endpoint updates the `matches` table with real results
-- After updating results, recalculates points in the `scores` table
-- Admins can also force a manual sync from `/admin/tournament`
+- **Next.js API Route** (`/api/sync-results?competition=wc2026`) — accepts competition slug
+- External cron (cron-job.org) calls the endpoint every 15 minutes (Vercel Hobby plan limitation)
+- The endpoint:
+  1. Looks up `competitions` table by slug to get `api_competition_code`
+  2. Fetches from football-data.org
+  3. Upserts `matches` by `api_id`
+  4. Recalculates points in `scores`
+  5. Writes a row to `sync_logs`
+- Admins can also force a manual sync per competition from `/admin/api`
+- One cron-job.org job per active competition
 
 ---
 
 ## 8. User Flow
 
 ```
-Register → Fill predictions (before Jun 10, 2026) → View results → Check leaderboard
-                                                                           ↑
-                                       [Cron every 15min] Football API → Sync results → Recalculate points
+Register → Join competition(s) → Fill predictions (before deadline) → View results → Check leaderboard
+                                                                                            ↑
+                                              [Cron every 15min] Football API → Sync results → Recalculate points
+
+Multi-competition user:
+  Navbar competition picker → switch active competition → all pages scope to that competition
 ```
 
 ---
@@ -369,11 +443,11 @@ mundIAl26/
 - Comments/reactions on the leaderboard (lightweight chat)
 - Push notifications when new results arrive
 - Share result on social media
-- Private groups (different "leagues" within the same app)
 - Additional individual stat predictions (yellow cards, etc.)
 - Ranking evolution chart over the course of the tournament
 - Export leaderboard to PDF/image for sharing
+- Cross-competition global ranking (who's best across all pools)
 
 ---
 
-*Document created: March 2026 | Last updated: 2026-03-19*
+*Document created: March 2026 | Last updated: 2026-03-22*

@@ -93,6 +93,7 @@ Filmin-like: minimal shadows, no heavy textures. Depth comes from layering dark 
 - Height: `60px`
 - Background: `#0d0d0d` (same as page bg) with a very subtle `1px` bottom border in `dark-border`
 - Left: Logo — "Mund**IA**l 26" with "IA" in `green-primary`, rest in `white`, Bebas Neue 28px
+- Center-left: **Competition switcher** — pill-shaped dropdown showing active competition name (e.g. "World Cup 2026"), with a small chevron; clicking opens a dropdown listing all competitions the user belongs to; active competition has a `green-primary` dot indicator
 - Right: nav links in Inter 500 14px — Ranking, Resultados, Mi Quiniela, (+ Admin if admin role)
 - Inactive links: `gray-muted`, hover: `white` (150ms transition)
 - Active link: `white` + `green-primary` 2px underline offset below
@@ -105,6 +106,17 @@ Filmin-like: minimal shadows, no heavy textures. Depth comes from layering dark 
 - 5 tabs: **Inicio** (Home), **Resultados** (Flag), **Ranking** (Trophy), **Quiniela** (ClipboardList), **Perfil** (User)
 - Active tab: icon + label in `green-primary`, inactive in `gray-muted`
 - Tab label: Inter 11px below icon
+- **Competition switcher on mobile:** sticky banner below the top of the page (not in the bottom nav), showing current competition name with a swap icon; tapping opens a bottom sheet with the list
+
+### 3.11 Competition Switcher
+
+- Pill component: `dark-card` bg, `dark-border` border, `8px` radius
+- Left: small competition logo/icon (20px) or trophy icon as fallback
+- Center: competition name, Inter 500 14px, `white`
+- Right: `ChevronDown` icon, `gray-muted`
+- Dropdown list item: logo + name + status badge (ACTIVO / PRÓXIMO / FINALIZADO)
+- Active competition: `green-primary` left border on the dropdown item
+- Transition: `150ms ease` open/close
 
 ### 3.3 Buttons
 
@@ -232,7 +244,7 @@ Filmin-like: minimal shadows, no heavy textures. Depth comes from layering dark 
 
 **Header section:**
 - Page title "Clasificación" Bebas Neue 40px
-- Subtitle "Mundial 2026 · Actualizado hace X minutos" Inter 14px `gray-muted`
+- Subtitle "[Competition Name] · Actualizado hace X minutos" Inter 14px `gray-muted`
 - Auto-refresh indicator (subtle spinning icon when refreshing)
 
 **Podium section (top 3 users):**
@@ -387,6 +399,77 @@ Mejor portero            [  3  ] puntos
 
 ---
 
+### 4.9 `/admin/logs` — Activity & Error Logs
+
+**Header:** "REGISTRO DE ACTIVIDAD" (ACTIVIDAD in green-primary)
+
+**Filter bar:** Type (Sincronización | Errores | Usuarios) + Competition dropdown + Date range picker
+
+**Log table:**
+```
+Timestamp | Type badge | Competition | Message | Duration / Detail
+```
+- Type badges: green "SYNC OK", red "ERROR", blue "USUARIO", yellow "SISTEMA"
+- Row click: expands inline to show full detail / stack trace
+- Auto-refresh toggle: green dot "En vivo" when enabled
+- Empty state: "No hay registros para este filtro"
+
+---
+
+### 4.10 `/admin/database` — Database Health
+
+**Header:** "BASE DE DATOS" (DATOS in green-primary)
+
+**Health card (top):**
+- Large status indicator: green "OPERATIVA" / red "ERROR"
+- Response time: "X ms" in Bebas Neue 32px
+- Connection pool: progress bar
+
+**Table stats grid (2-col desktop, 1-col mobile):**
+Each card: table name + row count (Bebas Neue 24px) + last updated
+Tables shown: users, competitions, matches, predictions, scores, sync_logs
+
+**Last migration card:**
+- Migration filename + applied date + status badge
+
+**SQL Runner (read-only):**
+- Monospace textarea (dark-bg, dark-border, 12px font)
+- "EJECUTAR" button
+- Results: simple table or error message in red
+- Warning banner: "Solo lectura. Las consultas de escritura serán rechazadas."
+
+---
+
+### 4.11 `/admin/api` — Football API Management
+
+**Header:** "API DE FÚTBOL" (API in green-primary)
+
+**API Status card:**
+- Provider: "football-data.org"
+- Plan badge: "FREE TIER" in gold
+- Rate limit: "X / 10 req/min" with progress bar
+- Daily requests: "X / Y" with progress bar
+- Connection status: green/red dot + latency
+
+**Per-competition sync cards** (one card per active competition):
+```
+┌─────────────────────────────────┐
+│  [Logo] World Cup 2026          │
+│  Último sync: hace 12 min       │
+│  Partidos: 48 / 104             │
+│  Estado: ● OPERATIVO            │
+│  [SINCRONIZAR AHORA]            │
+└─────────────────────────────────┘
+```
+- Sync button: shows spinner during sync, then success/error toast
+- Matches progress bar: green fill
+
+**Last API response preview:**
+- Collapsible JSON block, monospace, dark-card bg, `gray-muted` text
+- "Ver respuesta completa" expandable
+
+---
+
 ## 5. User Flows
 
 ### Registration → First prediction
@@ -441,4 +524,4 @@ Login → /ranking (default landing)
 
 ---
 
-*Document created: March 2026 | Last updated: 2026-03-19*
+*Document created: March 2026 | Last updated: 2026-03-22*
