@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Camera } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -15,7 +14,6 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -52,10 +50,6 @@ export default function RegisterPage() {
     }
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden.");
-      return;
-    }
-    if (!acceptedTerms) {
-      setError("Debes aceptar los términos y condiciones.");
       return;
     }
 
@@ -127,141 +121,122 @@ export default function RegisterPage() {
     }
   }
 
+  const inputClass =
+    "bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary/50 rounded-lg py-4 px-4 w-full text-on-surface placeholder:text-on-surface-variant/40 outline-none transition-all";
+  const labelClass =
+    "block text-xs font-semibold text-on-surface-variant tracking-wider uppercase";
+
   return (
-    <div className="w-full max-w-4xl grid md:grid-cols-12 gap-0 overflow-hidden rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.6)]">
-      {/* Left panel: brand */}
-      <div className="hidden md:flex md:col-span-5 bg-dark-card flex-col justify-between p-10 relative overflow-hidden">
-        <div className="z-10">
-          <h1 className="font-display text-5xl tracking-widest text-white mb-2">
-            MUND<span className="text-green-primary">IA</span>L{" "}
-            <span className="text-green-primary">26</span>
-          </h1>
-          <p className="text-gray-muted text-sm tracking-widest uppercase">
-            La quiniela definitiva del Mundial
-          </p>
-        </div>
-        <div className="z-10 space-y-6">
-          <div className="space-y-1">
-            <span className="text-green-primary font-display text-2xl tracking-tight block">
-              LA QUINIELA DEFINITIVA
-            </span>
-            <p className="text-gray-muted text-sm leading-relaxed">
-              Únete a la comunidad de pronósticos más exclusiva del mundo y domina el ranking global.
-            </p>
-          </div>
-        </div>
-        {/* Decorative glow */}
-        <div className="absolute bottom-0 right-0 w-64 h-64 bg-green-primary/5 rounded-full blur-[80px] pointer-events-none" />
+    <div className="pitch-black-bg min-h-screen flex flex-col items-center justify-center p-6 text-on-surface selection:bg-primary selection:text-on-primary">
+      {/* Noise texture overlay */}
+      <div className="fixed inset-0 pointer-events-none z-[-1] opacity-[0.03]">
+        <svg width="100%" height="100%">
+          <filter id="noise-register">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves={3} stitchTiles="stitch" />
+            <feColorMatrix type="saturate" values="0" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#noise-register)" />
+        </svg>
       </div>
 
-      {/* Right panel: form */}
-      <div className="md:col-span-7 bg-[#2a2a2a] p-8 md:p-12">
-        <div className="mb-8">
-          <h2 className="font-display text-4xl text-white mb-2">CREAR CUENTA</h2>
-          <p className="text-gray-muted text-sm">
-            Ingresa tus datos para comenzar tu camino a la gloria.
-          </p>
-        </div>
+      <main className="w-full max-w-[480px] flex flex-col items-center">
+        {/* Register Card */}
+        <div className="bg-surface-container-low rounded-xl p-8 md:p-12 shadow-2xl relative overflow-hidden w-full">
+          {/* Left ornament */}
+          <div className="absolute top-0 left-0 w-1 h-full editorial-gradient opacity-80" />
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          {/* Profile photo upload */}
-          <div className="flex items-center space-x-6 mb-2">
-            <div className="relative group">
+          <div className="mb-8">
+            <h1 className="font-bebas text-5xl text-on-surface mb-2">YOU&apos;VE BEEN SUMMONED</h1>
+            <p className="text-on-surface-variant text-sm">Complete your profile to join the competition.</p>
+          </div>
+
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Profile photo upload */}
+            <div>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-20 h-20 rounded-full bg-dark-bg border-2 border-dashed border-dark-border flex items-center justify-center overflow-hidden transition-colors group-hover:border-green-primary cursor-pointer"
+                className="w-full border-2 border-dashed border-outline-variant hover:border-primary rounded-lg py-6 flex flex-col items-center gap-3 transition-colors group cursor-pointer bg-transparent"
               >
                 {photoPreview ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={photoPreview}
                     alt="Vista previa"
-                    className="w-full h-full object-cover"
+                    className="w-16 h-16 rounded-lg object-cover"
                   />
                 ) : (
-                  <Camera className="w-8 h-8 text-gray-muted group-hover:text-green-primary transition-colors" />
+                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors text-4xl">
+                    photo_camera
+                  </span>
                 )}
+                <div className="text-center">
+                  <span className="block text-on-surface-variant text-xs font-semibold uppercase tracking-wider">
+                    Foto de Perfil
+                  </span>
+                  <span className="block text-on-surface-variant/50 text-[10px] uppercase tracking-wider mt-0.5">
+                    Opcional • JPG PNG GIF • 5MB
+                  </span>
+                </div>
               </button>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png"
+                accept="image/jpeg,image/png,image/gif"
                 className="hidden"
                 onChange={handlePhotoChange}
               />
             </div>
-            <div className="flex-1">
-              <label className="block text-xs font-semibold text-green-primary uppercase tracking-wider mb-1">
-                Foto de Perfil
-              </label>
-              <p className="text-gray-muted text-[10px] uppercase">
-                Opcional • JPG, PNG (Max 5MB)
-              </p>
-            </div>
-          </div>
 
-          {/* Name fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label
-                className="block text-xs font-semibold text-gray-muted uppercase tracking-wider"
-                htmlFor="first_name"
-              >
-                Nombre
+            {/* Name fields — 50/50 */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className={labelClass} htmlFor="first_name">
+                  Nombre
+                </label>
+                <input
+                  id="first_name"
+                  type="text"
+                  placeholder="Ej. Javier"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className={labelClass} htmlFor="last_name">
+                  Apellido
+                </label>
+                <input
+                  id="last_name"
+                  type="text"
+                  placeholder="Ej. Hernández"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="space-y-2">
+              <label className={labelClass} htmlFor="email">
+                Correo Electrónico
               </label>
               <input
-                id="first_name"
-                type="text"
-                placeholder="Ej. Javier"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full bg-dark-bg border-none focus:ring-1 focus:ring-green-primary rounded-lg text-white placeholder:text-gray-dim py-3 px-4 transition-all outline-none"
+                id="email"
+                type="email"
+                placeholder="javier@estadio.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className={inputClass}
               />
             </div>
-            <div className="space-y-1.5">
-              <label
-                className="block text-xs font-semibold text-gray-muted uppercase tracking-wider"
-                htmlFor="last_name"
-              >
-                Apellido
-              </label>
-              <input
-                id="last_name"
-                type="text"
-                placeholder="Ej. Hernández"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="w-full bg-dark-bg border-none focus:ring-1 focus:ring-green-primary rounded-lg text-white placeholder:text-gray-dim py-3 px-4 transition-all outline-none"
-              />
-            </div>
-          </div>
 
-          {/* Email */}
-          <div className="space-y-1.5">
-            <label
-              className="block text-xs font-semibold text-gray-muted uppercase tracking-wider"
-              htmlFor="email"
-            >
-              Correo Electrónico
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="javier@estadio.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-dark-bg border-none focus:ring-1 focus:ring-green-primary rounded-lg text-white placeholder:text-gray-dim py-3 px-4 transition-all outline-none"
-            />
-          </div>
-
-          {/* Password fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label
-                className="block text-xs font-semibold text-gray-muted uppercase tracking-wider"
-                htmlFor="password"
-              >
+            {/* Password */}
+            <div className="space-y-2">
+              <label className={labelClass} htmlFor="password">
                 Contraseña
               </label>
               <input
@@ -270,15 +245,15 @@ export default function RegisterPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-dark-bg border-none focus:ring-1 focus:ring-green-primary rounded-lg text-white placeholder:text-gray-dim py-3 px-4 transition-all outline-none"
+                required
+                className={inputClass}
               />
             </div>
-            <div className="space-y-1.5">
-              <label
-                className="block text-xs font-semibold text-gray-muted uppercase tracking-wider"
-                htmlFor="confirm_password"
-              >
-                Confirmar
+
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <label className={labelClass} htmlFor="confirm_password">
+                Confirmar Contraseña
               </label>
               <input
                 id="confirm_password"
@@ -286,63 +261,49 @@ export default function RegisterPage() {
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full bg-dark-bg border-none focus:ring-1 focus:ring-green-primary rounded-lg text-white placeholder:text-gray-dim py-3 px-4 transition-all outline-none"
+                required
+                className={inputClass}
               />
             </div>
-          </div>
 
-          {/* Terms */}
-          <div className="flex items-start space-x-3 pt-2">
-            <input
-              id="terms"
-              type="checkbox"
-              checked={acceptedTerms}
-              onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className="mt-1 rounded border-none bg-dark-bg text-green-primary focus:ring-green-primary transition-all accent-green-primary"
-            />
-            <label className="text-xs text-gray-muted leading-relaxed" htmlFor="terms">
-              Acepto los{" "}
-              <a className="text-green-primary hover:underline transition-all" href="#">
-                Términos de Servicio
-              </a>{" "}
-              y la{" "}
-              <a className="text-green-primary hover:underline transition-all" href="#">
-                Política de Privacidad
-              </a>{" "}
-              de MundIAl 26.
-            </label>
-          </div>
+            {/* Error message */}
+            {error && (
+              <p className="text-error text-xs">{error}</p>
+            )}
 
-          {/* Error message */}
-          {error && (
-            <p className="text-red-accent text-sm py-2 px-4 bg-red-accent/10 rounded-lg">
-              {error}
-            </p>
-          )}
-
-          {/* Submit button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full pitch-gradient text-dark-bg font-bold text-sm tracking-[0.2em] uppercase py-4 rounded-lg shadow-[0_10px_20px_rgba(0,212,106,0.2)] hover:shadow-[0_15px_30px_rgba(0,212,106,0.3)] hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-          >
-            {loading ? "CREANDO CUENTA..." : "CREAR CUENTA"}
-          </button>
-
-          {/* Login link */}
-          <div className="text-center pt-4">
-            <p className="text-xs text-gray-muted uppercase tracking-widest">
-              ¿Ya tienes cuenta?{" "}
-              <Link
-                href="/login"
-                className="text-green-primary font-bold ml-1 hover:text-white transition-colors"
+            {/* Submit Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="editorial-gradient text-on-primary-fixed font-bebas text-xl py-4 rounded-lg w-full tracking-widest hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Iniciar Sesión
-              </Link>
-            </p>
-          </div>
-        </form>
-      </div>
+                {loading ? (
+                  <>
+                    <span className="w-5 h-5 border-2 border-on-primary-fixed/30 border-t-on-primary-fixed rounded-full animate-spin" />
+                    REGISTRANDO...
+                  </>
+                ) : (
+                  "JOIN THE COMPETITION"
+                )}
+              </button>
+            </div>
+
+            {/* Login link */}
+            <div className="text-center pt-2">
+              <p className="text-on-surface-variant text-xs">
+                ¿Ya tienes cuenta?{" "}
+                <Link
+                  href="/login"
+                  className="text-on-surface font-semibold hover:text-primary transition-colors uppercase tracking-tighter underline underline-offset-4"
+                >
+                  ENTRAR
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
+      </main>
     </div>
   );
 }

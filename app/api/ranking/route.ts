@@ -1,11 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
+    const { searchParams } = new URL(request.url);
+    const competitionId = searchParams.get("competition_id");
 
-    const { data: scores, error } = await supabase
+    let query = supabase
       .from("scores")
       .select(
         `
@@ -23,6 +25,12 @@ export async function GET() {
       )
       .order("total_points", { ascending: false });
 
+    if (competitionId) {
+      query = query.eq("competition_id", competitionId);
+    }
+
+    const { data: scores, error } = await query;
+
     if (error) {
       console.error("Error fetching ranking:", error);
       return NextResponse.json(
@@ -34,6 +42,8 @@ export async function GET() {
     const ranking = (scores ?? []).map((entry, index) => ({
       rank: index + 1,
       user_id: entry.user_id,
+      first_name: entry.users?.first_name ?? "",
+      last_name: entry.users?.last_name ?? "",
       name: entry.users
         ? `${entry.users.first_name} ${entry.users.last_name}`.trim()
         : "Usuario",

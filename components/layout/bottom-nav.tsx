@@ -1,44 +1,46 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Trophy, Flag, ClipboardList, User } from "lucide-react";
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 const TABS = [
-  { href: "/ranking", label: "Ranking", icon: Trophy },
-  { href: "/results", label: "Resultados", icon: Flag },
-  { href: "/predictions", label: "Quiniela", icon: ClipboardList },
-  { href: "/profile", label: "Perfil", icon: User },
-];
+  { href: '/ranking', label: 'Home', icon: 'home' },
+  { href: '/results', label: 'Live', icon: 'sports_soccer' },
+  { href: '/ranking', label: 'Rankings', icon: 'insights' },
+  { href: '/predictions', label: 'Quiniela', icon: 'checklist' },
+  { href: '/profile', label: 'Perfil', icon: 'account_circle' },
+]
 
 export default function BottomNav() {
-  const pathname = usePathname();
+  const pathname = usePathname()
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-dark-card border-t border-dark-border z-50 flex items-stretch">
-      {TABS.map(({ href, label, icon: Icon }) => {
-        const isActive = pathname === href || pathname.startsWith(href + "/");
+    <nav className="lg:hidden fixed bottom-0 w-full bg-[#131313]/90 backdrop-blur-xl border-t border-white/5 z-50 flex justify-around items-center h-16">
+      {TABS.map(({ href, label, icon }) => {
+        const isActive = pathname === href || pathname.startsWith(href + '/')
         return (
           <Link
-            key={href}
+            key={`${href}-${label}`}
             href={href}
-            className="flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors"
+            className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full"
           >
-            <Icon
-              className={`w-5 h-5 ${
-                isActive ? "text-green-primary" : "text-gray-muted"
-              }`}
-            />
             <span
-              className={`text-[11px] font-medium ${
-                isActive ? "text-green-primary" : "text-gray-muted"
+              className={`material-symbols-outlined text-xl leading-none ${
+                isActive ? 'text-[#00D46A]' : 'text-gray-400'
+              }`}
+            >
+              {icon}
+            </span>
+            <span
+              className={`text-[10px] uppercase font-bold ${
+                isActive ? 'text-[#00D46A]' : 'text-gray-400'
               }`}
             >
               {label}
             </span>
           </Link>
-        );
+        )
       })}
     </nav>
-  );
+  )
 }

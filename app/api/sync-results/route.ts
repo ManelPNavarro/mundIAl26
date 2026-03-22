@@ -14,7 +14,21 @@ function mapStatus(apiStatus: string): "scheduled" | "live" | "finished" {
   }
 }
 
-// GET handler — used by Vercel Cron and manual "Sync Now"
+function mapPhase(
+  stage: string
+): "group" | "round_of_32" | "round_of_16" | "quarter" | "semi" | "third_place" | "final" {
+  switch (stage) {
+    case "ROUND_OF_32": return "round_of_32";
+    case "ROUND_OF_16": return "round_of_16";
+    case "QUARTER_FINALS": return "quarter";
+    case "SEMI_FINALS": return "semi";
+    case "THIRD_PLACE": return "third_place";
+    case "FINAL": return "final";
+    default: return "group";
+  }
+}
+
+// GET handler — used by cron-job.org and manual "Sync Now"
 export async function GET(request: NextRequest) {
   // Verify cron secret
   const cronSecret = process.env.CRON_SECRET;
@@ -24,25 +38,58 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Create service role client inside the handler (not at module level)
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
+  // Resolve competition from query param (defaults to wc2026)
+  const { searchParams } = new URL(request.url);
+  const competitionSlug = searchParams.get("competition") ?? "wc2026";
+  const triggeredBy = (searchParams.get("triggered_by") ?? "cron") as "cron" | "manual";
+
+  const { data: competitionRow, error: compError } = await supabase
+    .from("competitions")
+    .select("id, api_competition_code")
+    .eq("slug", competitionSlug)
+    .maybeSingle();
+
+  if (compError || !competitionRow) {
+    return NextResponse.json(
+      { error: `Competition '${competitionSlug}' not found` },
+      { status: 404 }
+    );
+  }
+
+  const competitionId: string = competitionRow.id;
+  const apiCode: string = competitionRow.api_competition_code;
+
+  // Insert sync_log row (status: running)
+  const { data: syncLog } = await supabase
+    .from("sync_logs")
+    .insert({
+      competition_id: competitionId,
+      started_at: new Date().toISOString(),
+      status: "running",
+      triggered_by: triggeredBy,
+    })
+    .select("id")
+    .single();
+
+  const syncLogId: string | null = syncLog?.id ?? null;
+
   const errors: string[] = [];
   let synced = 0;
-  let updated = 0;
 
   try {
-    const matches = await fetchMatches();
+    const matches = await fetchMatches(apiCode);
 
     for (const match of matches) {
       const homeScore = match.score?.fullTime?.home ?? null;
       const awayScore = match.score?.fullTime?.away ?? null;
       const status = mapStatus(match.status);
+      const phase = mapPhase(match.stage ?? "");
 
-      // Attempt to look up team IDs in our DB by short_name/api_id
       let homeTeamId: string | null = null;
       let awayTeamId: string | null = null;
 
@@ -50,27 +97,28 @@ export async function GET(request: NextRequest) {
         .from("teams")
         .select("id")
         .eq("api_id", match.homeTeam.id)
+        .eq("competition_id", competitionId)
         .maybeSingle();
-      const homeTeam = homeTeamRaw as { id: string } | null;
-      if (homeTeam) homeTeamId = homeTeam.id;
+      if (homeTeamRaw) homeTeamId = (homeTeamRaw as { id: string }).id;
 
       const { data: awayTeamRaw } = await supabase
         .from("teams")
         .select("id")
         .eq("api_id", match.awayTeam.id)
+        .eq("competition_id", competitionId)
         .maybeSingle();
-      const awayTeam = awayTeamRaw as { id: string } | null;
-      if (awayTeam) awayTeamId = awayTeam.id;
+      if (awayTeamRaw) awayTeamId = (awayTeamRaw as { id: string }).id;
 
       const record = {
         api_id: match.id,
+        competition_id: competitionId,
         home_team_id: homeTeamId,
         away_team_id: awayTeamId,
         home_score: homeScore,
         away_score: awayScore,
         status,
         match_date: match.utcDate,
-        phase: "group" as const,
+        phase,
       };
 
       const { error } = await supabase
@@ -84,21 +132,39 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    updated = synced;
-
-    // Update last_sync_at in settings
-    await supabase
-      .from("settings")
-      .upsert({ key: "last_sync_at", value: new Date().toISOString() }, { onConflict: "key" });
+    // Update sync_log: success
+    if (syncLogId) {
+      await supabase
+        .from("sync_logs")
+        .update({
+          finished_at: new Date().toISOString(),
+          status: "success",
+          matches_updated: synced,
+        })
+        .eq("id", syncLogId);
+    }
 
     return NextResponse.json({
+      competition: competitionSlug,
       synced,
-      updated,
       total: matches.length,
       errors,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: message, synced, updated, errors }, { status: 500 });
+
+    if (syncLogId) {
+      await supabase
+        .from("sync_logs")
+        .update({
+          finished_at: new Date().toISOString(),
+          status: "error",
+          matches_updated: synced,
+          error_message: message,
+        })
+        .eq("id", syncLogId);
+    }
+
+    return NextResponse.json({ error: message, synced, errors }, { status: 500 });
   }
 }

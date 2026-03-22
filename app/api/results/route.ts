@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     const phaseParam = searchParams.get("phase");
+    const competitionId = searchParams.get("competition_id");
 
     let query = supabase
       .from("matches")
@@ -50,6 +51,10 @@ export async function GET(request: NextRequest) {
 
     if (phaseParam && VALID_PHASES.includes(phaseParam as MatchPhase)) {
       query = query.eq("phase", phaseParam as MatchPhase);
+    }
+
+    if (competitionId) {
+      query = query.eq("competition_id", competitionId);
     }
 
     const { data: matches, error } = await query;

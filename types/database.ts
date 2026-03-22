@@ -17,6 +17,9 @@ export type MatchPhase =
   | "final";
 export type MatchStatus = "scheduled" | "live" | "finished";
 export type PlayerPosition = "goalkeeper" | "defender" | "midfielder" | "forward";
+export type CompetitionStatus = "upcoming" | "active" | "finished";
+export type SyncLogStatus = "running" | "success" | "error";
+export type SyncTrigger = "cron" | "manual";
 
 export interface Database {
   public: {
@@ -58,14 +61,17 @@ export interface Database {
         Row: {
           id: string;
           name: string;
+          competition_id: string | null;
         };
         Insert: {
           id?: string;
           name: string;
+          competition_id?: string | null;
         };
         Update: {
           id?: string;
           name?: string;
+          competition_id?: string | null;
         };
         Relationships: [];
       };
@@ -77,6 +83,7 @@ export interface Database {
           flag_url: string | null;
           group_id: string | null;
           api_id: number | null;
+          competition_id: string | null;
         };
         Insert: {
           id?: string;
@@ -85,6 +92,7 @@ export interface Database {
           flag_url?: string | null;
           group_id?: string | null;
           api_id?: number | null;
+          competition_id?: string | null;
         };
         Update: {
           id?: string;
@@ -93,6 +101,7 @@ export interface Database {
           flag_url?: string | null;
           group_id?: string | null;
           api_id?: number | null;
+          competition_id?: string | null;
         };
         Relationships: [
           {
@@ -116,6 +125,7 @@ export interface Database {
           away_score: number | null;
           status: MatchStatus;
           match_date: string;
+          competition_id: string | null;
         };
         Insert: {
           id?: string;
@@ -128,6 +138,7 @@ export interface Database {
           away_score?: number | null;
           status?: MatchStatus;
           match_date: string;
+          competition_id?: string | null;
         };
         Update: {
           id?: string;
@@ -140,6 +151,7 @@ export interface Database {
           away_score?: number | null;
           status?: MatchStatus;
           match_date?: string;
+          competition_id?: string | null;
         };
         Relationships: [
           {
@@ -172,6 +184,7 @@ export interface Database {
           team_id: string;
           position: PlayerPosition;
           api_id: number | null;
+          competition_id: string | null;
         };
         Insert: {
           id?: string;
@@ -179,6 +192,7 @@ export interface Database {
           team_id: string;
           position: PlayerPosition;
           api_id?: number | null;
+          competition_id?: string | null;
         };
         Update: {
           id?: string;
@@ -186,6 +200,7 @@ export interface Database {
           team_id?: string;
           position?: PlayerPosition;
           api_id?: number | null;
+          competition_id?: string | null;
         };
         Relationships: [
           {
@@ -207,6 +222,7 @@ export interface Database {
           mvp_player_id: string | null;
           top_scorer_player_id: string | null;
           best_goalkeeper_player_id: string | null;
+          competition_id: string | null;
         };
         Insert: {
           id?: string;
@@ -217,6 +233,7 @@ export interface Database {
           mvp_player_id?: string | null;
           top_scorer_player_id?: string | null;
           best_goalkeeper_player_id?: string | null;
+          competition_id?: string | null;
         };
         Update: {
           id?: string;
@@ -227,6 +244,7 @@ export interface Database {
           mvp_player_id?: string | null;
           top_scorer_player_id?: string | null;
           best_goalkeeper_player_id?: string | null;
+          competition_id?: string | null;
         };
         Relationships: [
           {
@@ -318,18 +336,21 @@ export interface Database {
           rule_key: string;
           points: number;
           label: string;
+          competition_id: string | null;
         };
         Insert: {
           id?: string;
           rule_key: string;
           points: number;
           label: string;
+          competition_id?: string | null;
         };
         Update: {
           id?: string;
           rule_key?: string;
           points?: number;
           label?: string;
+          competition_id?: string | null;
         };
         Relationships: [];
       };
@@ -340,6 +361,7 @@ export interface Database {
           total_points: number;
           breakdown: Json;
           last_calculated_at: string;
+          competition_id: string | null;
         };
         Insert: {
           id?: string;
@@ -347,6 +369,7 @@ export interface Database {
           total_points: number;
           breakdown?: Json;
           last_calculated_at?: string;
+          competition_id?: string | null;
         };
         Update: {
           id?: string;
@@ -354,6 +377,7 @@ export interface Database {
           total_points?: number;
           breakdown?: Json;
           last_calculated_at?: string;
+          competition_id?: string | null;
         };
         Relationships: [
           {
@@ -380,6 +404,116 @@ export interface Database {
         };
         Relationships: [];
       };
+      competitions: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          api_competition_code: string;
+          status: CompetitionStatus;
+          season: string;
+          logo_url: string | null;
+          predictions_deadline: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          api_competition_code: string;
+          status?: CompetitionStatus;
+          season: string;
+          logo_url?: string | null;
+          predictions_deadline?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          slug?: string;
+          api_competition_code?: string;
+          status?: CompetitionStatus;
+          season?: string;
+          logo_url?: string | null;
+          predictions_deadline?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      user_competitions: {
+        Row: {
+          user_id: string;
+          competition_id: string;
+          joined_at: string;
+        };
+        Insert: {
+          user_id: string;
+          competition_id: string;
+          joined_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          competition_id?: string;
+          joined_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_competitions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_competitions_competition_id_fkey";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "competitions";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      sync_logs: {
+        Row: {
+          id: string;
+          competition_id: string;
+          started_at: string;
+          finished_at: string | null;
+          status: SyncLogStatus;
+          matches_updated: number;
+          error_message: string | null;
+          triggered_by: SyncTrigger;
+        };
+        Insert: {
+          id?: string;
+          competition_id: string;
+          started_at?: string;
+          finished_at?: string | null;
+          status?: SyncLogStatus;
+          matches_updated?: number;
+          error_message?: string | null;
+          triggered_by?: SyncTrigger;
+        };
+        Update: {
+          id?: string;
+          competition_id?: string;
+          started_at?: string;
+          finished_at?: string | null;
+          status?: SyncLogStatus;
+          matches_updated?: number;
+          error_message?: string | null;
+          triggered_by?: SyncTrigger;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "sync_logs_competition_id_fkey";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "competitions";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -388,6 +522,9 @@ export interface Database {
       match_phase: MatchPhase;
       match_status: MatchStatus;
       player_position: PlayerPosition;
+      competition_status: CompetitionStatus;
+      sync_log_status: SyncLogStatus;
+      sync_trigger: SyncTrigger;
     };
     CompositeTypes: Record<string, never>;
   };

@@ -21,11 +21,12 @@ function getOutcome(home: number, away: number): "home" | "away" | "draw" {
 }
 
 /**
- * Calculate the score breakdown for a single user.
+ * Calculate the score breakdown for a single user within a competition.
  * Reads their predictions from the DB and compares against real results.
  */
 export async function calculateUserScore(
   userId: string,
+  competitionId: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any
 ): Promise<ScoreBreakdown> {
@@ -41,10 +42,11 @@ export async function calculateUserScore(
     total: 0,
   };
 
-  // --- 1. Load scoring rules ---
+  // --- 1. Load scoring rules for this competition ---
   const { data: rulesData, error: rulesError } = await supabase
     .from("scoring_rules")
-    .select("rule_key, points");
+    .select("rule_key, points")
+    .eq("competition_id", competitionId);
 
   if (rulesError) {
     console.error("Error fetching scoring_rules:", rulesError);
@@ -58,17 +60,17 @@ export async function calculateUserScore(
 
   const pts = (key: string, fallback = 0) => rules[key] ?? fallback;
 
-  // --- 2. Load user's prediction record ---
+  // --- 2. Load user's prediction record for this competition ---
   const { data: prediction, error: predError } = await supabase
     .from("predictions")
     .select(
       "id, tournament_winner_team_id, mvp_player_id, top_scorer_player_id, best_goalkeeper_player_id"
     )
     .eq("user_id", userId)
+    .eq("competition_id", competitionId)
     .maybeSingle();
 
   if (predError || !prediction) {
-    // No prediction submitted — return zeroed breakdown
     return breakdown;
   }
 
@@ -85,16 +87,15 @@ export async function calculateUserScore(
   }
 
   if (matchPredictions && matchPredictions.length > 0) {
-    // Get the match IDs the user predicted
     const matchIds = matchPredictions.map(
       (mp: { match_id: string }) => mp.match_id
     );
 
-    // Load actual match results (only finished matches matter)
     const { data: matches, error: matchError } = await supabase
       .from("matches")
       .select("id, home_score, away_score, status")
       .in("id", matchIds)
+      .eq("competition_id", competitionId)
       .eq("status", "finished");
 
     if (matchError) {
@@ -102,7 +103,6 @@ export async function calculateUserScore(
     }
 
     if (matches && matches.length > 0) {
-      // Build a lookup for real results
       const realResults: Record<
         string,
         { home_score: number; away_score: number }
@@ -118,7 +118,7 @@ export async function calculateUserScore(
 
       for (const mp of matchPredictions) {
         const real = realResults[mp.match_id];
-        if (!real) continue; // match not finished yet
+        if (!real) continue;
 
         const predHome: number = mp.home_score;
         const predAway: number = mp.away_score;
@@ -126,76 +126,68 @@ export async function calculateUserScore(
         const realAway: number = real.away_score;
 
         if (predHome === realHome && predAway === realAway) {
-          // Exact score match
           breakdown.exact_score += pts("exact_score", 3);
         } else if (getOutcome(predHome, predAway) === getOutcome(realHome, realAway)) {
-          // Same outcome (win/draw/loss) but not exact score
           breakdown.correct_winner += pts("correct_winner", 1);
         }
       }
     }
   }
 
-  // --- 4. Group predictions (skipped — group standings not yet in DB) ---
-  // breakdown.group_position_exact remains 0
-
-  // --- 5. Knockout qualifier (skipped — not yet implemented) ---
-  // breakdown.knockout_qualifier remains 0
-
-  // --- 6. Tournament winner ---
+  // --- 4. Tournament winner ---
   const { data: winnerSetting } = await supabase
     .from("settings")
     .select("value")
-    .eq("key", "tournament_winner")
+    .eq("key", `tournament_winner_${competitionId}`)
     .maybeSingle();
 
   if (
     winnerSetting?.value &&
     prediction.tournament_winner_team_id === winnerSetting.value
   ) {
-    breakdown.tournament_winner = pts("tournament_winner", 10);
+    breakdown.tournament_winner = pts("tournament_winner", 5);
   }
 
-  // --- 7. MVP ---
+  // --- 5. MVP ---
   const { data: mvpSetting } = await supabase
     .from("settings")
     .select("value")
-    .eq("key", "actual_mvp")
+    .eq("key", `actual_mvp_${competitionId}`)
     .maybeSingle();
 
   if (mvpSetting?.value && prediction.mvp_player_id === mvpSetting.value) {
-    breakdown.mvp = pts("mvp", 5);
+    breakdown.mvp = pts("mvp", 3);
   }
 
-  // --- 8. Top scorer ---
+  // --- 6. Top scorer ---
   const { data: topScorerSetting } = await supabase
     .from("settings")
     .select("value")
-    .eq("key", "actual_top_scorer")
+    .eq("key", `actual_top_scorer_${competitionId}`)
     .maybeSingle();
 
   if (
     topScorerSetting?.value &&
     prediction.top_scorer_player_id === topScorerSetting.value
   ) {
-    breakdown.top_scorer = pts("top_scorer", 5);
+    breakdown.top_scorer = pts("top_scorer", 3);
   }
 
-  // --- 9. Best goalkeeper ---
+  // --- 7. Best goalkeeper ---
   const { data: gkSetting } = await supabase
     .from("settings")
     .select("value")
-    .eq("key", "actual_best_goalkeeper")
+    .eq("key", `actual_best_goalkeeper_${competitionId}`)
     .maybeSingle();
 
   if (
     gkSetting?.value &&
     prediction.best_goalkeeper_player_id === gkSetting.value
   ) {
-    breakdown.best_goalkeeper = pts("best_goalkeeper", 5);
+    breakdown.best_goalkeeper = pts("best_goalkeeper", 3);
   }
 
-  // --- 10. Sum total ---
+  // --- 8. Sum total ---
   breakdown.total =
     breakdown.exact_score +
     breakdown.correct_winner +
@@ -206,15 +198,16 @@ export async function calculateUserScore(
     breakdown.top_scorer +
     breakdown.best_goalkeeper;
 
-  // --- 11. Upsert into scores table ---
+  // --- 9. Upsert into scores table ---
   const { error: upsertError } = await supabase.from("scores").upsert(
     {
       user_id: userId,
+      competition_id: competitionId,
       total_points: breakdown.total,
       breakdown: breakdown as unknown as Record<string, number>,
       last_calculated_at: new Date().toISOString(),
     },
-    { onConflict: "user_id" }
+    { onConflict: "user_id,competition_id" }
   );
 
   if (upsertError) {
@@ -225,10 +218,11 @@ export async function calculateUserScore(
 }
 
 /**
- * Recalculate scores for ALL users.
+ * Recalculate scores for ALL users in a competition.
  * Returns the number of users processed.
  */
 export async function recalculateAllScores(
+  competitionId: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any
 ): Promise<number> {
@@ -245,7 +239,7 @@ export async function recalculateAllScores(
 
   for (const user of users) {
     try {
-      await calculateUserScore(user.id, supabase);
+      await calculateUserScore(user.id, competitionId, supabase);
       processed++;
     } catch (err) {
       console.error(`Error calculating score for user ${user.id}:`, err);

@@ -34,64 +34,22 @@ interface Props {
   readOnly?: boolean;
 }
 
-function FlagCircle({ team }: { team?: Team | null }) {
+function FlagSquare({ team }: { team?: Team | null }) {
   return (
-    <div className="w-12 h-12 rounded-full bg-dark-border flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-green-primary/30 transition-all shrink-0">
+    <div className="w-20 h-20 bg-surface-container-highest rounded-2xl flex items-center justify-center p-4 shrink-0">
       {team?.flag_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={team.flag_url}
-          alt={`Bandera de ${team.name}`}
-          className="w-full h-full object-cover"
+          alt={team.name}
+          className="w-full h-auto object-contain"
         />
       ) : (
-        <span className="text-gray-muted text-xs font-bold">
+        <span className="text-gray-500 text-sm font-bold font-bebas">
           {team?.short_name?.slice(0, 3) ?? "?"}
         </span>
       )}
     </div>
-  );
-}
-
-function ScoreInput({
-  value,
-  onChange,
-  disabled,
-}: {
-  value: number | null;
-  onChange: (v: number) => void;
-  disabled?: boolean;
-}) {
-  const [localValue, setLocalValue] = useState<string>(
-    value !== null ? String(value) : ""
-  );
-
-  // Sync when parent value changes (e.g. after load)
-  useEffect(() => {
-    setLocalValue(value !== null ? String(value) : "");
-  }, [value]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/[^0-9]/g, "");
-    if (raw === "" || (Number(raw) >= 0 && Number(raw) <= 99)) {
-      setLocalValue(raw);
-      if (raw !== "") {
-        onChange(Number(raw));
-      }
-    }
-  };
-
-  return (
-    <input
-      type="number"
-      min={0}
-      max={99}
-      value={localValue}
-      placeholder="0"
-      disabled={disabled}
-      onChange={handleChange}
-      className="w-14 h-14 bg-dark-bg border border-dark-border rounded-lg text-center font-display text-[32px] text-green-primary focus:outline-none focus:border-green-primary focus:ring-2 focus:ring-green-primary/30 transition-all disabled:opacity-50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-    />
   );
 }
 
@@ -107,6 +65,8 @@ function MatchCard({
   readOnly?: boolean;
 }) {
   const saved = predictions.match_predictions[match.id];
+  const isSaved = saved?.home_score !== null && saved?.away_score !== null;
+
   const [home, setHome] = useState<number | null>(saved?.home_score ?? null);
   const [away, setAway] = useState<number | null>(saved?.away_score ?? null);
 
@@ -129,39 +89,181 @@ function MatchCard({
     [match.id, onUpdate]
   );
 
-  const handleHomeChange = (v: number) => {
-    setHome(v);
-    handleChange(v, away);
+  const handleHomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/[^0-9]/g, "");
+    if (raw === "" || (Number(raw) >= 0 && Number(raw) <= 99)) {
+      const v = raw === "" ? null : Number(raw);
+      setHome(v);
+      handleChange(v, away);
+    }
   };
 
-  const handleAwayChange = (v: number) => {
-    setAway(v);
-    handleChange(home, v);
+  const handleAwayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/[^0-9]/g, "");
+    if (raw === "" || (Number(raw) >= 0 && Number(raw) <= 99)) {
+      const v = raw === "" ? null : Number(raw);
+      setAway(v);
+      handleChange(home, v);
+    }
   };
+
+  const matchDate = new Date(match.match_date);
+  const formattedDate = matchDate.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const inputClass = [
+    "w-16 h-20 bg-surface-container-high border-none rounded-xl text-center font-bebas text-5xl focus:ring-2 focus:ring-primary transition-all placeholder:text-gray-700 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+    isSaved ? "text-primary" : "text-white",
+    readOnly ? "opacity-60 cursor-not-allowed" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div className="bg-dark-card rounded-xl p-6 flex items-center justify-between group transition-all hover:bg-dark-card-hover">
-      {/* Home team */}
-      <div className="flex flex-col items-center gap-2 w-1/3">
-        <FlagCircle team={match.home_team} />
-        <span className="text-xs font-bold uppercase tracking-tighter text-center text-white">
-          {match.home_team?.short_name ?? "TBD"}
-        </span>
-      </div>
+    <div className="bg-surface-container-low rounded-2xl overflow-hidden group relative border border-white/5">
+      {/* Left hover accent bar */}
+      <div className="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
 
-      {/* Scores */}
-      <div className="flex items-center gap-3">
-        <ScoreInput value={home} onChange={handleHomeChange} disabled={readOnly} />
-        <span className="text-gray-muted font-display text-xl opacity-50">-</span>
-        <ScoreInput value={away} onChange={handleAwayChange} disabled={readOnly} />
-      </div>
+      <div className="p-8">
+        {/* Card header */}
+        <div className="flex justify-between items-center mb-8">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+            {match.group_id ? `Group • ` : ""}{formattedDate}
+          </span>
+          {isSaved ? (
+            <div className="flex items-center gap-2">
+              <span
+                className="material-symbols-outlined text-sm text-gray-500"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                check_circle
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                Guess Saved
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                Open for Guess
+              </span>
+            </div>
+          )}
+        </div>
 
-      {/* Away team */}
-      <div className="flex flex-col items-center gap-2 w-1/3">
-        <FlagCircle team={match.away_team} />
-        <span className="text-xs font-bold uppercase tracking-tighter text-center text-white">
-          {match.away_team?.short_name ?? "TBD"}
-        </span>
+        {/* Teams + Score */}
+        <div className="flex items-center justify-between gap-4">
+          {/* Home team */}
+          <div className="flex flex-col items-center gap-4 flex-1">
+            <FlagSquare team={match.home_team} />
+            <span className="font-bebas text-2xl tracking-wide text-white">
+              {match.home_team?.short_name ?? "TBD"}
+            </span>
+          </div>
+
+          {/* Score inputs */}
+          <div className="flex items-center gap-3">
+            <input
+              type="number"
+              min={0}
+              max={99}
+              value={home !== null ? String(home) : ""}
+              placeholder="0"
+              disabled={readOnly}
+              onChange={handleHomeChange}
+              className={inputClass}
+            />
+            <span className="font-bebas text-3xl text-gray-600">VS</span>
+            <input
+              type="number"
+              min={0}
+              max={99}
+              value={away !== null ? String(away) : ""}
+              placeholder="0"
+              disabled={readOnly}
+              onChange={handleAwayChange}
+              className={inputClass}
+            />
+          </div>
+
+          {/* Away team */}
+          <div className="flex flex-col items-center gap-4 flex-1">
+            <FlagSquare team={match.away_team} />
+            <span className="font-bebas text-2xl tracking-wide text-white">
+              {match.away_team?.short_name ?? "TBD"}
+            </span>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
+          {isSaved ? (
+            <>
+              <div className="text-xs text-gray-500 font-medium">
+                Points Potential: <span className="text-white">500 XP</span>
+              </div>
+              <button className="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-white transition-colors">
+                Edit Prediction
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="text-xs text-gray-500 font-medium">
+                Predicted by your friends
+              </div>
+              <button className="text-xs font-bold text-primary uppercase tracking-widest hover:underline">
+                Expert Analysis
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TrendingPicksBento() {
+  return (
+    <div className="bg-surface-container-high rounded-2xl p-8 border border-white/5 md:col-span-2">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="font-bebas text-3xl text-white">Trending Picks</h3>
+        <div className="flex -space-x-3">
+          {["A", "B", "C"].map((letter) => (
+            <div
+              key={letter}
+              className="w-10 h-10 rounded-full border-2 border-background bg-surface-container-highest flex items-center justify-center text-xs font-bold text-gray-400"
+            >
+              {letter}
+            </div>
+          ))}
+          <div className="w-10 h-10 rounded-full border-2 border-background bg-primary-container text-on-primary-fixed flex items-center justify-center text-[10px] font-bold">
+            +2k
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-surface-container-low p-4 rounded-xl">
+          <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 font-bold">
+            Most Predicted Winner
+          </p>
+          <p className="text-2xl font-bebas text-white">ARGENTINA (62%)</p>
+        </div>
+        <div className="bg-surface-container-low p-4 rounded-xl">
+          <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 font-bold">
+            Hot Score Prediction
+          </p>
+          <p className="text-2xl font-bebas text-white">2 - 1 OVERALL</p>
+        </div>
+        <div className="bg-surface-container-low p-4 rounded-xl">
+          <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 font-bold">
+            Underdog Alert
+          </p>
+          <p className="text-2xl font-bebas text-secondary">MOROCCO (12%)</p>
+        </div>
       </div>
     </div>
   );
@@ -216,9 +318,9 @@ export default function GroupMatchesTab({ predictions, onUpdate, readOnly }: Pro
         {[...Array(4)].map((_, i) => (
           <div key={i} className="space-y-4">
             <div className="h-8 w-32 rounded skeleton-shimmer" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[...Array(3)].map((_, j) => (
-                <div key={j} className="h-28 rounded-xl skeleton-shimmer" />
+                <div key={j} className="h-64 rounded-2xl skeleton-shimmer" />
               ))}
             </div>
           </div>
@@ -229,20 +331,20 @@ export default function GroupMatchesTab({ predictions, onUpdate, readOnly }: Pro
 
   return (
     <section className="space-y-12">
-      {groups.map((group) => (
+      {groups.map((group, groupIndex) => (
         <div key={group.id}>
           {/* Group header */}
           <div className="flex items-center gap-4 mb-6">
-            <h2 className="text-2xl font-display text-green-primary tracking-wide uppercase">
+            <h2 className="font-bebas text-2xl text-primary tracking-wide uppercase">
               {group.name}
             </h2>
-            <div className="h-[2px] flex-grow bg-gradient-to-r from-green-primary/30 to-transparent" />
+            <div className="h-[2px] flex-grow bg-gradient-to-r from-primary/30 to-transparent" />
           </div>
 
           {group.matches.length === 0 ? (
-            <p className="text-gray-muted text-sm">Sin partidos asignados.</p>
+            <p className="text-gray-500 text-sm">Sin partidos asignados.</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {group.matches.map((match) => (
                 <MatchCard
                   key={match.id}
@@ -252,6 +354,10 @@ export default function GroupMatchesTab({ predictions, onUpdate, readOnly }: Pro
                   readOnly={readOnly}
                 />
               ))}
+              {/* Trending Picks bento after the first group */}
+              {groupIndex === 0 && group.matches.length > 0 && (
+                <TrendingPicksBento />
+              )}
             </div>
           )}
         </div>

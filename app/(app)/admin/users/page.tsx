@@ -1,32 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Pencil, Trash2, UserPlus, Shield, ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface User {
   id: string;
@@ -54,6 +29,10 @@ interface ApiResponse {
 
 const PAGE_LIMIT = 20;
 
+function fullName(u: User) {
+  return [u.first_name, u.last_name].filter(Boolean).join(" ") || u.email;
+}
+
 function AvatarFallback({ name }: { name: string }) {
   const initials = name
     .split(" ")
@@ -62,34 +41,371 @@ function AvatarFallback({ name }: { name: string }) {
     .join("")
     .toUpperCase();
   return (
-    <div className="w-full h-full flex items-center justify-center bg-[#2a2a2a] text-green-primary font-bold text-sm">
+    <div className="w-full h-full flex items-center justify-center bg-[#2a2a2a] text-[#42f183] font-bold text-sm">
       {initials}
+    </div>
+  );
+}
+
+// Dropdown menu for actions
+function ActionsMenu({
+  user,
+  onEdit,
+  onDelete,
+  onToggleStatus,
+}: {
+  user: User;
+  onEdit: () => void;
+  onDelete: () => void;
+  onToggleStatus: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="text-gray-500 hover:text-white transition-colors"
+        aria-label="Actions"
+      >
+        <span className="material-symbols-outlined">more_vert</span>
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-1 w-44 bg-[#1c1b1b] border border-white/10 rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)] z-50 overflow-hidden">
+          <button
+            onClick={() => { setOpen(false); onEdit(); }}
+            className="w-full flex items-center gap-2 px-4 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors text-left"
+          >
+            <span className="material-symbols-outlined text-base text-gray-400 leading-none">edit</span>
+            Edit
+          </button>
+          <button
+            onClick={() => { setOpen(false); onToggleStatus(); }}
+            className="w-full flex items-center gap-2 px-4 py-3 text-sm text-white hover:bg-[#2a2a2a] transition-colors text-left"
+          >
+            <span className="material-symbols-outlined text-base text-gray-400 leading-none">
+              {user.is_active ? "person_off" : "person"}
+            </span>
+            {user.is_active ? "Deactivate" : "Activate"}
+          </button>
+          <div className="border-t border-white/5" />
+          <button
+            onClick={() => { setOpen(false); onDelete(); }}
+            className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-red-400/10 transition-colors text-left"
+          >
+            <span className="material-symbols-outlined text-base leading-none">delete</span>
+            Delete
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Invite modal
+function InviteModal({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [inviteLink] = useState(
+    `mundial.io/invite/join?token=${crypto.randomUUID()}`
+  );
+  const [sending, setSending] = useState(false);
+
+  async function handleSend() {
+    if (!email) return;
+    setSending(true);
+    try {
+      await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, role: "user" }),
+      });
+      onClose();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSending(false);
+    }
+  }
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/80 backdrop-blur-sm">
+      <div className="bg-surface-container-low w-full max-w-lg rounded-2xl shadow-2xl border border-white/5 p-8 relative overflow-hidden">
+        {/* Decorative blur */}
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
+        <div className="relative z-10">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h3 className="font-bebas text-3xl text-white tracking-tight uppercase">
+                Send Invitation
+              </h3>
+              <p className="text-gray-500 text-sm">
+                A unique access link will be generated for the user.
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-white transition-colors"
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <label className="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2">
+                Recipient Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="e.g. journalist@stadium.com"
+                className="w-full bg-surface-container-highest border border-white/5 rounded-lg py-4 px-4 text-white focus:ring-1 focus:ring-primary outline-none placeholder-gray-600"
+              />
+            </div>
+
+            <div className="p-4 bg-surface-container-highest rounded-xl border border-dashed border-white/10">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] uppercase tracking-widest text-primary font-bold">
+                  Generated Link
+                </span>
+                <button
+                  onClick={() => navigator.clipboard.writeText(inviteLink)}
+                  className="text-primary hover:text-primary-container flex items-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-sm">content_copy</span>
+                  <span className="text-[10px] font-bold uppercase">Copy</span>
+                </button>
+              </div>
+              <p className="text-xs text-gray-400 truncate">{inviteLink}</p>
+            </div>
+
+            <div className="flex gap-4 pt-4">
+              <button
+                onClick={onClose}
+                className="flex-1 bg-surface-container-highest text-white font-bold py-4 rounded-lg border border-white/5 hover:bg-[#3a3939] transition-colors uppercase tracking-widest text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSend}
+                disabled={sending || !email}
+                className="flex-1 bg-gradient-to-tr from-primary to-primary-container text-on-primary font-bold py-4 rounded-lg shadow-lg hover:opacity-90 transition-opacity uppercase tracking-widest text-xs disabled:opacity-50"
+              >
+                {sending ? "Sending..." : "Send Invite"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Edit user modal
+function EditUserModal({
+  user,
+  onClose,
+  onSaved,
+}: {
+  user: User;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    first_name: user.first_name ?? "",
+    last_name: user.last_name ?? "",
+    role: user.role,
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSave() {
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: user.id, ...formData }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error ?? "Error saving");
+      }
+      onSaved();
+      onClose();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/80 backdrop-blur-sm">
+      <div className="bg-surface-container-low w-full max-w-lg rounded-2xl shadow-2xl border border-white/5 p-8 relative overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
+        <div className="relative z-10">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h3 className="font-bebas text-3xl text-white tracking-tight uppercase">Edit User</h3>
+              <p className="text-gray-500 text-sm">{user.email}</p>
+            </div>
+            <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.first_name}
+                  onChange={(e) => setFormData((f) => ({ ...f, first_name: e.target.value }))}
+                  className="w-full bg-surface-container-highest border border-white/5 rounded-lg py-3 px-4 text-white focus:ring-1 focus:ring-primary outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.last_name}
+                  onChange={(e) => setFormData((f) => ({ ...f, last_name: e.target.value }))}
+                  className="w-full bg-surface-container-highest border border-white/5 rounded-lg py-3 px-4 text-white focus:ring-1 focus:ring-primary outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2">
+                Role
+              </label>
+              <select
+                value={formData.role}
+                onChange={(e) => setFormData((f) => ({ ...f, role: e.target.value as "admin" | "user" }))}
+                className="w-full bg-surface-container-highest border border-white/5 rounded-lg py-3 px-4 text-white focus:ring-1 focus:ring-primary outline-none"
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+
+            {error && <p className="text-error text-sm">{error}</p>}
+
+            <div className="flex gap-4 pt-2">
+              <button
+                onClick={onClose}
+                className="flex-1 bg-surface-container-highest text-white font-bold py-4 rounded-lg border border-white/5 hover:bg-[#3a3939] transition-colors uppercase tracking-widest text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex-1 bg-gradient-to-tr from-primary to-primary-container text-on-primary font-bold py-4 rounded-lg shadow-lg hover:opacity-90 transition-opacity uppercase tracking-widest text-xs disabled:opacity-50"
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Delete confirmation modal
+function DeleteModal({
+  user,
+  onClose,
+  onDeleted,
+}: {
+  user: User;
+  onClose: () => void;
+  onDeleted: () => void;
+}) {
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/users?id=${user.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Error deleting");
+      onDeleted();
+      onClose();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/80 backdrop-blur-sm">
+      <div className="bg-surface-container-low w-full max-w-md rounded-2xl shadow-2xl border border-white/5 p-8 relative overflow-hidden">
+        <div className="relative z-10">
+          <h3 className="font-bebas text-3xl text-white tracking-tight uppercase mb-2">Delete User</h3>
+          <p className="text-gray-400 text-sm mb-6">
+            Are you sure you want to delete{" "}
+            <span className="text-white font-semibold">{fullName(user)}</span>? This action cannot be undone.
+          </p>
+          <div className="flex gap-4">
+            <button
+              onClick={onClose}
+              className="flex-1 bg-surface-container-highest text-white font-bold py-4 rounded-lg border border-white/5 hover:bg-[#3a3939] transition-colors uppercase tracking-widest text-xs"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex-1 bg-error text-white font-bold py-4 rounded-lg hover:opacity-90 transition-opacity uppercase tracking-widest text-xs disabled:opacity-50"
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
-  const [stats, setStats] = useState<UserStats>({ total: 0, active_today: 0, admins: 0 });
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
-  // Delete dialog
-  const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
-  const [deleting, setDeleting] = useState(false);
-
-  // Edit/Create sheet
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
-    email: "",
-    role: "user" as "admin" | "user",
-  });
-  const [saving, setSaving] = useState(false);
-  const [formError, setFormError] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
 
   const totalPages = Math.ceil(total / PAGE_LIMIT);
 
@@ -97,11 +413,10 @@ export default function AdminUsersPage() {
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/users?page=${p}&limit=${PAGE_LIMIT}`);
-      if (!res.ok) throw new Error("Error al cargar usuarios");
+      if (!res.ok) throw new Error("Failed to load users");
       const data: ApiResponse = await res.json();
       setUsers(data.users);
       setTotal(data.total);
-      setStats(data.stats);
     } catch (err) {
       console.error(err);
     } finally {
@@ -112,73 +427,6 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers(page);
   }, [page, fetchUsers]);
-
-  function openCreate() {
-    setEditingUser(null);
-    setFormData({ first_name: "", last_name: "", email: "", role: "user" });
-    setFormError("");
-    setSheetOpen(true);
-  }
-
-  function openEdit(user: User) {
-    setEditingUser(user);
-    setFormData({
-      first_name: user.first_name ?? "",
-      last_name: user.last_name ?? "",
-      email: user.email,
-      role: user.role,
-    });
-    setFormError("");
-    setSheetOpen(true);
-  }
-
-  async function handleSave() {
-    setSaving(true);
-    setFormError("");
-    try {
-      let res: Response;
-      if (editingUser) {
-        res = await fetch("/api/admin/users", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: editingUser.id, ...formData }),
-        });
-      } else {
-        res = await fetch("/api/admin/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-      }
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error ?? "Error al guardar");
-      }
-      setSheetOpen(false);
-      fetchUsers(page);
-    } catch (err: unknown) {
-      setFormError(err instanceof Error ? err.message : "Error desconocido");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleDelete() {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      const res = await fetch(`/api/admin/users?id=${deleteTarget.id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Error al eliminar");
-      setDeleteTarget(null);
-      fetchUsers(page);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setDeleting(false);
-    }
-  }
 
   async function handleToggleActive(user: User) {
     try {
@@ -195,392 +443,252 @@ export default function AdminUsersPage() {
     }
   }
 
-  const fullName = (u: User) =>
-    [u.first_name, u.last_name].filter(Boolean).join(" ") || u.email;
+  const filteredUsers = search
+    ? users.filter(
+        (u) =>
+          fullName(u).toLowerCase().includes(search.toLowerCase()) ||
+          u.email.toLowerCase().includes(search.toLowerCase())
+      )
+    : users;
 
   return (
-    <div>
+    <div className="px-6 md:px-12 pt-8 pb-20">
       {/* Header */}
-      <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-2">
-          <h1 className="font-display text-5xl md:text-6xl tracking-tight leading-none text-white">
-            Gestión de{" "}
-            <span className="text-green-primary">Usuarios</span>
-          </h1>
-          <p className="text-gray-muted font-medium tracking-tight">
-            Control de acceso y roles de la plataforma administrativa.
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div>
+          <h2 className="font-bebas text-5xl md:text-7xl text-white tracking-tighter uppercase mb-2">
+            User Directory
+          </h2>
+          <p className="text-gray-400 max-w-xl">
+            Manage platform access, monitor participant engagement, and invite editorial contributors to the Mundial ecosystem.
           </p>
         </div>
         <button
-          onClick={openCreate}
-          className="bg-green-primary hover:bg-green-dim text-[#003918] font-bold text-xs px-6 py-4 rounded-lg flex items-center gap-2 shadow-[0px_10px_30px_rgba(0,212,106,0.2)] hover:scale-105 active:scale-95 transition-all uppercase tracking-widest"
+          onClick={() => setInviteOpen(true)}
+          className="bg-gradient-to-tr from-primary to-primary-container text-on-primary font-bold px-8 py-4 rounded-lg flex items-center gap-3 hover:scale-105 transition-transform duration-300 shadow-[0px_20px_40px_rgba(0,212,106,0.15)] group shrink-0"
         >
-          <UserPlus size={16} />
-          Nuevo Usuario
+          <span className="material-symbols-outlined group-hover:rotate-90 transition-transform duration-500">
+            add
+          </span>
+          <span className="tracking-widest uppercase text-sm">Invite New User</span>
         </button>
-      </header>
+      </div>
 
-      {/* Table */}
-      <div className="grid grid-cols-1 gap-6">
-        <div className="bg-dark-card rounded-xl overflow-hidden border-l-4 border-green-primary">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[#1e1e1e]/50 border-b border-white/5">
-                  <th className="px-6 py-5 text-gray-muted font-display tracking-widest text-base uppercase">
-                    Avatar
-                  </th>
-                  <th className="px-6 py-5 text-gray-muted font-display tracking-widest text-base uppercase">
-                    Nombre
-                  </th>
-                  <th className="px-6 py-5 text-gray-muted font-display tracking-widest text-base uppercase">
-                    Email
-                  </th>
-                  <th className="px-6 py-5 text-gray-muted font-display tracking-widest text-base uppercase text-center">
-                    Rol
-                  </th>
-                  <th className="px-6 py-5 text-gray-muted font-display tracking-widest text-base uppercase text-center">
-                    Estado
-                  </th>
-                  <th className="px-6 py-5 text-gray-muted font-display tracking-widest text-base uppercase text-right">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {loading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <tr key={i} className="animate-pulse">
-                      <td className="px-6 py-4">
-                        <div className="w-12 h-12 rounded-full bg-dark-card-hover" />
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="h-4 w-32 bg-dark-card-hover rounded" />
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="h-4 w-48 bg-dark-card-hover rounded" />
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <div className="h-5 w-14 bg-dark-card-hover rounded-full mx-auto" />
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <div className="h-6 w-11 bg-dark-card-hover rounded-full mx-auto" />
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="h-8 w-20 bg-dark-card-hover rounded ml-auto" />
-                      </td>
-                    </tr>
-                  ))
-                ) : users.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-muted">
-                      No hay usuarios
-                    </td>
-                  </tr>
-                ) : (
-                  users.map((user) => (
-                    <tr
-                      key={user.id}
-                      className="hover:bg-dark-card-hover transition-colors group"
-                    >
-                      {/* Avatar */}
-                      <td className="px-6 py-4">
-                        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-green-primary/20 group-hover:border-green-primary transition-all">
-                          {user.avatar_url ? (
-                            <img
-                              src={user.avatar_url}
-                              alt={fullName(user)}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <AvatarFallback name={fullName(user)} />
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Name */}
-                      <td className="px-6 py-4">
-                        <div className="text-white font-semibold">{fullName(user)}</div>
-                      </td>
-
-                      {/* Email */}
-                      <td className="px-6 py-4 text-gray-muted text-sm">{user.email}</td>
-
-                      {/* Role badge */}
-                      <td className="px-6 py-4 text-center">
-                        {user.role === "admin" ? (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 bg-gold/10 text-gold rounded-full text-[10px] font-bold uppercase tracking-wider border border-gold/20">
-                            <Shield size={10} />
-                            Admin
-                          </span>
-                        ) : (
-                          <span className="inline-block px-3 py-1 bg-[#2a2a2a] text-gray-muted rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/5">
-                            User
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Active toggle */}
-                      <td className="px-6 py-4 text-center">
-                        <div className="flex items-center justify-center">
-                          <button
-                            onClick={() => handleToggleActive(user)}
-                            className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
-                            style={{
-                              backgroundColor: user.is_active
-                                ? "rgba(0,212,106,0.2)"
-                                : "rgba(255,255,255,0.1)",
-                            }}
-                            aria-label={user.is_active ? "Desactivar" : "Activar"}
-                          >
-                            <span
-                              className="inline-block h-4 w-4 transform rounded-full transition-transform"
-                              style={{
-                                backgroundColor: user.is_active ? "#00D46A" : "rgba(255,255,255,0.3)",
-                                transform: user.is_active ? "translateX(24px)" : "translateX(4px)",
-                              }}
-                            />
-                          </button>
-                        </div>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-6 py-4 text-right space-x-1">
-                        <button
-                          onClick={() => openEdit(user)}
-                          className="p-2 text-gray-muted hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-all"
-                          aria-label="Editar"
-                        >
-                          <Pencil size={18} />
-                        </button>
-                        <button
-                          onClick={() => setDeleteTarget(user)}
-                          className="p-2 text-gray-muted hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
-                          aria-label="Eliminar"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          <div className="bg-[#2a2a2a]/30 px-6 py-4 flex items-center justify-between">
-            <p className="text-gray-muted text-xs font-medium">
-              Mostrando {users.length} de {total} usuarios
-            </p>
-            {totalPages > 1 && (
-              <div className="flex gap-2 items-center">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="p-2 text-gray-muted hover:text-white transition-colors disabled:opacity-30"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setPage(p)}
-                    className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${
-                      page === p
-                        ? "bg-green-primary text-[#003918]"
-                        : "text-gray-muted hover:text-white"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  className="p-2 text-gray-muted hover:text-white transition-colors disabled:opacity-30"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </div>
-            )}
-          </div>
+      {/* Filters & Search */}
+      <div className="flex flex-wrap items-center gap-4 mb-8">
+        <div className="relative flex-1 min-w-[300px]">
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+            search
+          </span>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name, email or invite code..."
+            className="w-full bg-surface-container-low border-none rounded-xl py-4 pl-12 pr-4 focus:ring-1 focus:ring-primary text-sm text-white placeholder-gray-600 outline-none"
+          />
         </div>
-
-        {/* Stats cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-dark-card p-6 rounded-xl flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-green-primary/10 flex items-center justify-center text-green-primary">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-            </div>
-            <div>
-              <div className="text-gray-muted text-[10px] font-bold uppercase tracking-widest">
-                Total Usuarios
-              </div>
-              <div className="font-display text-3xl text-white">{stats.total.toLocaleString()}</div>
-            </div>
-          </div>
-          <div className="bg-dark-card p-6 rounded-xl flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-green-primary/10 flex items-center justify-center text-green-primary">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-              </svg>
-            </div>
-            <div>
-              <div className="text-gray-muted text-[10px] font-bold uppercase tracking-widest">
-                Activos Hoy
-              </div>
-              <div className="font-display text-3xl text-white">{stats.active_today.toLocaleString()}</div>
-            </div>
-          </div>
-          <div className="bg-dark-card p-6 rounded-xl flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-green-primary/10 flex items-center justify-center text-green-primary">
-              <Shield size={24} />
-            </div>
-            <div>
-              <div className="text-gray-muted text-[10px] font-bold uppercase tracking-widest">
-                Admins
-              </div>
-              <div className="font-display text-3xl text-white">{stats.admins}</div>
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <button className="bg-surface-container-high px-4 py-3 rounded-lg text-xs font-bold flex items-center gap-2 border border-white/5 hover:bg-surface-container-highest transition-colors text-white">
+            <span className="material-symbols-outlined text-sm">filter_list</span>
+            Status
+          </button>
+          <button className="bg-surface-container-high px-4 py-3 rounded-lg text-xs font-bold flex items-center gap-2 border border-white/5 hover:bg-surface-container-highest transition-colors text-white">
+            <span className="material-symbols-outlined text-sm">sort</span>
+            Date Joined
+          </button>
         </div>
       </div>
 
-      {/* Delete confirmation dialog */}
-      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <DialogContent className="bg-dark-card border-dark-border text-white">
-          <DialogHeader>
-            <DialogTitle className="font-display text-2xl tracking-tight text-white">
-              Eliminar usuario
-            </DialogTitle>
-            <DialogDescription className="text-gray-muted">
-              ¿Eliminar a{" "}
-              <span className="text-white font-semibold">
-                {deleteTarget ? fullName(deleteTarget) : ""}
-              </span>
-              ? Esta acción no se puede deshacer.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteTarget(null)}
-              className="border-dark-border text-gray-muted hover:text-white"
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleDelete}
-              disabled={deleting}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold"
-            >
-              {deleting ? "Eliminando..." : "Eliminar"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="border-b border-white/5 text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold">
+              <th className="pb-6 pl-4">User Details</th>
+              <th className="pb-6">Games</th>
+              <th className="pb-6">Role</th>
+              <th className="pb-6">Status</th>
+              <th className="pb-6">Invite Code</th>
+              <th className="pb-6 pr-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/[0.03]">
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i} className="animate-pulse">
+                  <td className="py-6 pl-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-surface-container-high" />
+                      <div className="space-y-2">
+                        <div className="h-3 w-32 bg-surface-container-high rounded" />
+                        <div className="h-2 w-24 bg-surface-container-high rounded" />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-6"><div className="h-6 w-8 bg-surface-container-high rounded" /></td>
+                  <td className="py-6"><div className="h-5 w-16 bg-surface-container-high rounded-full" /></td>
+                  <td className="py-6"><div className="h-4 w-14 bg-surface-container-high rounded" /></td>
+                  <td className="py-6"><div className="h-4 w-20 bg-surface-container-high rounded" /></td>
+                  <td className="py-6 pr-4 text-right"><div className="h-6 w-6 bg-surface-container-high rounded ml-auto" /></td>
+                </tr>
+              ))
+            ) : filteredUsers.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="py-16 text-center text-gray-500">
+                  No users found
+                </td>
+              </tr>
+            ) : (
+              filteredUsers.map((user) => {
+                const name = fullName(user);
+                const isAdmin = user.role === "admin";
+                return (
+                  <tr
+                    key={user.id}
+                    className="group hover:bg-white/[0.02] transition-colors"
+                  >
+                    {/* User details */}
+                    <td className="py-6 pl-4">
+                      <div className={`flex items-center gap-4 ${!user.is_active ? "opacity-50" : ""}`}>
+                        <div
+                          className={`w-12 h-12 rounded-full overflow-hidden border-2 shrink-0 ${
+                            isAdmin ? "border-primary/20" : "border-white/10"
+                          }`}
+                        >
+                          {user.avatar_url ? (
+                            <img
+                              src={user.avatar_url}
+                              alt={name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <AvatarFallback name={name} />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-white font-bold text-sm">{name}</p>
+                          <p className="text-gray-500 text-xs">{user.email}</p>
+                        </div>
+                      </div>
+                    </td>
 
-      {/* Create/Edit sheet */}
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="bg-dark-card border-dark-border text-white w-full sm:max-w-md">
-          <SheetHeader>
-            <SheetTitle className="font-display text-2xl tracking-tight text-white">
-              {editingUser ? "Editar Usuario" : "Nuevo Usuario"}
-            </SheetTitle>
-            <SheetDescription className="text-gray-muted">
-              {editingUser
-                ? "Modifica los datos del usuario."
-                : "Crea una nueva cuenta de usuario."}
-            </SheetDescription>
-          </SheetHeader>
+                    {/* Games count — placeholder since API doesn't return this */}
+                    <td className="py-6">
+                      <span className={`font-bebas text-2xl tracking-tight ${user.is_active ? "text-white" : "text-gray-600"}`}>
+                        —
+                      </span>
+                    </td>
 
-          <div className="mt-6 space-y-5 px-0">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="first_name" className="text-gray-muted text-xs uppercase tracking-widest font-bold">
-                  Nombre
-                </Label>
-                <Input
-                  id="first_name"
-                  value={formData.first_name}
-                  onChange={(e) => setFormData((f) => ({ ...f, first_name: e.target.value }))}
-                  className="bg-[#0d0d0d] border-dark-border text-white"
-                  placeholder="Juan"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="last_name" className="text-gray-muted text-xs uppercase tracking-widest font-bold">
-                  Apellido
-                </Label>
-                <Input
-                  id="last_name"
-                  value={formData.last_name}
-                  onChange={(e) => setFormData((f) => ({ ...f, last_name: e.target.value }))}
-                  className="bg-[#0d0d0d] border-dark-border text-white"
-                  placeholder="García"
-                />
-              </div>
-            </div>
+                    {/* Role badge */}
+                    <td className="py-6">
+                      {isAdmin ? (
+                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-primary/20">
+                          Admin
+                        </span>
+                      ) : (
+                        <span className="bg-white/5 text-gray-400 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-white/10">
+                          User
+                        </span>
+                      )}
+                    </td>
 
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-muted text-xs uppercase tracking-widest font-bold">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData((f) => ({ ...f, email: e.target.value }))}
-                className="bg-[#0d0d0d] border-dark-border text-white"
-                placeholder="usuario@ejemplo.com"
-                disabled={!!editingUser}
-              />
-            </div>
+                    {/* Status */}
+                    <td className="py-6">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            user.is_active ? "bg-primary" : "bg-gray-600"
+                          }`}
+                        />
+                        <span
+                          className={`text-xs font-medium ${
+                            user.is_active ? "text-on-surface" : "text-gray-600"
+                          }`}
+                        >
+                          {user.is_active ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                    </td>
 
-            <div className="space-y-2">
-              <Label className="text-gray-muted text-xs uppercase tracking-widest font-bold">
-                Rol
-              </Label>
-              <Select
-                value={formData.role}
-                onValueChange={(v) => setFormData((f) => ({ ...f, role: v as "admin" | "user" }))}
-              >
-                <SelectTrigger className="bg-[#0d0d0d] border-dark-border text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-dark-card border-dark-border">
-                  <SelectItem value="user" className="text-white">User</SelectItem>
-                  <SelectItem value="admin" className="text-white">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                    {/* Invite code — placeholder */}
+                    <td className="py-6">
+                      <code className="text-xs bg-surface-container-high px-2 py-1 rounded border border-white/5 text-gray-400">
+                        WC26-{user.id.slice(0, 4).toUpperCase()}
+                      </code>
+                    </td>
 
-            {formError && (
-              <p className="text-red-400 text-sm">{formError}</p>
+                    {/* Actions */}
+                    <td className="py-6 pr-4 text-right">
+                      <ActionsMenu
+                        user={user}
+                        onEdit={() => setEditingUser(user)}
+                        onDelete={() => setDeleteTarget(user)}
+                        onToggleStatus={() => handleToggleActive(user)}
+                      />
+                    </td>
+                  </tr>
+                );
+              })
             )}
+          </tbody>
+        </table>
+      </div>
 
-            <div className="flex gap-3 pt-2">
-              <Button
-                variant="outline"
-                onClick={() => setSheetOpen(false)}
-                className="flex-1 border-dark-border text-gray-muted hover:text-white"
-              >
-                Cancelar
-              </Button>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-8 flex items-center justify-between">
+          <p className="text-gray-500 text-xs font-medium">
+            Showing {users.length} of {total} users
+          </p>
+          <div className="flex gap-2 items-center">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="p-2 text-gray-500 hover:text-white transition-colors disabled:opacity-30"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((p) => (
               <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex-1 bg-green-primary hover:bg-green-dim text-[#003918] font-bold py-2 px-4 rounded-lg transition-all disabled:opacity-50 text-sm uppercase tracking-widest"
+                key={p}
+                onClick={() => setPage(p)}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${
+                  page === p
+                    ? "bg-primary text-on-primary"
+                    : "text-gray-500 hover:text-white"
+                }`}
               >
-                {saving ? "Guardando..." : editingUser ? "Guardar" : "Crear"}
+                {p}
               </button>
-            </div>
+            ))}
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="p-2 text-gray-500 hover:text-white transition-colors disabled:opacity-30"
+            >
+              <ChevronRight size={18} />
+            </button>
           </div>
-        </SheetContent>
-      </Sheet>
+        </div>
+      )}
+
+      {/* Modals */}
+      <InviteModal open={inviteOpen} onClose={() => setInviteOpen(false)} />
+      {editingUser && (
+        <EditUserModal
+          user={editingUser}
+          onClose={() => setEditingUser(null)}
+          onSaved={() => fetchUsers(page)}
+        />
+      )}
+      {deleteTarget && (
+        <DeleteModal
+          user={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={() => fetchUsers(page)}
+        />
+      )}
     </div>
   );
 }

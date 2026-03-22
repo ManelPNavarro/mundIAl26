@@ -1,477 +1,306 @@
-# mundIAl26 — AI Agent Task List
+# mundIAl26 — Task List
 
-> Executable task list ordered by dependency. Work phase by phase. Each task is self-contained and can be handed to an AI agent with the context below.
->
-> **Before implementing any page**, read the corresponding `designs/<section>/code.html` for the exact HTML/CSS structure.
-
----
-
-## Phase 1 — Project Bootstrap
-
-### Task 1.1 — Initialize Next.js project
-```bash
-npx create-next-app@latest . --typescript --tailwind --app --src-dir=false --import-alias="@/*"
-```
-Verify `app/`, `tailwind.config.ts`, `tsconfig.json` exist.
-
-### Task 1.2 — Install dependencies
-```bash
-npm install @supabase/supabase-js @supabase/ssr swr lucide-react clsx tailwind-merge
-npx shadcn@latest init  # select dark theme, slate base
-npx shadcn@latest add button input label card table badge avatar toggle dialog sheet tabs progress select sonner
-npm install @fontsource/bebas-neue @fontsource-variable/inter
-```
-
-### Task 1.3 — Configure Tailwind with design tokens
-Edit `tailwind.config.ts` — add custom colors:
-- `green-primary: #00D46A`, `green-dim: #00a854`
-- `gold: #f5a623`, `silver: #9ca3af`, `bronze: #b45309`
-- `red-accent: #e63946`
-- `dark-bg: #0d0d0d`, `dark-card: #161616`, `dark-card-hover: #1e1e1e`, `dark-border: #2a2a2a`
-- `white: #ffffff`, `gray-muted: #888888`, `gray-dim: #555555`
-
-Add Bebas Neue and Inter to font family. Set `darkMode: 'class'` (always dark).
-
-### Task 1.4 — Environment variables
-Create `.env.local` and `.env.example`:
-```
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-FOOTBALL_DATA_API_KEY=
-CRON_SECRET=
-```
-
-### Task 1.5 — Global layout and fonts
-- `app/layout.tsx`: `<html lang="es" className="dark">`, Inter default font, Bebas Neue via CSS variable, dark-bg background
-- `app/globals.css`: import fonts, CSS variables for design tokens, `.font-display` utility for Bebas Neue, shimmer keyframe animation for skeletons
-
-**Status:** [ ] Not started
+> Executable task list ordered by dependency. Updated 2026-03-22.
+> Designs live in `designs/public/` and `designs/admin/` — always read the matching `code.html` before implementing a page.
+> Status: ✅ Done | 🔄 Needs update | ⬜ Not started
 
 ---
 
-## Phase 2 — Multi-Competition Architecture
+## Design Token Reference (from HTML prototypes)
 
-### Task 2.0 — Competitions data model
-Add to `supabase/migrations/001_initial_schema.sql` (before all other tables):
+All pages use Material Design 3 color tokens. These must be configured in Tailwind:
 
-- `competitions` table: `id`, `name`, `slug` (unique), `api_competition_code`, `status` (enum: upcoming|active|finished), `season`, `logo_url`, `predictions_deadline`, `created_at`
-- `user_competitions` junction: `user_id` + `competition_id` + `joined_at`, PK (user_id, competition_id)
-- `sync_logs` table: `id`, `competition_id`, `started_at`, `finished_at`, `status` (enum: running|success|error), `matches_updated`, `error_message`, `triggered_by` (enum: cron|manual)
-- Add `competition_id` FK to: `groups`, `teams`, `players`, `matches`, `predictions`, `scores`
-- Change `predictions` unique constraint from `(user_id)` to `(user_id, competition_id)`
-- Change `scores` unique constraint from `(user_id)` to `(user_id, competition_id)`
-- Change `scoring_rules` unique constraint from `(rule_key)` to `(competition_id, rule_key)`
-- RLS: users can only see competitions they belong to (via `user_competitions`); admins see all
-
-### Task 2.0b — Competition context (React)
-`lib/context/competition-context.tsx`
-- `CompetitionProvider`: stores active competition in state + `localStorage`
-- `useCompetition()` hook: returns `{ activeCompetition, setActiveCompetition, competitions }`
-- Fetches user's competitions on mount from `/api/competitions`
-- Wrap `app/(app)/layout.tsx` with this provider
-
-### Task 2.0c — Competition switcher component
-`components/layout/competition-switcher.tsx`
-- Pill dropdown: logo + name + ChevronDown
-- Dropdown list: all user competitions with status badges
-- On select: calls `setActiveCompetition()`, re-fetches page data via SWR mutate
-- Mobile: renders as a compact banner below the page header
-- Design spec: `DESIGN.md §3.11`
-
-**Status:** [ ] Not started
-
----
-
-## Phase 3 — Supabase Setup
-
-### Task 2.1 — Supabase client helpers
-- `lib/supabase/client.ts` — browser client (`createBrowserClient`)
-- `lib/supabase/server.ts` — server client (`createServerClient`, reads cookies)
-- `middleware.ts` (root) — refresh session on every request; protect `/admin/*` (admin role only) and `/(app)/*` (auth required); redirect authenticated users away from `/login`/`/register`
-
-### Task 2.2 — Database schema
-Create `supabase/migrations/001_initial_schema.sql` with:
-- Enums: `user_role` (user|admin), `match_phase` (group|round_of_32|round_of_16|quarter|semi|third_place|final), `match_status` (scheduled|live|finished), `player_position` (goalkeeper|defender|midfielder|forward)
-- Tables: `users`, `groups`, `teams`, `matches`, `players`, `predictions`, `match_predictions`, `group_predictions`, `scoring_rules`, `scores`, `settings`
-- Full schema as per `PLANNING.md §5`
-- RLS policies: users own their predictions; public read for teams/groups/matches/players/scoring_rules/scores/settings; admin write for scoring_rules/settings
-- Indexes on all FK columns
-
-### Task 2.3 — Seed scoring rules
-`supabase/migrations/002_seed_scoring_rules.sql`:
-```sql
-INSERT INTO scoring_rules (rule_key, points, label) VALUES
-  ('exact_score', 3, 'Marcador exacto'),
-  ('correct_winner', 1, 'Ganador / empate'),
-  ('group_position_exact', 2, 'Posición exacta en grupo'),
-  ('knockout_qualifier', 2, 'Clasificado eliminatoria'),
-  ('tournament_winner', 5, 'Campeón del mundial'),
-  ('mvp', 3, 'MVP del torneo'),
-  ('top_scorer', 3, 'Máximo goleador'),
-  ('best_goalkeeper', 3, 'Mejor portero');
+```js
+colors: {
+  "primary": "#42f183",
+  "primary-container": "#00d46a",
+  "primary-fixed": "#63ff94",
+  "primary-fixed-dim": "#2ce377",
+  "on-primary": "#003918",
+  "on-primary-fixed": "#00210b",
+  "background": "#131313",
+  "surface": "#131313",
+  "surface-dim": "#131313",
+  "surface-container-lowest": "#0e0e0e",
+  "surface-container-low": "#1c1b1b",
+  "surface-container": "#201f1f",
+  "surface-container-high": "#2a2a2a",
+  "surface-container-highest": "#353534",
+  "surface-bright": "#3a3939",
+  "surface-variant": "#353534",
+  "on-surface": "#e5e2e1",
+  "on-surface-variant": "#bbcbb9",
+  "on-background": "#e5e2e1",
+  "outline": "#859585",
+  "outline-variant": "#3c4a3d",
+  "secondary": "#ffb955",
+  "secondary-container": "#dc9100",
+  "on-secondary": "#452b00",
+  "error": "#ffb4ab",
+  "error-container": "#93000a",
+  "on-error": "#690005",
+  "tertiary": "#ced5e1",
+  "inverse-surface": "#e5e2e1",
+  "inverse-on-surface": "#313030",
+  "inverse-primary": "#006d33",
+}
+fontFamily: {
+  "headline": ["Epilogue", "sans-serif"],   // admin pages
+  "body": ["Inter", "sans-serif"],
+  "label": ["Inter", "sans-serif"],
+  "bebas": ["Bebas Neue", "cursive"],        // scores, logo, big numbers
+}
 ```
 
-### Task 2.4 — Seed default settings
-```sql
-INSERT INTO settings (key, value) VALUES
-  ('predictions_deadline', '2026-06-10T23:59:59Z'),
-  ('registration_open', 'true');
-```
+Custom CSS classes needed:
+- `.pitch-black-bg` → `background-color: #050505`
+- `.editorial-gradient` → `background: linear-gradient(135deg, #42f183 0%, #00d46a 100%)`
+- `.glass-panel` → `background: rgba(28,27,27,0.6); backdrop-filter: blur(24px)`
+- `.text-glow` → `text-shadow: 0 0 20px rgba(66,241,131,0.3)`
+- `.hide-scrollbar` → removes scrollbar
 
-### Task 2.5 — TypeScript database types
-`types/database.ts` — full TypeScript types matching the schema. Include `Database`, `Tables<T>`, `Enums<T>` helpers.
-
-**Status:** [ ] Not started
+Icons: use **Material Symbols Outlined** (Google Font), loaded via `<link>` in layout.
+Icon usage: `<span class="material-symbols-outlined">icon_name</span>`
 
 ---
 
-## Phase 3 — Authentication Pages
+## Phase 1 — Foundation
 
-### Task 3.1 — Auth layout
-`app/(auth)/layout.tsx` — full-screen dark bg, vertically centered.
+### Task 1.1 — Update Tailwind config & globals.css ✅
+`app/globals.css` + `tailwind.config.ts` (or CSS-based config for Tailwind v4):
+- Replace existing color tokens with the full MD3 palette above
+- Add `font-bebas`, `font-headline`, `font-body`, `font-label` families
+- Import Epilogue font (already has Bebas Neue + Inter)
+- Add `.pitch-black-bg`, `.editorial-gradient`, `.glass-panel`, `.text-glow`, `.hide-scrollbar` CSS classes
+- Add Material Symbols Outlined link to `app/layout.tsx`
 
-### Task 3.2 — Register page (`/register`)
-Reference: `designs/Public/register_login/screen.png` + `code.html`
+### Task 1.2 — DB migration: multi-competition architecture ✅
+Create `supabase/migrations/004_multi_competition.sql`:
+- Add `competitions` table (id, name, slug unique, api_competition_code, status enum upcoming|active|finished, season, logo_url, predictions_deadline timestamptz, created_at)
+- Add `user_competitions` junction (user_id, competition_id, joined_at, PK composite)
+- Add `sync_logs` table (id, competition_id FK, started_at, finished_at nullable, status enum running|success|error, matches_updated int default 0, error_message text nullable, triggered_by enum cron|manual)
+- Add `competition_id` column to: `groups`, `teams`, `players`, `matches`, `predictions`, `scores`, `scoring_rules`
+- Change `predictions` unique from `(user_id)` to `(user_id, competition_id)`
+- Change `scores` unique from `(user_id)` to `(user_id, competition_id)`
+- Change `scoring_rules` unique from `(rule_key)` to `(competition_id, rule_key)`
+- Seed one competition: World Cup 2026 (slug: `wc2026`, api_competition_code: `WC`, status: `upcoming`)
+- Update RLS policies for competition-scoped access
+- Add indexes on all new competition_id columns
 
-- Two-panel layout: left = stadium image + "LA QUINIELA DEFINITIVA" tagline (desktop only), right = form card
-- Fields: Nombre + Apellido (side by side), Correo Electrónico, Contraseña, Confirmar contraseña
-- Profile photo: dashed upload area, camera icon, "Foto de Perfil — Opcional • JPG PNG GIF • 5MB"
-- Terms checkbox
-- Button "CREAR CUENTA" (full width, primary green)
-- Link: "¿YA TIENES CUENTA? INICIAR SESIÓN"
-- Logic: Supabase `signUp()`, insert row in `users`, upload avatar to `avatars` storage bucket, redirect to `/predictions`
-- Validation: required fields, password match, file < 5MB
-
-### Task 3.3 — Login page (`/login`)
-Reference: same design file
-
-- Same two-panel layout
-- Fields: Correo Electrónico, Contraseña
-- Button "ENTRAR" (full width)
-- Error: "Email o contraseña incorrectos"
-- Logic: Supabase `signInWithPassword()`, redirect admin → `/admin/tournament`, user → `/ranking`
-
-**Status:** [ ] Not started
-
----
-
-## Phase 4 — Global Navigation Components
-
-### Task 4.1 — Top navbar (desktop)
-`components/layout/navbar.tsx`
-- Height 60px, bg dark-bg, 1px bottom border dark-border
-- Left: Logo "Mund**IA**l 26" — "IA" in green-primary (#00D46A), rest white, Bebas Neue 28px
-- Right: nav links (Ranking, Resultados, Mi Quiniela, Admin if role=admin), Inter 500 14px, gray-muted inactive / white+green underline active
-- Far right: Avatar 32px with dropdown (Perfil, Cerrar sesión)
-
-### Task 4.2 — Bottom nav bar (mobile)
-`components/layout/bottom-nav.tsx`
-- Fixed bottom, 64px, bg dark-card, top border dark-border
-- 5 tabs: Inicio (Home), Resultados (Flag), Ranking (Trophy), Quiniela (ClipboardList), Perfil (User)
-- Active: green-primary; inactive: gray-muted; label Inter 11px
-
-### Task 4.3 — App layout
-`app/(app)/layout.tsx`
-- Top navbar on `lg:`, bottom nav on mobile
-- Auth check → redirect to `/login` if unauthenticated
-- max-width 1200px centered, px-8 / px-4
-
-**Status:** [ ] Not started
+### Task 1.3 — Update TypeScript types ✅
+`types/database.ts`:
+- Add `competitions`, `user_competitions`, `sync_logs` table types
+- Add `competition_id` fields to `groups`, `teams`, `players`, `matches`, `predictions`, `scores`, `scoring_rules`
+- Add new enums: `CompetitionStatus`, `SyncLogStatus`, `SyncTrigger`
 
 ---
 
-## Phase 5 — Ranking Page
+## Phase 2 — Competition Context
 
-Reference: `designs/Public/user_ranking/screen.png` + `code.html`
+### Task 2.1 — Competition context provider ✅
+`lib/context/competition-context.tsx`:
+- `CompetitionProvider`: fetches user's competitions on mount from `/api/competitions`
+- Stores `activeCompetition` in state + `localStorage` (persist between sessions)
+- `useCompetition()` hook: returns `{ activeCompetition, setActiveCompetition, competitions, loading }`
+- Wrap `app/(app)/layout.tsx` with `<CompetitionProvider>`
 
-### Task 5.1 — Ranking page
-`app/(app)/ranking/page.tsx`
-- Header: "CLASIFICACIÓN" Bebas Neue 40px + subtitle "MUNDIAL 2026 · ACTUALIZADO HACE X MINUTOS"
-- Podium (top 3): 2nd (left, silver border) | 1st (center, elevated, gold border + glow, star icon, "LÍDER GLOBAL" badge) | 3rd (right, bronze border)
-  - Each: avatar 80px, name Inter 700 18px, points Bebas Neue 36px (green for 1st), rank badge
-- Table (positions 4+): # | avatar 32px + name | points (Bebas Neue)
-  - Current user row: green bg 10%, left green accent border, "Tú (Name)" + "↑ X POSICIONES HOY"
-  - Row 56px, subtle alternating bg
-- "VER CLASIFICACIÓN COMPLETA" button at bottom
-- Loading: 5 skeleton rows; Empty state: "Aún no hay puntuaciones"
-- Data: `scores` joined with `users`, ordered DESC by `total_points`
-- SWR, revalidate every 60s
+### Task 2.2 — Competitions API route ✅
+`app/api/competitions/route.ts`:
+- GET: returns competitions user belongs to (via `user_competitions` join)
+- For now, if user has no competitions, auto-join them to WC 2026
+- Returns `{ id, name, slug, status, logo_url, predictions_deadline }`
 
-### Task 5.2 — Ranking API + hook
-- `app/api/ranking/route.ts` — scores joined users, sorted
-- `lib/hooks/useRanking.ts` — SWR hook
-
-**Status:** [ ] Not started
-
----
-
-## Phase 6 — Results Page
-
-Reference: `designs/Public/user_results/screen.png` + `code.html`
-
-### Task 6.1 — Results page
-`app/(app)/results/page.tsx`
-- Header: "TEMPORADA 2026" (green-primary small) + "RESULTADOS" Bebas Neue 64px
-- Phase filter tabs: GRUPOS | OCTAVOS | CUARTOS | SEMIFINAL | FINAL (green-primary underline when active)
-- Featured live match card (full-width, large flags, Bebas Neue score, "EN JUEGO" badge, "X' MINUTO")
-- Match grid (2-col desktop, 1-col mobile): flag + name | score | name + flag + status badge
-- Football quote footer (italics, gray-muted)
-- SWR, revalidate every 60s
-
-### Task 6.2 — Match card component
-`components/results/match-card.tsx`
-- States: scheduled (date/time, "vs"), live (score + minute + red pulse), finished (score + FINALIZADO green badge)
-
-**Status:** [ ] Not started
+### Task 2.3 — Competition switcher component ✅
+`components/layout/competition-switcher.tsx`:
+- Pill dropdown: small trophy icon + competition name + ChevronDown (or Material Symbol `expand_more`)
+- Dropdown list items: logo + name + status badge
+- Active competition: green left border on dropdown item
+- On select: `setActiveCompetition()` + close dropdown
+- Used in Navbar (desktop) and as banner (mobile, above page content)
 
 ---
 
-## Phase 7 — Predictions Page
+## Phase 3 — Auth Pages Redesign
 
-Reference: `designs/Public/user_guess/screen.png` + `code.html`
+Reference: `designs/public/public_login/code.html` + `designs/public/public_register/code.html`
 
-### Task 7.1 — Predictions page shell
-`app/(app)/predictions/page.tsx`
-- Header: "MI QUINIELA" Bebas Neue 40px
-- Progress bar: "PROGRESO DE PREDICCIONES" / "12 / 48", green fill, 8px height
-- 4 tabs: PARTIDOS DE GRUPOS | CLASIFICACIÓN DE GRUPOS | FASE ELIMINATORIA | PREMIOS ESPECIALES
-- Sticky "GUARDAR QUINIELA" button
-- Deadline check: past deadline → read-only banner + all inputs static
+### Task 3.1 — Login page ✅→🔄
+`app/(auth)/login/page.tsx` — needs visual update to match design:
+- `pitch-black-bg` body
+- Logo: `mundIAl26` Bebas Neue 6xl + "Editorial Admin Console" tagline
+- Card: `surface-container-low` bg, `rounded-xl`, left green bar ornament (`editorial-gradient w-1`)
+- Inputs: `surface-container-lowest` bg, no border, `focus:ring-1 focus:ring-primary/50`
+- Button: `editorial-gradient`, Bebas Neue xl, `shadow-[0px_10px_30px_rgba(0,212,106,0.2)]`
+- Footer: 3 decorative grayscale images (football/stadium) + copyright
+- Noise texture overlay (SVG fixed background)
 
-### Task 7.2 — Tab 1: Group match predictions
-`components/predictions/group-matches-tab.tsx`
-- Groups as sections with green header "GRUPO A", etc.
-- Match card: circular flag + name | number input — number input | name + flag
-- Score input: Bebas Neue 32px, 72px wide, 0–99 integer, dark-bg, green focus border
-- Debounced auto-save to `match_predictions`
-
-### Task 7.3 — Tab 2: Group standings predictions
-`components/predictions/group-standings-tab.tsx`
-- 16 group cards, each with 1º / 2º / 3º team selectors (dropdown or draggable)
-- Teams pre-populated per group
-- Saves to `group_predictions`
-
-### Task 7.4 — Tab 3: Knockout bracket predictions
-`components/predictions/knockout-tab.tsx`
-- Rounds: Round of 32 → Final
-- Each slot: team selector "¿Quién pasa?" (all 48 teams)
-- Grouped by round with round labels
-
-### Task 7.5 — Tab 4: Special awards
-`components/predictions/awards-tab.tsx`
-- Campeón del Mundial — team selector
-- MVP del torneo — searchable player selector
-- Máximo goleador — searchable player selector
-- Mejor portero — searchable player selector (filtered: position=goalkeeper)
-- Saves to `predictions` table
-
-### Task 7.6 — Predictions data layer
-- `app/api/predictions/route.ts` — GET (load user's predictions), POST (save/update)
-- `lib/hooks/usePredictions.ts` — SWR hook
-- Progress calculation: filled fields / total expected (48 matches + 16 group standings + knockout slots + 4 awards)
-
-**Status:** [ ] Not started
+### Task 3.2 — Register page ✅→🔄
+`app/(auth)/register/page.tsx` — update to match design:
+- "YOU'VE BEEN SUMMONED" headline (Bebas Neue)
+- Invite code display (if applicable) or standard registration
+- Same input/button style as login
+- Profile photo upload with dashed border area
 
 ---
 
-## Phase 8 — Admin Pages
+## Phase 4 — Public Pages Redesign
 
-### Task 8.1 — Admin layout
-`app/(app)/admin/layout.tsx`
-- Check role === 'admin'; redirect to `/ranking` if not
-- Sidebar nav or extend top navbar (Users, Scoring, Tournament)
+### Task 4.1 — Update Navbar & Bottom Nav ✅→🔄
+`components/layout/navbar.tsx`:
+- Keep existing links but add `CompetitionSwitcher` between logo and nav links
+- Update active link style: green left border (`border-l-4 border-[#00D46A]`)
+- Use `font-bebas` for logo, Inter for nav links
+- Material Symbols icons for avatar/notification
 
-### Task 8.2 — Admin Users page
-Reference: `designs/Admin/admin_users/screen.png` + `code.html`
+`components/layout/bottom-nav.tsx`:
+- 5 tabs: Inicio, Resultados, Ranking, Quiniela, Perfil
+- Active: `text-primary-container`, inactive: `text-gray-400`
 
-`app/(app)/admin/users/page.tsx`
-- Header: "GESTIÓN DE USUARIOS" (USUARIOS in green-primary) + "NUEVO USUARIO" button
-- Table: Avatar | Nombre | Email | Rol (ADMIN gold badge / USER gray) | Estado (toggle) | Acciones (edit + delete)
-- Pagination: "Mostrando X de Y usuarios"
-- Footer stats: Total Usuarios | Activos Hoy | Admins
-- Delete: confirmation dialog
-- Edit/Create: sheet/modal with Nombre, Apellido, Email, Rol, Contraseña (create only)
-- Toggle: updates `is_active`
+### Task 4.2 — Ranking page ✅→🔄
+Reference: `designs/public/public_ranking/code.html`
+`app/(app)/ranking/page.tsx`:
+- Filter by `activeCompetition.id`
+- Podium: top 3 with border-b-4 (gold/silver/bronze), avatar 128px, Bebas Neue points
+- Table: accuracy bars (`bg-primary w-[X%]`), position, avatar, name, points
+- Competition name in subtitle
 
-### Task 8.3 — Admin Scoring page
-Reference: `designs/Admin/admin_scoring_settings/screen.png` + `code.html`
+### Task 4.3 — Results page ✅→🔄
+Reference: `designs/public/public_results/code.html`
+`app/(app)/results/page.tsx`:
+- Filter by `activeCompetition.id`
+- Phase tabs: GRUPOS | OCTAVOS | CUARTOS | SEMIS | FINAL
+- Featured live match card (large, full-width)
+- Match grid: 2-col desktop, 1-col mobile
+- Live badge: `animate-ping` red dot
 
-`app/(app)/admin/scoring/page.tsx`
-- Header: "REGLAS DE PUNTUACIÓN" + subtitle
-- Unsaved changes banner (amber)
-- Grid of scoring rule cards with icon, title, description, large green number input
-- "DESCARTAR CAMBIOS" + "GUARDAR CAMBIOS" buttons
-- On save: update `scoring_rules`; show "RECALCULAR PUNTUACIONES" button
-- On recalculate: POST `/api/recalculate-scores`
-
-### Task 8.4 — Admin Tournament page
-Reference: `designs/Admin/admin_dashboard/screen.png` + `code.html`
-
-`app/(app)/admin/tournament/page.tsx`
-- Large two-line header "TOURNAMENT / CONFIGURATION" (second line green)
-- Competition selector at top (manage multiple competitions)
-- Per-competition: Registration Deadline (date + time pickers + Save), status
-- Stats panel (right): TOTAL PARTICIPANTS | COMPLETIONS | MATCHES SYNCED (X/104) with progress bars
-- Bottom: ACCESS CONTROL + links to DB and API pages
-
-### Task 8.5 — Admin Logs page
-`app/(app)/admin/logs/page.tsx`
-- Filter bar: type (Sync | Error | Users | System) + competition dropdown + date range
-- Log table: timestamp | type badge | competition | message | detail
-- Row expand: inline detail / stack trace
-- Auto-refresh toggle (polls every 30s)
-- Data: `sync_logs` + auth events via Supabase
-- Design spec: `DESIGN.md §4.9`
-
-### Task 8.6 — Admin Database page
-`app/(app)/admin/database/page.tsx`
-- DB health card: status, response time (ping Supabase), connection info
-- Table stats: row counts for all tables (server-side query via service role)
-- Last migration applied
-- Read-only SQL runner: textarea → POST `/api/admin/query` → result table
-- `/api/admin/query/route.ts`: service role client, reject non-SELECT statements
-- Design spec: `DESIGN.md §4.10`
-
-### Task 8.7 — Admin API page
-`app/(app)/admin/api/page.tsx`
-- Football API status: ping football-data.org, show latency + rate limit headers
-- Per-competition sync cards: last sync, matches progress, "Sincronizar ahora" button
-- Sync button calls `/api/sync-results?competition={slug}` and shows result
-- Last API response preview: collapsible JSON block
-- Design spec: `DESIGN.md §4.11`
-
-**Status:** [ ] Not started
+### Task 4.4 — Predictions page ✅→🔄
+Reference: `designs/public/public_guessings/code.html`
+`app/(app)/predictions/page.tsx`:
+- Filter by `activeCompetition.id`
+- Progress bar: "12/48 PREDICTIONS" green fill
+- Score inputs: Bebas Neue 32px, 72px wide, `surface-container-lowest` bg
+- Sticky FAB: "SAVE ALL PREDICTIONS" button bottom-right
 
 ---
 
-## Phase 9 — Backend Logic & API Routes
+## Phase 5 — Admin Pages
 
-### Task 9.1 — Football API client
-`lib/football-api.ts`
-- `fetchMatches()`, `fetchTeams()`, `fetchStandings()`
-- Base: `https://api.football-data.org/v4`, header `X-Auth-Token`
-- Competition: `WC`
+### Task 5.1 — Admin layout update ✅→🔄
+`app/(app)/admin/layout.tsx` + new `components/layout/admin-sidebar.tsx`:
+- Fixed sidebar 256px, `bg-[#1c1b1b]`, `border-r border-white/5`
+- Nav items: Home, Users, Games, Scoring, System
+- Active item: `bg-[#2a2a2a] text-[#00D46A] border-l-4 border-[#00D46A]`
+- Top header: `bg-[#131313]/70 backdrop-blur-xl`
+- Main content: `lg:ml-64 pt-24 pb-12 px-6`
 
-### Task 9.2 — Sync results route
-`app/api/sync-results/route.ts`
-- GET handler — called by cron-job.org (external cron, not Vercel Cron)
-- Query param: `?competition=wc2026` (competition slug)
-- Auth: verify `Authorization: Bearer ${CRON_SECRET}`
-- Steps:
-  1. Look up competition by slug → get `api_competition_code`
-  2. Insert `sync_logs` row with status `running`
-  3. Fetch from football-data.org using `api_competition_code`
-  4. Upsert `matches` by `api_id`, scoped to `competition_id`
-  5. Trigger score recalculation
-  6. Update `sync_logs` row: status=success, `matches_updated`, `finished_at`
-  7. On error: update `sync_logs` row with status=error, `error_message`
+### Task 5.2 — Admin Users page ✅→🔄
+Reference: `designs/admin/admin_users_management/code.html`
+`app/(app)/admin/users/page.tsx`:
+- Search + filter bar
+- Table: avatar | name/email | games count | role badge | status | actions
+- Invite modal (hidden by default)
+- "Invite New User" button → modal open
 
-### Task 9.3 — Scoring engine
-`lib/scoring.ts`
-- `calculateUserScore(userId)` — loads predictions + results + rules, returns breakdown
-- Point categories: exact score (3pts), correct winner (1pt), group position (2pts), knockout qualifier (2pts), tournament winner (5pts), MVP (3pts), top scorer (3pts), best goalkeeper (3pts)
-- `recalculateAllScores()` — runs for all users, upserts `scores` table
+### Task 5.3 — Admin Scoring page ✅→🔄
+Reference: `designs/admin/admin_scoring_config/code.html`
+`app/(app)/admin/scoring/page.tsx`:
+- Bento grid layout
+- "Match Day Rewards" card: exact score, outcome, goal difference inputs
+- "Tournament Meta" card: group position, golden boot bonuses
+- "The Multiplier Logic" full-width card
+- Competition selector at top (scoped to active competition)
 
-### Task 9.4 — Recalculate scores route
-`app/api/recalculate-scores/route.ts`
-- POST, admin-only (verify session role)
-- Calls `recalculateAllScores()`
-- Returns `{ recalculated: N, durationMs: X }`
+### Task 5.4 — Admin Games page ✅ (NEW — replaces `/admin/tournament`)
+Reference: `designs/admin/admin_games_config/code.html`
+`app/(app)/admin/games/page.tsx`:
+- Header: "GAMES MANAGEMENT" + "CREATE NEW GAME" button
+- Asymmetric bento grid (12 cols):
+  - Featured active game card (8 cols): name, participants, pools, logo, edit/delete buttons
+  - Network overview card (4 cols): total games, active, retention %
+  - Smaller game cards (4 cols each): status badge, logo, name, participants, action buttons
+  - Empty state card (12 cols): dashed border, "Draft New Tournament Ecosystem"
+- Create/Edit game modal: name, slug, api_competition_code, season, deadline, logo URL
+- Data: CRUD on `competitions` table
 
-### Task 9.5 — External Cron (cron-job.org)
-No Vercel Cron (Hobby plan limitation). Instead, configure one cron-job.org job per active competition:
-- URL: `https://your-app.vercel.app/api/sync-results?competition={slug}`
-- Schedule: every 15 minutes
-- Header: `Authorization: Bearer {CRON_SECRET}`
-- Document active jobs in `README.md` under "Cron Jobs"
+### Task 5.5 — Admin System Dashboard ✅ (NEW)
+Reference: `designs/admin/admin_system_dashboard/code.html`
+`app/(app)/admin/system/page.tsx`:
+- Header: "System Monitoring" + "All Systems Operational" badge + Refresh button
+- Stats bento (4 cols):
+  - API Response time card (2 cols): Bebas Neue ms, mini bar chart
+  - Active Syncs card (1 col): count + `border-l-2 border-primary`
+  - Sync Failures card (1 col): count + `border-l-2 border-secondary`
+- Competition Health grid (3 cols): per-competition card with last sync, success rate, progress bar
+- Real-time logs table: timestamp | category badge | source | event | status | view action
+- Pagination: "Showing X of Y logs"
+- Data: reads from `sync_logs` + Supabase auth events
 
-**Status:** [ ] Not started
-
----
-
-## Phase 10 — Shared Components & Polish
-
-### Task 10.1 — Avatar with fallback
-`components/ui/avatar-with-fallback.tsx`
-- Sizes: sm (32px), md (48px), lg (80px), xl (120px)
-- Fallback: colored circle with initials, color from name (6 preset brand colors)
-
-### Task 10.2 — Skeleton loading states
-- `components/ui/skeleton-rows.tsx` — table row skeletons with shimmer
-- `components/ui/skeleton-match-card.tsx`
-
-### Task 10.3 — Status badge component
-`components/ui/status-badge.tsx`
-Variants: scheduled, live (pulse dot), finished, admin, active, inactive
-
-### Task 10.4 — Empty state component
-`components/ui/empty-state.tsx` — icon + title + subtitle + optional action button
-
-**Status:** [ ] Not started
+### Task 5.6 — Admin system API routes ✅
+- `app/api/admin/competitions/route.ts` — GET (list all), POST (create), PATCH (update), DELETE
+- `app/api/admin/system/logs/route.ts` — GET sync_logs with pagination + filters
+- `app/api/admin/system/health/route.ts` — DB ping (count query), API latency ping
 
 ---
 
-## Phase 11 — Data Seeding
+## Phase 6 — Backend Updates
 
-### Task 11.1 — Seed teams and groups
-`supabase/seed.sql` or `scripts/seed-teams.ts`
-- 16 groups (A–P), 48 WC 2026 teams with short names
-- Flag URLs: `https://flagcdn.com/w40/{country_code}.png`
+### Task 6.1 — Update sync-results route ✅
+`app/api/sync-results/route.ts`:
+- Accept `?competition=wc2026` query param
+- Look up competition by slug → get `api_competition_code`
+- Insert sync_log row (status: running)
+- Fetch from football-data.org using code
+- Upsert matches scoped to `competition_id`
+- Update sync_log: status success/error, `matches_updated`, `finished_at`
 
-### Task 11.2 — Seed group stage matches
-48 matches with correct team pairings and scheduled dates (starting June 11, 2026)
+### Task 6.2 — Update scoring engine ✅
+`lib/scoring.ts`:
+- `calculateUserScore(userId, competitionId, supabase)` — add competition scope
+- `recalculateAllScores(competitionId, supabase)` — filter by competition
 
-### Task 11.3 — Seed players
-Key players per team (min 1–3 per team) with positions. Prioritize well-known names for player selectors.
+### Task 6.3 — Update all API routes ✅
+Add `competition_id` filter to:
+- `app/api/ranking/route.ts`
+- `app/api/results/route.ts`
+- `app/api/predictions/route.ts`
+- `app/api/recalculate-scores/route.ts`
+- `app/api/admin/scoring/route.ts`
 
-**Status:** [ ] Not started
-
----
-
-## Phase 12 — QA & Deployment
-
-### Task 12.1 — Route protection audit
-Verify middleware redirects:
-- Unauthenticated → `/login`
-- Non-admin accessing `/admin/*` → `/ranking`
-- Authenticated user accessing `/login` or `/register` → `/ranking`
-
-### Task 12.2 — Responsive QA
-Test at 375px, 768px, 1280px:
-- Bottom nav mobile / top nav desktop
-- Predictions tabs scrollable on mobile
-- Admin tables scroll horizontally on mobile
-
-### Task 12.3 — Dark theme consistency
-- All pages: dark-bg (#0d0d0d) background
-- Cards: dark-card (#161616)
-- shadcn components overridden to match design tokens
-
-### Task 12.4 — Deployment
-1. Push to GitHub
-2. Connect to Vercel, set all env vars
-3. Connect Supabase project, run migrations
-4. Test `/api/sync-results` endpoint manually
-5. Verify RLS policies for user/admin roles
-
-**Status:** [ ] Not started
+Each route reads `competition_id` from query param or request body.
 
 ---
 
-## Design Assets
+## Phase 7 — QA & Deploy
 
-Each page has a pixel-accurate prototype to reference:
+### Task 7.1 — Run DB migration ⬜
+`npx supabase db push` after creating migration 004
+
+### Task 7.2 — Route audit ✅
+- `/admin/tournament` → redirect to `/admin/games` (handled in proxy.ts)
+- All admin routes protected: redirect to `/ranking` if not admin
+- Competition context always has a fallback (default to first available)
+
+### Task 7.3 — Responsive QA ⬜
+- 375px, 768px, 1280px
+- Admin sidebar hidden mobile, shown desktop
+- Bottom nav mobile only
+- Competition switcher banner on mobile
+
+---
+
+## Design Assets Reference
 
 | Screen | Folder |
 |---|---|
-| Register / Login | `designs/Public/register_login/` |
-| Mi Quiniela (predictions) | `designs/Public/user_guess/` |
-| Resultados | `designs/Public/user_results/` |
-| Clasificación (ranking) | `designs/Public/user_ranking/` |
-| Admin — Usuarios | `designs/Admin/admin_users/` |
-| Admin — Puntuación | `designs/Admin/admin_scoring_settings/` |
-| Admin — Tournament | `designs/Admin/admin_dashboard/` |
+| Login | `designs/public/public_login/` |
+| Register | `designs/public/public_register/` |
+| Ranking | `designs/public/public_ranking/` |
+| Results | `designs/public/public_results/` |
+| Predictions | `designs/public/public_guessings/` |
+| Admin — Users | `designs/admin/admin_users_management/` |
+| Admin — Scoring | `designs/admin/admin_scoring_config/` |
+| Admin — Games | `designs/admin/admin_games_config/` |
+| Admin — System | `designs/admin/admin_system_dashboard/` |
 
 Always read `code.html` before implementing each page.
 

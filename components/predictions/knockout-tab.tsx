@@ -33,6 +33,8 @@ interface Props {
   predictions: PredictionState;
   onUpdate: (matchId: string, teamId: string | null) => void;
   readOnly?: boolean;
+  /** When set, only show this specific phase. Accepts DB phase values like "round_of_16", "quarter", "semi", "final". */
+  phaseFilter?: string;
 }
 
 const PHASE_ORDER: MatchPhase[] = [
@@ -139,7 +141,15 @@ function KnockoutMatchSlot({
   );
 }
 
-export default function KnockoutTab({ predictions, onUpdate, readOnly }: Props) {
+// Map page tab keys to DB phase values
+const TAB_TO_PHASES: Record<string, MatchPhase[]> = {
+  round_of_16: ["round_of_16"],
+  quarter_finals: ["quarter"],
+  semi_finals: ["semi", "third_place"],
+  final: ["final"],
+};
+
+export default function KnockoutTab({ predictions, onUpdate, readOnly, phaseFilter }: Props) {
   const [matchesByPhase, setMatchesByPhase] = useState<
     Record<string, KnockoutMatch[]>
   >({});
@@ -202,18 +212,23 @@ export default function KnockoutTab({ predictions, onUpdate, readOnly }: Props) 
     );
   }
 
-  const hasMatches = PHASE_ORDER.some(
-    (phase) => matchesByPhase[phase]?.length > 0
-  );
+  // Determine which phases to render
+  const phasesToShow = phaseFilter
+    ? (TAB_TO_PHASES[phaseFilter] ?? []).filter(
+        (p) => PHASE_ORDER.includes(p) && matchesByPhase[p]?.length > 0
+      )
+    : PHASE_ORDER.filter((phase) => matchesByPhase[phase]?.length > 0);
+
+  const hasMatches = phasesToShow.length > 0;
 
   if (!hasMatches) {
     return (
-      <div className="text-center py-20 text-gray-muted">
-        <p className="text-lg font-display uppercase tracking-wide mb-2">
+      <div className="text-center py-20 text-gray-500">
+        <p className="text-lg font-bebas uppercase tracking-wide mb-2">
           Brackets no disponibles aún
         </p>
         <p className="text-sm">
-          Los partidos de la fase eliminatoria se configurarán próximamente.
+          Los partidos de esta fase se configurarán próximamente.
         </p>
       </div>
     );
@@ -221,15 +236,15 @@ export default function KnockoutTab({ predictions, onUpdate, readOnly }: Props) 
 
   return (
     <div className="space-y-12">
-      {PHASE_ORDER.filter((phase) => matchesByPhase[phase]?.length > 0).map(
+      {phasesToShow.map(
         (phase) => (
           <div key={phase}>
             {/* Phase header */}
             <div className="flex items-center gap-4 mb-6">
-              <h2 className="text-2xl font-display text-green-primary uppercase tracking-wide">
+              <h2 className="font-bebas text-2xl text-primary uppercase tracking-wide">
                 {PHASE_LABELS[phase]}
               </h2>
-              <div className="h-[2px] flex-grow bg-gradient-to-r from-green-primary/30 to-transparent" />
+              <div className="h-[2px] flex-grow bg-gradient-to-r from-primary/30 to-transparent" />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

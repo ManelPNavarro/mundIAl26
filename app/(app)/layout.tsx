@@ -1,31 +1,35 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import Navbar from "@/components/layout/navbar";
-import BottomNav from "@/components/layout/bottom-nav";
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { CompetitionProvider } from '@/lib/context/competition-context'
+import Navbar from '@/components/layout/navbar'
+import AppSidebar from '@/components/layout/app-sidebar'
+import BottomNav from '@/components/layout/bottom-nav'
+import { Toaster } from 'sonner'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient();
+  const supabase = await createClient()
 
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getSession()
 
   if (!session) {
-    redirect("/login");
+    redirect('/login')
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg flex flex-col">
-      {/* Desktop navbar */}
-      <Navbar />
+    <CompetitionProvider>
+      <div className="min-h-screen bg-[#131313]">
+        <Navbar />
+        <AppSidebar />
 
-      {/* Main content */}
-      <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 lg:px-8 pb-20 lg:pb-8 pt-6">
-        {children}
-      </main>
+        <main className="lg:ml-64 pt-16 min-h-screen">
+          {children}
+        </main>
 
-      {/* Mobile bottom nav */}
-      <BottomNav />
-    </div>
-  );
+        <BottomNav />
+        <Toaster richColors position="top-right" />
+      </div>
+    </CompetitionProvider>
+  )
 }

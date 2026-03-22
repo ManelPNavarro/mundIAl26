@@ -50,110 +50,139 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-4xl grid md:grid-cols-12 gap-0 overflow-hidden rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.6)]">
-      {/* Left panel: brand */}
-      <div className="hidden md:flex md:col-span-5 bg-dark-card flex-col justify-between p-10 relative overflow-hidden">
-        <div className="z-10">
-          <h1 className="font-display text-5xl tracking-widest text-white mb-2">
-            MUND<span className="text-green-primary">IA</span>L{" "}
-            <span className="text-green-primary">26</span>
-          </h1>
-          <p className="text-gray-muted text-sm tracking-widest uppercase">
-            La quiniela definitiva del Mundial
-          </p>
-        </div>
-        <div className="z-10 space-y-6">
-          <div className="space-y-1">
-            <span className="text-green-primary font-display text-2xl tracking-tight block">
-              LA QUINIELA DEFINITIVA
-            </span>
-            <p className="text-gray-muted text-sm leading-relaxed">
-              Únete a la comunidad de pronósticos más exclusiva del mundo y domina el ranking global.
-            </p>
-          </div>
-        </div>
-        {/* Decorative glow */}
-        <div className="absolute bottom-0 right-0 w-64 h-64 bg-green-primary/5 rounded-full blur-[80px] pointer-events-none" />
+    <div className="pitch-black-bg min-h-screen flex flex-col items-center justify-center p-6 text-on-surface selection:bg-primary selection:text-on-primary">
+      {/* Noise texture overlay */}
+      <div className="fixed inset-0 pointer-events-none z-[-1] opacity-[0.03]">
+        <svg width="100%" height="100%">
+          <filter id="noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves={3} stitchTiles="stitch" />
+            <feColorMatrix type="saturate" values="0" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#noise)" />
+        </svg>
       </div>
 
-      {/* Right panel: form */}
-      <div className="md:col-span-7 bg-[#2a2a2a] p-8 md:p-12">
-        <div className="mb-8">
-          <h2 className="font-display text-4xl text-white mb-2">INICIAR SESIÓN</h2>
-          <p className="text-gray-muted text-sm">
-            Bienvenido de vuelta. Introduce tus credenciales para continuar.
+      <main className="w-full max-w-[440px] flex flex-col items-center">
+        {/* Brand Identity */}
+        <div className="mb-12 text-center">
+          <h1 className="font-bebas text-6xl tracking-tighter uppercase mb-2">
+            mund<span className="text-primary text-glow">IA</span>l26
+          </h1>
+          <p className="text-on-surface-variant text-sm tracking-widest uppercase">
+            Editorial Admin Console
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          {/* Email */}
-          <div className="space-y-1.5">
-            <label
-              className="block text-xs font-semibold text-gray-muted uppercase tracking-wider"
-              htmlFor="email"
-            >
-              Correo Electrónico
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="javier@estadio.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full bg-dark-bg border-none focus:ring-1 focus:ring-green-primary rounded-lg text-white placeholder:text-gray-dim py-3 px-4 transition-all outline-none"
-            />
+        {/* Login Card */}
+        <div className="bg-surface-container-low rounded-xl p-8 md:p-12 shadow-2xl relative overflow-hidden w-full">
+          {/* Left ornament */}
+          <div className="absolute top-0 left-0 w-1 h-full editorial-gradient opacity-80" />
+
+          <div className="mb-8">
+            <h2 className="font-bebas text-3xl text-on-surface mb-1">WELCOME BACK</h2>
+            <p className="text-on-surface-variant text-sm">Access the digital stadium curator suite.</p>
           </div>
 
-          {/* Password */}
-          <div className="space-y-1.5">
-            <label
-              className="block text-xs font-semibold text-gray-muted uppercase tracking-wider"
-              htmlFor="password"
-            >
-              Contraseña
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full bg-dark-bg border-none focus:ring-1 focus:ring-green-primary rounded-lg text-white placeholder:text-gray-dim py-3 px-4 transition-all outline-none"
-            />
-          </div>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label
+                className="block text-xs font-semibold text-on-surface-variant tracking-wider uppercase"
+                htmlFor="email"
+              >
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="editor@mundial26.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary/50 rounded-lg py-4 px-4 w-full text-on-surface placeholder:text-on-surface-variant/40 outline-none transition-all"
+              />
+            </div>
 
-          {/* Error message */}
-          {error && (
-            <p className="text-red-accent text-sm py-2 px-4 bg-red-accent/10 rounded-lg">
-              {error}
-            </p>
-          )}
+            {/* Password Field */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <label
+                  className="block text-xs font-semibold text-on-surface-variant tracking-wider uppercase"
+                  htmlFor="password"
+                >
+                  Password
+                </label>
+                <a
+                  href="#"
+                  className="text-[10px] text-primary hover:underline uppercase tracking-tighter"
+                >
+                  Forgot?
+                </a>
+              </div>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary/50 rounded-lg py-4 px-4 w-full text-on-surface placeholder:text-on-surface-variant/40 outline-none transition-all"
+              />
+            </div>
 
-          {/* Submit button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full pitch-gradient text-dark-bg font-bold text-sm tracking-[0.2em] uppercase py-4 rounded-lg shadow-[0_10px_20px_rgba(0,212,106,0.2)] hover:shadow-[0_15px_30px_rgba(0,212,106,0.3)] hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-          >
-            {loading ? "ENTRANDO..." : "ENTRAR"}
-          </button>
+            {/* Submit Button */}
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={loading}
+                className="editorial-gradient text-on-primary-fixed font-bebas text-xl py-4 rounded-lg tracking-widest w-full shadow-[0px_10px_30px_rgba(0,212,106,0.2)] hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <span className="w-5 h-5 border-2 border-on-primary-fixed/30 border-t-on-primary-fixed rounded-full animate-spin" />
+                    ENTRANDO...
+                  </>
+                ) : (
+                  "ENTRAR"
+                )}
+              </button>
+            </div>
 
-          {/* Register link */}
-          <div className="text-center pt-4">
-            <p className="text-xs text-gray-muted uppercase tracking-widest">
-              ¿No tienes cuenta?{" "}
+            {/* Error message */}
+            {error && (
+              <p className="text-error text-sm">{error}</p>
+            )}
+          </form>
+
+          {/* Registration link */}
+          <div className="mt-10 pt-8 border-t border-outline-variant/10 text-center">
+            <p className="text-on-surface-variant text-xs">
+              New to the editorial team?{" "}
               <Link
                 href="/register"
-                className="text-green-primary font-bold ml-1 hover:text-white transition-colors"
+                className="text-on-surface font-semibold hover:text-primary transition-colors ml-1 uppercase tracking-tighter underline underline-offset-4"
               >
-                Regístrate
+                Request Access
               </Link>
             </p>
           </div>
-        </form>
-      </div>
+        </div>
+
+        {/* Footer Visual Decor */}
+        <div className="mt-16 opacity-10 flex gap-4 grayscale">
+          <div className="w-16 h-16 rounded-lg bg-surface-container-high" />
+          <div className="w-16 h-16 rounded-lg bg-surface-container-high" />
+          <div className="w-16 h-16 rounded-lg bg-surface-container-high" />
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-[10px] text-on-surface-variant/40 tracking-[0.2em] uppercase">
+            © 2026 mundIAl26 Editorial Team. All Rights Reserved.
+          </p>
+        </div>
+      </main>
     </div>
   );
 }

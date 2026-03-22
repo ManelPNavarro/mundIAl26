@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import AdminSubNav from "./sub-nav";
+import AdminSidebar from "@/components/layout/admin-sidebar";
 
 export default async function AdminLayout({
   children,
@@ -29,8 +29,10 @@ export default async function AdminLayout({
 
   return (
     <div>
-      <AdminSubNav />
-      {children}
+      <AdminSidebar />
+      <main className="md:ml-64 pt-16 min-h-screen">
+        {children}
+      </main>
     </div>
   );
 }

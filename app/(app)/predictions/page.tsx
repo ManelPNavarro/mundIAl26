@@ -3,27 +3,25 @@
 import { useState, useEffect } from "react";
 import { usePredictions } from "@/lib/hooks/usePredictions";
 import GroupMatchesTab from "@/components/predictions/group-matches-tab";
-import GroupStandingsTab from "@/components/predictions/group-standings-tab";
 import KnockoutTab from "@/components/predictions/knockout-tab";
-import AwardsTab from "@/components/predictions/awards-tab";
-import { Save } from "lucide-react";
 
-type TabKey = "partidos" | "clasificacion" | "eliminatoria" | "premios";
+type TabKey = "group_stage" | "round_of_16" | "quarter_finals" | "semi_finals" | "final";
 
 const TABS: { key: TabKey; label: string }[] = [
-  { key: "partidos", label: "Partidos de Grupos" },
-  { key: "clasificacion", label: "Clasificación de Grupos" },
-  { key: "eliminatoria", label: "Fase Eliminatoria" },
-  { key: "premios", label: "Premios Especiales" },
+  { key: "group_stage", label: "GROUP STAGE" },
+  { key: "round_of_16", label: "ROUND OF 16" },
+  { key: "quarter_finals", label: "QUARTER FINALS" },
+  { key: "semi_finals", label: "SEMI FINALS" },
+  { key: "final", label: "FINAL" },
 ];
 
 export default function PredictionsPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>("partidos");
+  const [activeTab, setActiveTab] = useState<TabKey>("group_stage");
   const [deadline, setDeadline] = useState<Date | null>(null);
   const [isPastDeadline, setIsPastDeadline] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const { state, isLoading, saveMatch, saveGroup, saveAwards, refetch } =
+  const { state, isLoading, saveMatch, saveAwards, refetch } =
     usePredictions();
 
   // Fetch deadline from settings
@@ -69,42 +67,12 @@ export default function PredictionsPage() {
     saveMatch(matchId, home, away);
   };
 
-  const handleUpdateGroup = (
-    groupId: string,
-    position: "first" | "second" | "third",
-    teamId: string | null
-  ) => {
-    const current = state.group_predictions[groupId] ?? {
-      group_id: groupId,
-      first_team_id: null,
-      second_team_id: null,
-      third_team_id: null,
-    };
-    const updated = {
-      first_team_id: position === "first" ? teamId : current.first_team_id,
-      second_team_id: position === "second" ? teamId : current.second_team_id,
-      third_team_id: position === "third" ? teamId : current.third_team_id,
-    };
-    saveGroup(
-      groupId,
-      updated.first_team_id,
-      updated.second_team_id,
-      updated.third_team_id
-    );
-  };
-
   const handleUpdateKnockout = (matchId: string, teamId: string | null) => {
-    // Knockout bracket predictions stored as match predictions with a special team field
-    // We store winner as home_score placeholder; use awards-style save
     saveAwards(`knockout_${matchId}`, teamId);
   };
 
-  const handleUpdateAward = (field: string, id: string | null) => {
-    saveAwards(field, id);
-  };
-
   return (
-    <div className="pb-32 md:pb-16">
+    <div className="pb-32">
       {/* Deadline banner */}
       {isPastDeadline && deadline && (
         <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-400">
@@ -121,105 +89,152 @@ export default function PredictionsPage() {
         </div>
       )}
 
-      {/* Header */}
-      <header className="mb-8">
-        <h1 className="font-display text-[40px] leading-none uppercase tracking-tight text-white mb-4">
-          Mi Quiniela
-        </h1>
-
-        {/* Progress bar */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-end mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-muted">
-              Progreso de Predicciones
+      {/* Hero Title Section */}
+      <section className="mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <span className="text-primary font-bold uppercase tracking-widest text-xs block mb-2">
+              Personal Dashboard
             </span>
-            <span className="text-xs font-bold text-green-primary">
-              {filledSlots} / {totalSlots}
-            </span>
+            <h1 className="text-5xl md:text-7xl font-bebas text-white leading-none tracking-tight">
+              MI QUINIELA
+            </h1>
+            <p className="text-gray-400 mt-4 max-w-md">
+              Predice los resultados del Mundial 2026 y compite por el título mundial.
+              Apuestas de alto nivel, excelencia editorial pura.
+            </p>
           </div>
-          <div className="w-full h-2 bg-dark-border rounded-full overflow-hidden">
-            <div
-              className="h-full bg-green-primary rounded-full transition-all duration-500"
-              style={{
-                width: `${progressPercent}%`,
-                boxShadow: "0 0 10px rgba(0,212,106,0.4)",
-              }}
-            />
+          {/* Global Rank card */}
+          <div className="bg-surface-container-low p-6 rounded-2xl flex flex-col items-center justify-center min-w-[200px] border border-white/5">
+            <span className="text-gray-500 uppercase text-[10px] tracking-[0.2em] font-bold mb-2">
+              Global Rank
+            </span>
+            <span className="font-bebas text-5xl text-white leading-none">
+              #{(1000 + matchCount * 10).toLocaleString()}
+            </span>
+            <div className="mt-2 flex items-center gap-1 text-primary text-xs font-bold">
+              <span className="material-symbols-outlined text-sm">trending_up</span>
+              <span>+{matchCount} today</span>
+            </div>
           </div>
         </div>
-      </header>
+      </section>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-8 overflow-x-auto pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch]">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={[
-              "whitespace-nowrap px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors",
-              activeTab === tab.key
-                ? "bg-green-primary text-black shadow-lg shadow-green-primary/20"
-                : "bg-dark-card text-gray-muted hover:bg-dark-card-hover",
-            ].join(" ")}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* Progress and Action Buttons */}
+      <section className="mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          <div className="md:col-span-8">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-white text-sm font-bold uppercase tracking-tighter">
+                Completion Progress
+              </span>
+              <span className="text-primary font-bebas text-xl">
+                {matchCount}/48 MATCHES
+              </span>
+            </div>
+            <div className="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-primary to-primary-container transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
+          <div className="md:col-span-4 flex justify-end gap-2">
+            <button
+              className="bg-surface-container-high text-white p-3 rounded-xl hover:bg-surface-container-highest transition-colors border border-white/5"
+              aria-label="Share"
+            >
+              <span className="material-symbols-outlined">share</span>
+            </button>
+            <button
+              className="bg-surface-container-high text-white p-3 rounded-xl hover:bg-surface-container-highest transition-colors border border-white/5"
+              aria-label="Settings"
+            >
+              <span className="material-symbols-outlined">settings</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Phase Tabs */}
+        <div className="mt-12 flex gap-4 overflow-x-auto pb-4 [scrollbar-width:none] [-webkit-overflow-scrolling:touch]">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={[
+                "px-8 py-3 whitespace-nowrap font-bebas text-xl tracking-wide transition-colors",
+                activeTab === tab.key
+                  ? "bg-[#2a2a2a] text-[#00D46A] border-b-2 border-[#00D46A]"
+                  : "text-gray-500 hover:text-white",
+              ].join(" ")}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </section>
 
       {/* Tab content */}
       {isLoading ? (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-32 rounded-xl skeleton-shimmer" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-64 rounded-2xl skeleton-shimmer" />
           ))}
         </div>
       ) : (
         <>
-          {activeTab === "partidos" && (
+          {activeTab === "group_stage" && (
             <GroupMatchesTab
               predictions={state}
               onUpdate={handleUpdateMatch}
               readOnly={isPastDeadline}
             />
           )}
-          {activeTab === "clasificacion" && (
-            <GroupStandingsTab
-              predictions={state}
-              onUpdate={handleUpdateGroup}
-              readOnly={isPastDeadline}
-            />
-          )}
-          {activeTab === "eliminatoria" && (
+          {activeTab === "round_of_16" && (
             <KnockoutTab
               predictions={state}
               onUpdate={handleUpdateKnockout}
               readOnly={isPastDeadline}
+              phaseFilter="round_of_16"
             />
           )}
-          {activeTab === "premios" && (
-            <AwardsTab
+          {activeTab === "quarter_finals" && (
+            <KnockoutTab
               predictions={state}
-              onUpdate={handleUpdateAward}
+              onUpdate={handleUpdateKnockout}
               readOnly={isPastDeadline}
+              phaseFilter="quarter_finals"
+            />
+          )}
+          {activeTab === "semi_finals" && (
+            <KnockoutTab
+              predictions={state}
+              onUpdate={handleUpdateKnockout}
+              readOnly={isPastDeadline}
+              phaseFilter="semi_finals"
+            />
+          )}
+          {activeTab === "final" && (
+            <KnockoutTab
+              predictions={state}
+              onUpdate={handleUpdateKnockout}
+              readOnly={isPastDeadline}
+              phaseFilter="final"
             />
           )}
         </>
       )}
 
-      {/* Sticky save button */}
+      {/* Sticky FAB */}
       {!isPastDeadline && (
-        <div className="fixed bottom-24 md:bottom-8 right-8 z-50">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="flex items-center gap-3 px-8 py-4 bg-green-primary text-black rounded-full font-bold uppercase tracking-widest shadow-[0_10px_30px_rgba(0,212,106,0.4)] hover:scale-105 active:scale-95 transition-all disabled:opacity-70 disabled:scale-100"
+            className="bg-gradient-to-tr from-primary to-primary-container text-on-primary-fixed font-bold px-10 py-4 rounded-full uppercase tracking-widest text-sm shadow-[0px_20px_40px_rgba(0,212,106,0.3)] flex items-center gap-3 active:scale-95 transition-transform disabled:opacity-70"
           >
-            <Save className="size-5" strokeWidth={2.5} />
-            <span className="hidden md:inline">
-              {isSaving ? "Guardando..." : "Guardar Quiniela"}
-            </span>
-            <span className="md:hidden">{isSaving ? "..." : "Guardar"}</span>
+            {isSaving ? "Guardando..." : "Guardar Quiniela"}
+            <span className="material-symbols-outlined">send</span>
           </button>
         </div>
       )}

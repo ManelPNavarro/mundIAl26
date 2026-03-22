@@ -1,5 +1,4 @@
 const BASE_URL = "https://api.football-data.org/v4";
-const COMPETITION_CODE = "WC";
 
 // Rate limiting: free tier allows 10 req/min
 // We add a small delay between requests to avoid hitting the limit
@@ -96,23 +95,23 @@ async function fetchFromApi(endpoint: string): Promise<unknown> {
   return response.json();
 }
 
-export async function fetchMatches(): Promise<FootballMatch[]> {
+export async function fetchMatches(competitionCode = "WC"): Promise<FootballMatch[]> {
   const data = (await fetchFromApi(
-    `/competitions/${COMPETITION_CODE}/matches`
+    `/competitions/${competitionCode}/matches`
   )) as { matches: FootballMatch[] };
   return data.matches ?? [];
 }
 
-export async function fetchTeams(): Promise<FootballTeam[]> {
+export async function fetchTeams(competitionCode = "WC"): Promise<FootballTeam[]> {
   const data = (await fetchFromApi(
-    `/competitions/${COMPETITION_CODE}/teams`
+    `/competitions/${competitionCode}/teams`
   )) as { teams: FootballTeam[] };
   return data.teams ?? [];
 }
 
-export async function fetchStandings(): Promise<FootballStanding[]> {
+export async function fetchStandings(competitionCode = "WC"): Promise<FootballStanding[]> {
   const data = (await fetchFromApi(
-    `/competitions/${COMPETITION_CODE}/standings`
+    `/competitions/${competitionCode}/standings`
   )) as { standings: FootballStanding[] };
   return data.standings ?? [];
 }

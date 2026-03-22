@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -43,6 +43,13 @@ export async function middleware(request: NextRequest) {
   if (user && (pathname === "/login" || pathname === "/register")) {
     const url = request.nextUrl.clone();
     url.pathname = "/ranking";
+    return NextResponse.redirect(url);
+  }
+
+  // Redirect /admin/tournament → /admin/games
+  if (pathname === "/admin/tournament") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/games";
     return NextResponse.redirect(url);
   }
 
