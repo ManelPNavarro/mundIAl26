@@ -28,8 +28,7 @@ export interface Database {
         Row: {
           id: string;
           email: string;
-          first_name: string;
-          last_name: string;
+          username: string;
           avatar_url: string | null;
           role: UserRole;
           is_active: boolean;
@@ -38,8 +37,7 @@ export interface Database {
         Insert: {
           id: string;
           email: string;
-          first_name: string;
-          last_name: string;
+          username: string;
           avatar_url?: string | null;
           role?: UserRole;
           is_active?: boolean;
@@ -48,8 +46,7 @@ export interface Database {
         Update: {
           id?: string;
           email?: string;
-          first_name?: string;
-          last_name?: string;
+          username?: string;
           avatar_url?: string | null;
           role?: UserRole;
           is_active?: boolean;

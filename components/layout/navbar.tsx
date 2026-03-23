@@ -60,8 +60,8 @@ export default function Navbar() {
     router.push('/login')
   }
 
-  const initials = userData
-    ? `${userData.first_name[0]}${userData.last_name[0]}`.toUpperCase()
+  const initials = userData?.username
+    ? userData.username.slice(0, 2).toUpperCase()
     : '?'
 
   const isAdmin = userData?.role === 'admin'
@@ -135,7 +135,7 @@ export default function Navbar() {
               </AvatarFallback>
             </Avatar>
             <span className="hidden lg:block text-sm text-white font-medium max-w-[120px] truncate">
-              {userData ? `${userData.first_name} ${userData.last_name}` : '…'}
+              {userData?.username ?? '…'}
             </span>
             <span className="material-symbols-outlined text-sm text-gray-500 leading-none hidden lg:block">
               expand_more

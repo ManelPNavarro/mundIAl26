@@ -9,8 +9,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -36,8 +35,8 @@ export default function RegisterPage() {
     setError(null);
     const supabase = createClient();
 
-    if (!firstName.trim() || !lastName.trim()) {
-      setError("Por favor, introduce tu nombre y apellido.");
+    if (!username.trim()) {
+      setError("Por favor, introduce un nombre de usuario.");
       return;
     }
     if (!email.trim()) {
@@ -61,8 +60,7 @@ export default function RegisterPage() {
         password,
         options: {
           data: {
-            first_name: firstName,
-            last_name: lastName,
+            username,
           },
         },
       });
@@ -103,8 +101,7 @@ export default function RegisterPage() {
       const { error: insertError } = await supabase.from("users").insert({
         id: userId,
         email,
-        first_name: firstName,
-        last_name: lastName,
+        username,
         avatar_url: avatarUrl,
       });
 
@@ -188,34 +185,19 @@ export default function RegisterPage() {
               />
             </div>
 
-            {/* Name fields — 50/50 */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className={labelClass} htmlFor="first_name">
-                  Nombre
-                </label>
-                <input
-                  id="first_name"
-                  type="text"
-                  placeholder="Ej. Javier"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className={inputClass}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className={labelClass} htmlFor="last_name">
-                  Apellido
-                </label>
-                <input
-                  id="last_name"
-                  type="text"
-                  placeholder="Ej. Hernández"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className={inputClass}
-                />
-              </div>
+            {/* Username */}
+            <div className="space-y-2">
+              <label className={labelClass} htmlFor="username">
+                Nombre de usuario
+              </label>
+              <input
+                id="username"
+                type="text"
+                placeholder="Ej. javier_hdz"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className={inputClass}
+              />
             </div>
 
             {/* Email */}

@@ -17,8 +17,7 @@ export async function GET(request: NextRequest) {
         breakdown,
         last_calculated_at,
         users (
-          first_name,
-          last_name,
+          username,
           avatar_url
         )
       `
@@ -42,11 +41,7 @@ export async function GET(request: NextRequest) {
     const ranking = (scores ?? []).map((entry, index) => ({
       rank: index + 1,
       user_id: entry.user_id,
-      first_name: entry.users?.first_name ?? "",
-      last_name: entry.users?.last_name ?? "",
-      name: entry.users
-        ? `${entry.users.first_name} ${entry.users.last_name}`.trim()
-        : "Usuario",
+      name: entry.users?.username ?? "Usuario",
       avatar_url: entry.users?.avatar_url ?? null,
       total_points: entry.total_points,
       breakdown: (entry.breakdown as Record<string, number>) ?? {},

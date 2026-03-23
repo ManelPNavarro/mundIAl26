@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
 
   const { data: users, error, count } = await service
     .from("users")
-    .select("id, first_name, last_name, email, role, is_active, avatar_url", { count: "exact" })
+    .select("id, username, email, role, is_active, avatar_url", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { first_name, last_name, email, role } = body;
+  const { username, email, role } = body;
 
   if (!email) {
     return NextResponse.json({ error: "Email es requerido" }, { status: 400 });
@@ -121,8 +121,7 @@ export async function POST(request: NextRequest) {
     .insert({
       id: authUser.user.id,
       email,
-      first_name: first_name || null,
-      last_name: last_name || null,
+      username: username || email.split("@")[0],
       role: role ?? "user",
       is_active: true,
     })
@@ -146,7 +145,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { id, first_name, last_name, role, is_active } = body;
+  const { id, username, role, is_active } = body;
 
   if (!id) {
     return NextResponse.json({ error: "ID de usuario requerido" }, { status: 400 });
@@ -157,8 +156,7 @@ export async function PATCH(request: NextRequest) {
   // Build update payload (only include provided fields)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updates: Record<string, any> = {};
-  if (first_name !== undefined) updates.first_name = first_name;
-  if (last_name !== undefined) updates.last_name = last_name;
+  if (username !== undefined) updates.username = username;
   if (role !== undefined) updates.role = role;
   if (is_active !== undefined) updates.is_active = is_active;
 

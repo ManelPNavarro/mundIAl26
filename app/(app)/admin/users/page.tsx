@@ -5,8 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface User {
   id: string;
-  first_name: string | null;
-  last_name: string | null;
+  username: string | null;
   email: string;
   role: "admin" | "user";
   is_active: boolean;
@@ -30,7 +29,7 @@ interface ApiResponse {
 const PAGE_LIMIT = 20;
 
 function fullName(u: User) {
-  return [u.first_name, u.last_name].filter(Boolean).join(" ") || u.email;
+  return u.username || u.email;
 }
 
 function AvatarFallback({ name }: { name: string }) {
@@ -232,8 +231,7 @@ function EditUserModal({
   onSaved: () => void;
 }) {
   const [formData, setFormData] = useState({
-    first_name: user.first_name ?? "",
-    last_name: user.last_name ?? "",
+    username: user.username ?? "",
     role: user.role,
   });
   const [saving, setSaving] = useState(false);
@@ -277,29 +275,16 @@ function EditUserModal({
           </div>
 
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.first_name}
-                  onChange={(e) => setFormData((f) => ({ ...f, first_name: e.target.value }))}
-                  className="w-full bg-surface-container-highest border border-white/5 rounded-lg py-3 px-4 text-white focus:ring-1 focus:ring-primary outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.last_name}
-                  onChange={(e) => setFormData((f) => ({ ...f, last_name: e.target.value }))}
-                  className="w-full bg-surface-container-highest border border-white/5 rounded-lg py-3 px-4 text-white focus:ring-1 focus:ring-primary outline-none"
-                />
-              </div>
+            <div>
+              <label className="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2">
+                Username
+              </label>
+              <input
+                type="text"
+                value={formData.username}
+                onChange={(e) => setFormData((f) => ({ ...f, username: e.target.value }))}
+                className="w-full bg-surface-container-highest border border-white/5 rounded-lg py-3 px-4 text-white focus:ring-1 focus:ring-primary outline-none"
+              />
             </div>
 
             <div>
