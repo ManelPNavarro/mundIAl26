@@ -50,6 +50,26 @@ export interface FootballMatch {
   matchday: number | null;
 }
 
+export interface FootballCompetition {
+  id: number;
+  name: string;
+  code: string;
+  type: string;
+  emblem: string | null;
+  area: {
+    id: number;
+    name: string;
+    code: string;
+    flag: string | null;
+  };
+  currentSeason: {
+    id: number;
+    startDate: string;
+    endDate: string;
+    currentMatchday: number | null;
+  } | null;
+}
+
 export interface FootballStanding {
   stage: string;
   type: string;
@@ -114,4 +134,9 @@ export async function fetchStandings(competitionCode = "WC"): Promise<FootballSt
     `/competitions/${competitionCode}/standings`
   )) as { standings: FootballStanding[] };
   return data.standings ?? [];
+}
+
+export async function fetchCompetitions(): Promise<FootballCompetition[]> {
+  const data = (await fetchFromApi("/competitions")) as { competitions: FootballCompetition[] };
+  return data.competitions ?? [];
 }
