@@ -122,7 +122,7 @@ function InviteModal({
 }) {
   const [email, setEmail] = useState("");
   const [inviteLink] = useState(
-    `mundial.io/invite/join?token=${crypto.randomUUID()}`
+    `${window.location.origin}/register?token=${crypto.randomUUID()}`
   );
   const [sending, setSending] = useState(false);
 

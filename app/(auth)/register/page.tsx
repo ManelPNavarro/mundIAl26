@@ -1,13 +1,20 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Guard: only accessible via admin-generated invite link
+  useEffect(() => {
+    if (!searchParams.get("token")) {
+      router.replace("/login");
+    }
+  }, [searchParams, router]);
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -271,18 +278,6 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            {/* Login link */}
-            <div className="text-center pt-2">
-              <p className="text-on-surface-variant text-xs">
-                ¿Ya tienes cuenta?{" "}
-                <Link
-                  href="/login"
-                  className="text-on-surface font-semibold hover:text-primary transition-colors uppercase tracking-tighter underline underline-offset-4"
-                >
-                  ENTRAR
-                </Link>
-              </p>
-            </div>
           </form>
         </div>
       </main>

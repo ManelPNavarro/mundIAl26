@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -156,18 +155,6 @@ export default function LoginPage() {
             )}
           </form>
 
-          {/* Registration link */}
-          <div className="mt-10 pt-8 border-t border-outline-variant/10 text-center">
-            <p className="text-on-surface-variant text-xs">
-              New to the editorial team?{" "}
-              <Link
-                href="/register"
-                className="text-on-surface font-semibold hover:text-primary transition-colors ml-1 uppercase tracking-tighter underline underline-offset-4"
-              >
-                Request Access
-              </Link>
-            </p>
-          </div>
         </div>
 
         {/* Footer Visual Decor */}
