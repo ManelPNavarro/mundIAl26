@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import AdminSidebar from "@/components/layout/admin-sidebar";
 
 export default async function AdminLayout({
   children,
@@ -26,5 +27,12 @@ export default async function AdminLayout({
     redirect("/ranking");
   }
 
-  return <>{children}</>;
+  return (
+    <div className="flex">
+      <AdminSidebar />
+      <div className="ml-60 flex-1 min-w-0">
+        {children}
+      </div>
+    </div>
+  );
 }
