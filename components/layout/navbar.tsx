@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import CompetitionSwitcher from '@/components/layout/competition-switcher'
 import type { Tables } from '@/types/database'
 
 const NAV_LINKS = [
@@ -68,18 +67,13 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 w-full z-50 bg-[#131313]/70 backdrop-blur-xl border-b border-white/5 h-16 flex items-center px-6">
-      {/* Left: Logo + CompetitionSwitcher */}
+      {/* Left: Logo */}
       <div className="flex items-center gap-4 flex-shrink-0">
         <Link href="/ranking" className="flex-shrink-0">
           <span className="font-bebas text-2xl italic tracking-tight text-white">
             Mund<span className="text-[#00D46A]">IA</span>l 26
           </span>
         </Link>
-
-        {/* Competition switcher — desktop only */}
-        <div className="hidden lg:flex">
-          <CompetitionSwitcher />
-        </div>
       </div>
 
       {/* Center nav links — desktop only */}

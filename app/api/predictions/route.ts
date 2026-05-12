@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getWC2026Id } from "@/lib/wc2026";
 import type { Tables } from "@/types/database";
 
 export async function GET() {
@@ -13,15 +14,20 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const competitionId = await getWC2026Id(supabase);
+
   // Load prediction for the current user
-  const { data: predictionRaw, error: predictionError } = await supabase
+  const predQuery = supabase
     .from("predictions")
     .select("*")
-    .eq("user_id", session.user.id)
-    .single();
+    .eq("user_id", session.user.id);
+
+  const { data: predictionRaw, error: predictionError } = await (
+    competitionId ? predQuery.eq("competition_id", competitionId) : predQuery
+  ).maybeSingle();
   const prediction = predictionRaw as Tables<"predictions"> | null;
 
-  if (predictionError && predictionError.code !== "PGRST116") {
+  if (predictionError) {
     return NextResponse.json({ error: predictionError.message }, { status: 500 });
   }
 
@@ -84,12 +90,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const competitionId = await getWC2026Id(supabase);
+
   // Check deadline
   const { data: deadlineSetting } = await supabase
     .from("settings")
     .select("value")
     .eq("key", "predictions_deadline")
-    .single();
+    .maybeSingle();
 
   if (deadlineSetting?.value) {
     const deadline = new Date(deadlineSetting.value);
@@ -110,11 +118,14 @@ export async function POST(request: NextRequest) {
   // Ensure a parent prediction row exists
   let predictionId: string;
 
-  const { data: existingRaw } = await supabase
+  const existQuery = supabase
     .from("predictions")
     .select("id")
-    .eq("user_id", session.user.id)
-    .single();
+    .eq("user_id", session.user.id);
+
+  const { data: existingRaw } = await (
+    competitionId ? existQuery.eq("competition_id", competitionId) : existQuery
+  ).maybeSingle();
   const existing = existingRaw as { id: string } | null;
 
   if (existing) {
@@ -122,7 +133,10 @@ export async function POST(request: NextRequest) {
   } else {
     const { data: createdRaw, error: createError } = await supabase
       .from("predictions")
-      .insert({ user_id: session.user.id })
+      .insert({
+        user_id: session.user.id,
+        ...(competitionId ? { competition_id: competitionId } : {}),
+      })
       .select("id")
       .single();
     const created = createdRaw as { id: string } | null;

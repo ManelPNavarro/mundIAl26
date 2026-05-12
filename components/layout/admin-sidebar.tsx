@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { href: "/admin/juegos", label: "Juegos", icon: "sports_soccer" },
+  { href: "/admin/resultados", label: "Resultados", icon: "scoreboard" },
   { href: "/admin/usuarios", label: "Usuarios", icon: "group" },
   { href: "/admin/configuracion", label: "Configuración", icon: "settings" },
 ];

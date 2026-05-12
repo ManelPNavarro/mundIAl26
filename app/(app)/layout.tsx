@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { CompetitionProvider } from '@/lib/context/competition-context'
 import Navbar from '@/components/layout/navbar'
 import BottomNav from '@/components/layout/bottom-nav'
 import { Toaster } from 'sonner'
@@ -17,17 +16,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <CompetitionProvider>
-      <div className="min-h-screen bg-[#131313]">
-        <Navbar />
+    <div className="min-h-screen bg-[#131313]">
+      <Navbar />
 
-        <main className="pt-16 min-h-screen">
-          {children}
-        </main>
+      <main className="pt-16 min-h-screen">
+        {children}
+      </main>
 
-        <BottomNav />
-        <Toaster richColors position="top-right" />
-      </div>
-    </CompetitionProvider>
+      <BottomNav />
+      <Toaster richColors position="top-right" />
+    </div>
   )
 }

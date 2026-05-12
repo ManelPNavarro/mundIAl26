@@ -1,0 +1,800 @@
+{
+  "tournament": "2026 FIFA World Cup",
+  "host": "USA / Mexico / Canada",
+  "format": {
+    "groups": 12,
+    "teams_per_group": 4,
+    "total_teams": 48,
+    "group_matches": 72,
+    "knockout_rounds": [
+      "R32",
+      "R16",
+      "QF",
+      "SF",
+      "THIRD_PLACE",
+      "FINAL"
+    ],
+    "r32_qualifiers": "2 per group + 8 best 3rd-placed teams"
+  },
+  "groups": {
+    "A": [
+      "Corea del Sur",
+      "México",
+      "República Checa",
+      "Sudáfrica"
+    ],
+    "B": [
+      "Bosnia y Herzegovina",
+      "Canadá",
+      "Catar",
+      "Suiza"
+    ],
+    "C": [
+      "Brasil",
+      "Escocia",
+      "Haití",
+      "Marruecos"
+    ],
+    "D": [
+      "Australia",
+      "Estados Unidos",
+      "Paraguay",
+      "Turquía"
+    ],
+    "E": [
+      "Alemania",
+      "Costa de Marfil",
+      "Curazao",
+      "Ecuador"
+    ],
+    "F": [
+      "Japón",
+      "Países Bajos",
+      "Suecia",
+      "Túnez"
+    ],
+    "G": [
+      "Bélgica",
+      "Egipto",
+      "Irán",
+      "Nueva Zelanda"
+    ],
+    "H": [
+      "Arabia Saudita",
+      "Cabo Verde",
+      "España",
+      "Uruguay"
+    ],
+    "I": [
+      "Francia",
+      "Irak",
+      "Noruega",
+      "Senegal"
+    ],
+    "J": [
+      "Argelia",
+      "Argentina",
+      "Austria",
+      "Jordania"
+    ],
+    "K": [
+      "Colombia",
+      "Portugal",
+      "RD Congo",
+      "Uzbekistán"
+    ],
+    "L": [
+      "Croacia",
+      "Ghana",
+      "Inglaterra",
+      "Panamá"
+    ]
+  },
+  "group_matches": [
+    {
+      "round": "GROUP",
+      "group": "A",
+      "matchday": 1,
+      "home": "México",
+      "away": "Sudáfrica"
+    },
+    {
+      "round": "GROUP",
+      "group": "A",
+      "matchday": 1,
+      "home": "Corea del Sur",
+      "away": "República Checa"
+    },
+    {
+      "round": "GROUP",
+      "group": "B",
+      "matchday": 1,
+      "home": "Canadá",
+      "away": "Bosnia y Herzegovina"
+    },
+    {
+      "round": "GROUP",
+      "group": "B",
+      "matchday": 1,
+      "home": "Catar",
+      "away": "Suiza"
+    },
+    {
+      "round": "GROUP",
+      "group": "C",
+      "matchday": 1,
+      "home": "Brasil",
+      "away": "Marruecos"
+    },
+    {
+      "round": "GROUP",
+      "group": "C",
+      "matchday": 1,
+      "home": "Haití",
+      "away": "Escocia"
+    },
+    {
+      "round": "GROUP",
+      "group": "D",
+      "matchday": 1,
+      "home": "Estados Unidos",
+      "away": "Paraguay"
+    },
+    {
+      "round": "GROUP",
+      "group": "D",
+      "matchday": 1,
+      "home": "Australia",
+      "away": "Turquía"
+    },
+    {
+      "round": "GROUP",
+      "group": "E",
+      "matchday": 1,
+      "home": "Alemania",
+      "away": "Curazao"
+    },
+    {
+      "round": "GROUP",
+      "group": "E",
+      "matchday": 1,
+      "home": "Costa de Marfil",
+      "away": "Ecuador"
+    },
+    {
+      "round": "GROUP",
+      "group": "F",
+      "matchday": 1,
+      "home": "Países Bajos",
+      "away": "Japón"
+    },
+    {
+      "round": "GROUP",
+      "group": "F",
+      "matchday": 1,
+      "home": "Suecia",
+      "away": "Túnez"
+    },
+    {
+      "round": "GROUP",
+      "group": "G",
+      "matchday": 1,
+      "home": "Bélgica",
+      "away": "Egipto"
+    },
+    {
+      "round": "GROUP",
+      "group": "G",
+      "matchday": 1,
+      "home": "Irán",
+      "away": "Nueva Zelanda"
+    },
+    {
+      "round": "GROUP",
+      "group": "H",
+      "matchday": 1,
+      "home": "España",
+      "away": "Cabo Verde"
+    },
+    {
+      "round": "GROUP",
+      "group": "H",
+      "matchday": 1,
+      "home": "Arabia Saudita",
+      "away": "Uruguay"
+    },
+    {
+      "round": "GROUP",
+      "group": "I",
+      "matchday": 1,
+      "home": "Francia",
+      "away": "Senegal"
+    },
+    {
+      "round": "GROUP",
+      "group": "I",
+      "matchday": 1,
+      "home": "Irak",
+      "away": "Noruega"
+    },
+    {
+      "round": "GROUP",
+      "group": "J",
+      "matchday": 1,
+      "home": "Argentina",
+      "away": "Argelia"
+    },
+    {
+      "round": "GROUP",
+      "group": "J",
+      "matchday": 1,
+      "home": "Austria",
+      "away": "Jordania"
+    },
+    {
+      "round": "GROUP",
+      "group": "K",
+      "matchday": 1,
+      "home": "Portugal",
+      "away": "RD Congo"
+    },
+    {
+      "round": "GROUP",
+      "group": "K",
+      "matchday": 1,
+      "home": "Uzbekistán",
+      "away": "Colombia"
+    },
+    {
+      "round": "GROUP",
+      "group": "L",
+      "matchday": 1,
+      "home": "Inglaterra",
+      "away": "Croacia"
+    },
+    {
+      "round": "GROUP",
+      "group": "L",
+      "matchday": 1,
+      "home": "Ghana",
+      "away": "Panamá"
+    },
+    {
+      "round": "GROUP",
+      "group": "A",
+      "matchday": 2,
+      "home": "República Checa",
+      "away": "Sudáfrica"
+    },
+    {
+      "round": "GROUP",
+      "group": "A",
+      "matchday": 2,
+      "home": "México",
+      "away": "Corea del Sur"
+    },
+    {
+      "round": "GROUP",
+      "group": "B",
+      "matchday": 2,
+      "home": "Suiza",
+      "away": "Bosnia y Herzegovina"
+    },
+    {
+      "round": "GROUP",
+      "group": "B",
+      "matchday": 2,
+      "home": "Canadá",
+      "away": "Catar"
+    },
+    {
+      "round": "GROUP",
+      "group": "C",
+      "matchday": 2,
+      "home": "Escocia",
+      "away": "Marruecos"
+    },
+    {
+      "round": "GROUP",
+      "group": "C",
+      "matchday": 2,
+      "home": "Brasil",
+      "away": "Haití"
+    },
+    {
+      "round": "GROUP",
+      "group": "D",
+      "matchday": 2,
+      "home": "Estados Unidos",
+      "away": "Australia"
+    },
+    {
+      "round": "GROUP",
+      "group": "D",
+      "matchday": 2,
+      "home": "Turquía",
+      "away": "Paraguay"
+    },
+    {
+      "round": "GROUP",
+      "group": "E",
+      "matchday": 2,
+      "home": "Alemania",
+      "away": "Costa de Marfil"
+    },
+    {
+      "round": "GROUP",
+      "group": "E",
+      "matchday": 2,
+      "home": "Ecuador",
+      "away": "Curazao"
+    },
+    {
+      "round": "GROUP",
+      "group": "F",
+      "matchday": 2,
+      "home": "Países Bajos",
+      "away": "Suecia"
+    },
+    {
+      "round": "GROUP",
+      "group": "F",
+      "matchday": 2,
+      "home": "Túnez",
+      "away": "Japón"
+    },
+    {
+      "round": "GROUP",
+      "group": "G",
+      "matchday": 2,
+      "home": "Bélgica",
+      "away": "Irán"
+    },
+    {
+      "round": "GROUP",
+      "group": "G",
+      "matchday": 2,
+      "home": "Nueva Zelanda",
+      "away": "Egipto"
+    },
+    {
+      "round": "GROUP",
+      "group": "H",
+      "matchday": 2,
+      "home": "España",
+      "away": "Arabia Saudita"
+    },
+    {
+      "round": "GROUP",
+      "group": "H",
+      "matchday": 2,
+      "home": "Uruguay",
+      "away": "Cabo Verde"
+    },
+    {
+      "round": "GROUP",
+      "group": "I",
+      "matchday": 2,
+      "home": "Francia",
+      "away": "Irak"
+    },
+    {
+      "round": "GROUP",
+      "group": "I",
+      "matchday": 2,
+      "home": "Noruega",
+      "away": "Senegal"
+    },
+    {
+      "round": "GROUP",
+      "group": "J",
+      "matchday": 2,
+      "home": "Argentina",
+      "away": "Austria"
+    },
+    {
+      "round": "GROUP",
+      "group": "J",
+      "matchday": 2,
+      "home": "Jordania",
+      "away": "Argelia"
+    },
+    {
+      "round": "GROUP",
+      "group": "K",
+      "matchday": 2,
+      "home": "Portugal",
+      "away": "Uzbekistán"
+    },
+    {
+      "round": "GROUP",
+      "group": "K",
+      "matchday": 2,
+      "home": "Colombia",
+      "away": "RD Congo"
+    },
+    {
+      "round": "GROUP",
+      "group": "L",
+      "matchday": 2,
+      "home": "Inglaterra",
+      "away": "Ghana"
+    },
+    {
+      "round": "GROUP",
+      "group": "L",
+      "matchday": 2,
+      "home": "Panamá",
+      "away": "Croacia"
+    },
+    {
+      "round": "GROUP",
+      "group": "A",
+      "matchday": 3,
+      "home": "República Checa",
+      "away": "México"
+    },
+    {
+      "round": "GROUP",
+      "group": "A",
+      "matchday": 3,
+      "home": "Sudáfrica",
+      "away": "Corea del Sur"
+    },
+    {
+      "round": "GROUP",
+      "group": "B",
+      "matchday": 3,
+      "home": "Suiza",
+      "away": "Canadá"
+    },
+    {
+      "round": "GROUP",
+      "group": "B",
+      "matchday": 3,
+      "home": "Bosnia y Herzegovina",
+      "away": "Catar"
+    },
+    {
+      "round": "GROUP",
+      "group": "C",
+      "matchday": 3,
+      "home": "Escocia",
+      "away": "Brasil"
+    },
+    {
+      "round": "GROUP",
+      "group": "C",
+      "matchday": 3,
+      "home": "Marruecos",
+      "away": "Haití"
+    },
+    {
+      "round": "GROUP",
+      "group": "D",
+      "matchday": 3,
+      "home": "Turquía",
+      "away": "Estados Unidos"
+    },
+    {
+      "round": "GROUP",
+      "group": "D",
+      "matchday": 3,
+      "home": "Paraguay",
+      "away": "Australia"
+    },
+    {
+      "round": "GROUP",
+      "group": "E",
+      "matchday": 3,
+      "home": "Curazao",
+      "away": "Costa de Marfil"
+    },
+    {
+      "round": "GROUP",
+      "group": "E",
+      "matchday": 3,
+      "home": "Ecuador",
+      "away": "Alemania"
+    },
+    {
+      "round": "GROUP",
+      "group": "F",
+      "matchday": 3,
+      "home": "Japón",
+      "away": "Suecia"
+    },
+    {
+      "round": "GROUP",
+      "group": "F",
+      "matchday": 3,
+      "home": "Túnez",
+      "away": "Países Bajos"
+    },
+    {
+      "round": "GROUP",
+      "group": "G",
+      "matchday": 3,
+      "home": "Egipto",
+      "away": "Irán"
+    },
+    {
+      "round": "GROUP",
+      "group": "G",
+      "matchday": 3,
+      "home": "Nueva Zelanda",
+      "away": "Bélgica"
+    },
+    {
+      "round": "GROUP",
+      "group": "H",
+      "matchday": 3,
+      "home": "Cabo Verde",
+      "away": "Arabia Saudita"
+    },
+    {
+      "round": "GROUP",
+      "group": "H",
+      "matchday": 3,
+      "home": "Uruguay",
+      "away": "España"
+    },
+    {
+      "round": "GROUP",
+      "group": "I",
+      "matchday": 3,
+      "home": "Noruega",
+      "away": "Francia"
+    },
+    {
+      "round": "GROUP",
+      "group": "I",
+      "matchday": 3,
+      "home": "Senegal",
+      "away": "Irak"
+    },
+    {
+      "round": "GROUP",
+      "group": "J",
+      "matchday": 3,
+      "home": "Argelia",
+      "away": "Austria"
+    },
+    {
+      "round": "GROUP",
+      "group": "J",
+      "matchday": 3,
+      "home": "Jordania",
+      "away": "Argentina"
+    },
+    {
+      "round": "GROUP",
+      "group": "K",
+      "matchday": 3,
+      "home": "Colombia",
+      "away": "Portugal"
+    },
+    {
+      "round": "GROUP",
+      "group": "K",
+      "matchday": 3,
+      "home": "RD Congo",
+      "away": "Uzbekistán"
+    },
+    {
+      "round": "GROUP",
+      "group": "L",
+      "matchday": 3,
+      "home": "Panamá",
+      "away": "Inglaterra"
+    },
+    {
+      "round": "GROUP",
+      "group": "L",
+      "matchday": 3,
+      "home": "Croacia",
+      "away": "Ghana"
+    }
+  ],
+  "knockout_matches": [
+    {
+      "round": "R32",
+      "match_no": 73,
+      "home_slot": "2A",
+      "away_slot": "2B"
+    },
+    {
+      "round": "R32",
+      "match_no": 74,
+      "home_slot": "1C",
+      "away_slot": "2F"
+    },
+    {
+      "round": "R32",
+      "match_no": 75,
+      "home_slot": "1E",
+      "away_slot": "3ABCDF"
+    },
+    {
+      "round": "R32",
+      "match_no": 76,
+      "home_slot": "1F",
+      "away_slot": "2C"
+    },
+    {
+      "round": "R32",
+      "match_no": 77,
+      "home_slot": "2E",
+      "away_slot": "2I"
+    },
+    {
+      "round": "R32",
+      "match_no": 78,
+      "home_slot": "1I",
+      "away_slot": "3CDFGH"
+    },
+    {
+      "round": "R32",
+      "match_no": 79,
+      "home_slot": "1A",
+      "away_slot": "3CEFHI"
+    },
+    {
+      "round": "R32",
+      "match_no": 80,
+      "home_slot": "1L",
+      "away_slot": "3EHIJK"
+    },
+    {
+      "round": "R32",
+      "match_no": 81,
+      "home_slot": "1G",
+      "away_slot": "3AEHIJ"
+    },
+    {
+      "round": "R32",
+      "match_no": 82,
+      "home_slot": "1D",
+      "away_slot": "3BEFIJ"
+    },
+    {
+      "round": "R32",
+      "match_no": 83,
+      "home_slot": "1H",
+      "away_slot": "2J"
+    },
+    {
+      "round": "R32",
+      "match_no": 84,
+      "home_slot": "2K",
+      "away_slot": "2L"
+    },
+    {
+      "round": "R32",
+      "match_no": 85,
+      "home_slot": "1B",
+      "away_slot": "3EFGIJ"
+    },
+    {
+      "round": "R32",
+      "match_no": 86,
+      "home_slot": "2D",
+      "away_slot": "2G"
+    },
+    {
+      "round": "R32",
+      "match_no": 87,
+      "home_slot": "1J",
+      "away_slot": "2H"
+    },
+    {
+      "round": "R32",
+      "match_no": 88,
+      "home_slot": "1K",
+      "away_slot": "3DEIJL"
+    },
+    {
+      "round": "R16",
+      "match_no": 89,
+      "home_slot": "W73",
+      "away_slot": "W75"
+    },
+    {
+      "round": "R16",
+      "match_no": 90,
+      "home_slot": "W74",
+      "away_slot": "W77"
+    },
+    {
+      "round": "R16",
+      "match_no": 91,
+      "home_slot": "W76",
+      "away_slot": "W78"
+    },
+    {
+      "round": "R16",
+      "match_no": 92,
+      "home_slot": "W79",
+      "away_slot": "W80"
+    },
+    {
+      "round": "R16",
+      "match_no": 93,
+      "home_slot": "W83",
+      "away_slot": "W84"
+    },
+    {
+      "round": "R16",
+      "match_no": 94,
+      "home_slot": "W81",
+      "away_slot": "W82"
+    },
+    {
+      "round": "R16",
+      "match_no": 95,
+      "home_slot": "W86",
+      "away_slot": "W88"
+    },
+    {
+      "round": "R16",
+      "match_no": 96,
+      "home_slot": "W85",
+      "away_slot": "W87"
+    },
+    {
+      "round": "QF",
+      "match_no": 97,
+      "home_slot": "W89",
+      "away_slot": "W90"
+    },
+    {
+      "round": "QF",
+      "match_no": 98,
+      "home_slot": "W93",
+      "away_slot": "W94"
+    },
+    {
+      "round": "QF",
+      "match_no": 99,
+      "home_slot": "W91",
+      "away_slot": "W92"
+    },
+    {
+      "round": "QF",
+      "match_no": 100,
+      "home_slot": "W95",
+      "away_slot": "W96"
+    },
+    {
+      "round": "SF",
+      "match_no": 101,
+      "home_slot": "W97",
+      "away_slot": "W98"
+    },
+    {
+      "round": "SF",
+      "match_no": 102,
+      "home_slot": "W99",
+      "away_slot": "W100"
+    },
+    {
+      "round": "THIRD_PLACE",
+      "match_no": 103,
+      "home_slot": "L101",
+      "away_slot": "L102"
+    },
+    {
+      "round": "FINAL",
+      "match_no": 104,
+      "home_slot": "W101",
+      "away_slot": "W102"
+    }
+  ],
+  "slot_notation": {
+    "1A": "Winner of Group A",
+    "2A": "Runner-up of Group A",
+    "3ABCDF": "Best 3rd-placed team among groups A, B, C, D, F",
+    "W73": "Winner of match #73 (a Round of 32 match)",
+    "L101": "Loser of match #101 (a Semifinal)"
+  }
+}
