@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8f3080a5-40ce-4b9e-a0a1-cb5c7fcfeff4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.claude/DESIGN.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.claude/PLANNING.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/deploy.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/mundIAl26.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AGENTS.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TASKS.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/configuracion/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/games/GamesClient.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/games/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/juegos/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/resultados/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/scoring/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/sub-nav.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/system/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/tournament/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/users/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/admin/usuarios/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/predictions/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/ranking/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(app)/results/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(auth)/layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(auth)/login/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(auth)/register/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/admin/competitions/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/admin/competitions/search/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/admin/resultados/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/admin/scoring/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/admin/system/health/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/admin/system/logs/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/admin/users/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/competitions/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/predictions/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/ranking/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/recalculate-scores/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/results/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/sync-results/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/layout/admin-sidebar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/layout/app-sidebar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/layout/bottom-nav.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/layout/competition-switcher.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/layout/navbar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/predictions/awards-tab.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/predictions/group-matches-tab.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/predictions/group-standings-tab.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/predictions/knockout-tab.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/results/match-card.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/avatar-with-fallback.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/avatar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/badge.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/button.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/card.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/dialog.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/empty-state.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/input.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/label.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/progress.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/select.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/sheet.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/skeleton-match-card.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/skeleton-rows.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/sonner.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/status-badge.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/table.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/tabs.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/toggle.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/admin/admin_games_config/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/admin/admin_games_config/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/admin/admin_scoring_config/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/admin/admin_scoring_config/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/admin/admin_system_dashboard/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/admin/admin_system_dashboard/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/admin/admin_users_management/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/admin/admin_users_management/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/public/public_guessings/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/public/public_guessings/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/public/public_login/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/public/public_login/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/public/public_ranking/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/public/public_ranking/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/public/public_register/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/public/public_register/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/public/public_results/code.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/designs/public/public_results/screen.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/eslint.config.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/context/competition-context.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/football-api.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/hooks/usePredictions.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/hooks/useRanking.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/hooks/useResults.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/scoring.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/supabase/client.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/supabase/server.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/utils.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/wc2026.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/next.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postcss.config.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/file.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/globe.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/next.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/vercel.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/window.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supabase/migrations/001_initial_schema.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supabase/migrations/002_seed_scoring_rules.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supabase/migrations/003_seed_settings.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supabase/migrations/004_multi_competition.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supabase/migrations/005_username.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supabase/migrations/006_reseed_wc2026.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supabase/seed.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/database.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vercel.json" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="dev8" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3B9XUoi5P4uLrLXqc4mt5TWx6LR" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
+    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/manelpuigcerver/Workspace/Personal/mundIAl26&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/manelpuigcerver/Workspace/Personal/mundIAl26/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/.claude" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.Next.js: server-side">
+    <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
+      <method v="2" />
+    </configuration>
+    <configuration name="Next.js: server-side" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-PS-261.23567.149" />
+        <option value="bundled-php-predefined-a98d8de5180a-022fa7b8ab75-com.jetbrains.php.sharedIndexes-PS-261.23567.149" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8f3080a5-40ce-4b9e-a0a1-cb5c7fcfeff4" name="Changes" comment="" />
+      <created>1773902278156</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1773902278156</updated>
+      <workItem from="1773902279194" duration="14524000" />
+      <workItem from="1774084269674" duration="15392000" />
+      <workItem from="1774263715032" duration="1468000" />
+      <workItem from="1774365448606" duration="1538000" />
+      <workItem from="1774527630377" duration="3334000" />
+      <workItem from="1774774459698" duration="2288000" />
+      <workItem from="1778573599789" duration="6276000" />
+      <workItem from="1778650349928" duration="5328000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
