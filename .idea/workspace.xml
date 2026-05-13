@@ -7,9 +7,7 @@
     <list default="true" id="8f3080a5-40ce-4b9e-a0a1-cb5c7fcfeff4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/layouts/default.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/layouts/default.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/pages/admin/users.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/pages/admin/users.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/pages/login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/pages/login.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nuxt.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/nuxt.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/pages/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,7 +102,7 @@
       <workItem from="1774527630377" duration="3334000" />
       <workItem from="1774774459698" duration="2288000" />
       <workItem from="1778573599789" duration="6276000" />
-      <workItem from="1778650349928" duration="9736000" />
+      <workItem from="1778650349928" duration="11929000" />
     </task>
     <servers />
   </component>
