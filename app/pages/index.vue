@@ -1,21 +1,14 @@
 <script setup lang="ts">
-const user = useSupabaseUser()
-
-onMounted(async () => {
-  if (!user.value) {
-    await navigateTo('/login')
-    return
-  }
-  if (user.value.user_metadata?.is_admin) {
-    await navigateTo('/admin/users')
-  } else {
-    await navigateTo('/dashboard')
-  }
-})
+definePageMeta({ middleware: 'auth' })
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center">
-    <UIcon name="i-lucide-loader-2" class="size-8 animate-spin text-muted" />
+  <div>
+    <h1 class="text-2xl font-bold text-foreground mb-2">
+      mundIAl 26
+    </h1>
+    <p class="text-muted text-sm">
+      Las predicciones estarán disponibles pronto.
+    </p>
   </div>
 </template>

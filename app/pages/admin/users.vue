@@ -9,6 +9,7 @@ interface AppUser {
 }
 
 const supabase = useSupabaseClient()
+const currentUser = useSupabaseUser()
 const toast = useToast()
 
 async function getAuthHeaders() {
@@ -38,41 +39,6 @@ async function loadUsers() {
 
 await loadUsers()
 
-// Invite modal
-const inviteOpen = ref(false)
-const inviteEmail = ref('')
-const inviteLoading = ref(false)
-
-async function inviteUser() {
-  if (!inviteEmail.value.trim()) return
-
-  inviteLoading.value = true
-  try {
-    const headers = await getAuthHeaders()
-    await $fetch('/api/users/invite', {
-      method: 'POST',
-      headers,
-      body: { email: inviteEmail.value.trim() },
-    })
-    toast.add({
-      title: 'Invitación enviada',
-      description: `Se ha enviado un enlace de acceso a ${inviteEmail.value}`,
-      color: 'success',
-    })
-    inviteEmail.value = ''
-    inviteOpen.value = false
-    await loadUsers()
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : 'Error desconocido'
-    toast.add({
-      title: 'Error al invitar',
-      description: msg,
-      color: 'error',
-    })
-  } finally {
-    inviteLoading.value = false
-  }
-}
 
 // Role toggle
 const roleLoading = ref<string | null>(null)
@@ -136,10 +102,10 @@ function formatDate(dateStr: string) {
 }
 
 const columns = [
-  { key: 'email', label: 'Correo electrónico' },
-  { key: 'is_admin', label: 'Rol' },
-  { key: 'created_at', label: 'Registro' },
-  { key: 'actions', label: '' },
+  { accessorKey: 'email', header: 'Correo electrónico' },
+  { accessorKey: 'is_admin', header: 'Rol' },
+  { accessorKey: 'created_at', header: 'Registro' },
+  { id: 'actions', header: '' },
 ]
 </script>
 
@@ -154,12 +120,17 @@ const columns = [
           Gestiona los participantes de la porra
         </p>
       </div>
-      <UButton
-        icon="i-lucide-user-plus"
-        @click="inviteOpen = true"
-      >
-        Invitar usuario
-      </UButton>
+      <UTooltip text="Crea usuarios desde el panel de Supabase">
+        <UButton
+          icon="i-lucide-external-link"
+          color="neutral"
+          variant="outline"
+          :to="`https://supabase.com/dashboard/project/_/auth/users`"
+          target="_blank"
+        >
+          Añadir usuario
+        </UButton>
+      </UTooltip>
     </div>
 
     <UAlert
@@ -179,23 +150,23 @@ const columns = [
       >
         <template #email-cell="{ row }">
           <div class="flex items-center gap-2">
-            <UAvatar :alt="row.email" size="xs" />
-            <span class="text-sm font-medium text-foreground">{{ row.email }}</span>
+            <UAvatar :alt="row.original.email" size="xs" />
+            <span class="text-sm font-medium text-foreground">{{ row.original.email }}</span>
           </div>
         </template>
 
         <template #is_admin-cell="{ row }">
           <UBadge
-            :color="row.is_admin ? 'primary' : 'neutral'"
+            :color="row.original.is_admin ? 'primary' : 'neutral'"
             variant="subtle"
             size="sm"
           >
-            {{ row.is_admin ? 'Admin' : 'Jugador' }}
+            {{ row.original.is_admin ? 'Admin' : 'Jugador' }}
           </UBadge>
         </template>
 
         <template #created_at-cell="{ row }">
-          <span class="text-sm text-muted">{{ formatDate(row.created_at) }}</span>
+          <span class="text-sm text-muted">{{ formatDate(row.original.created_at) }}</span>
         </template>
 
         <template #actions-cell="{ row }">
@@ -204,18 +175,19 @@ const columns = [
               variant="ghost"
               color="neutral"
               size="xs"
-              :loading="roleLoading === row.id"
-              :icon="row.is_admin ? 'i-lucide-shield-off' : 'i-lucide-shield-check'"
-              @click="toggleRole(row)"
+              :loading="roleLoading === row.original.id"
+              :icon="row.original.is_admin ? 'i-lucide-shield-off' : 'i-lucide-shield-check'"
+              :disabled="row.original.id === currentUser?.id"
+              @click="toggleRole(row.original)"
             >
-              {{ row.is_admin ? 'Quitar admin' : 'Hacer admin' }}
+              {{ row.original.is_admin ? 'Quitar admin' : 'Hacer admin' }}
             </UButton>
             <UButton
               variant="ghost"
               color="error"
               size="xs"
               icon="i-lucide-trash-2"
-              @click="deleteTarget = row"
+              @click="deleteTarget = row.original"
             >
               Eliminar
             </UButton>
@@ -223,46 +195,6 @@ const columns = [
         </template>
       </UTable>
     </UCard>
-
-    <!-- Invite Modal -->
-    <UModal v-model:open="inviteOpen" title="Invitar usuario">
-      <template #body>
-        <div class="space-y-4">
-          <p class="text-sm text-muted">
-            Se enviará un enlace de acceso al correo indicado.
-          </p>
-          <UFormField label="Correo electrónico">
-            <UInput
-              v-model="inviteEmail"
-              type="email"
-              placeholder="compañero@empresa.com"
-              class="w-full"
-              :disabled="inviteLoading"
-              @keyup.enter="inviteUser"
-            />
-          </UFormField>
-        </div>
-      </template>
-      <template #footer>
-        <div class="flex justify-end gap-2">
-          <UButton
-            variant="ghost"
-            color="neutral"
-            :disabled="inviteLoading"
-            @click="inviteOpen = false"
-          >
-            Cancelar
-          </UButton>
-          <UButton
-            :loading="inviteLoading"
-            :disabled="!inviteEmail.trim()"
-            @click="inviteUser"
-          >
-            Enviar invitación
-          </UButton>
-        </div>
-      </template>
-    </UModal>
 
     <!-- Delete Confirmation Modal -->
     <UModal

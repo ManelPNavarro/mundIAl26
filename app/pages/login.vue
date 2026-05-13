@@ -4,31 +4,27 @@ definePageMeta({ layout: false })
 const supabase = useSupabaseClient()
 
 const email = ref('')
+const password = ref('')
 const loading = ref(false)
-const sent = ref(false)
 const error = ref('')
 
-const origin = useRequestURL().origin
-
-async function sendMagicLink() {
-  if (!email.value.trim()) return
+async function signIn() {
+  if (!email.value.trim() || !password.value) return
 
   loading.value = true
   error.value = ''
 
-  const { error: authError } = await supabase.auth.signInWithOtp({
+  const { error: authError } = await supabase.auth.signInWithPassword({
     email: email.value.trim(),
-    options: {
-      emailRedirectTo: `${origin}/confirm`,
-    },
+    password: password.value,
   })
 
   loading.value = false
 
   if (authError) {
-    error.value = 'No se pudo enviar el enlace. Inténtalo de nuevo.'
+    error.value = 'Correo o contraseña incorrectos.'
   } else {
-    sent.value = true
+    await navigateTo('/')
   }
 }
 </script>
@@ -51,13 +47,10 @@ async function sendMagicLink() {
             <h2 class="font-semibold text-foreground">
               Acceder
             </h2>
-            <p class="text-sm text-muted mt-1">
-              Accede a tu cuenta con un enlace mágico
-            </p>
           </div>
         </template>
 
-        <div v-if="!sent" class="space-y-4">
+        <form class="space-y-4" @submit.prevent="signIn">
           <UAlert
             v-if="error"
             color="error"
@@ -74,41 +67,32 @@ async function sendMagicLink() {
               size="lg"
               class="w-full"
               :disabled="loading"
-              @keyup.enter="sendMagicLink"
+              autocomplete="email"
+            />
+          </UFormField>
+
+          <UFormField label="Contraseña">
+            <UInput
+              v-model="password"
+              type="password"
+              placeholder="••••••••"
+              size="lg"
+              class="w-full"
+              :disabled="loading"
+              autocomplete="current-password"
             />
           </UFormField>
 
           <UButton
+            type="submit"
             block
             size="lg"
             :loading="loading"
-            :disabled="!email.trim()"
-            @click="sendMagicLink"
+            :disabled="!email.trim() || !password"
           >
-            Enviar enlace
+            Entrar
           </UButton>
-        </div>
-
-        <div v-else class="text-center py-4 space-y-3">
-          <div class="flex justify-center">
-            <UIcon name="i-lucide-mail-check" class="size-12 text-primary" />
-          </div>
-          <p class="font-medium text-foreground">
-            Revisa tu correo electrónico
-          </p>
-          <p class="text-sm text-muted">
-            Hemos enviado un enlace de acceso a
-            <span class="font-medium text-foreground">{{ email }}</span>
-          </p>
-          <UButton
-            variant="ghost"
-            color="neutral"
-            size="sm"
-            @click="sent = false"
-          >
-            Usar otro correo
-          </UButton>
-        </div>
+        </form>
       </UCard>
     </div>
   </div>

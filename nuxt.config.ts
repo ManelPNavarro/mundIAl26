@@ -1,12 +1,16 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   future: { compatibilityVersion: 4 },
+  css: ['~/assets/css/main.css'],
   modules: ['@nuxt/ui', '@nuxtjs/supabase'],
   supabase: {
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
       exclude: ['/login', '/confirm'],
+    },
+    cookieOptions: {
+      secure: process.env.NODE_ENV === 'production',
     },
   },
   colorMode: { preference: 'system' },
