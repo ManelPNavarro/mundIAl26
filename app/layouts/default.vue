@@ -25,7 +25,6 @@ const menuItems = computed(() => [
     { label: 'Usuarios', icon: 'i-lucide-users', to: '/admin/users' },
     { label: 'Resultados', icon: 'i-lucide-clipboard-list', to: '/admin/results' },
     { label: 'Puntuación', icon: 'i-lucide-sliders-horizontal', to: '/admin/scoring' },
-    { label: 'Premios', icon: 'i-lucide-trophy', to: '/admin/awards' },
   ]] : []),
   [{
     label: 'Cerrar sesión',
