@@ -55,7 +55,10 @@ function teamName(match: Match, side: 'home' | 'away'): string {
     <div
       v-for="match in props.matches"
       :key="match.id"
-      class="border border-border rounded-lg p-4 space-y-3"
+      class="border border-border rounded-lg p-4 pl-3 border-l-4 space-y-2"
+      :class="props.summary?.[match.id]
+        ? (props.summary[match.id].isCorrect ? 'border-l-success' : 'border-l-error')
+        : 'border-l-border'"
     >
       <div class="flex items-center gap-2">
         <span class="flex-1 text-sm text-right font-medium text-foreground truncate">{{ teamName(match, 'home') }}</span>
@@ -74,7 +77,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <span class="flex-1 text-sm text-left font-medium text-foreground truncate">{{ teamName(match, 'away') }}</span>
       </div>
 
-      <!-- Penalties tiebreaker (only when not yet resolved) -->
+      <!-- Penalties tiebreaker -->
       <div v-if="isDraw(match.id) && !props.summary?.[match.id]" class="flex items-center justify-center gap-3 pt-1 border-t border-border">
         <p class="text-xs text-muted">¿Quién avanza en penaltis?</p>
         <div class="flex gap-2">
@@ -88,24 +91,12 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       </div>
 
       <!-- Result comparison -->
-      <div v-if="props.summary?.[match.id]" class="flex items-center justify-center gap-2 pt-1 border-t border-border">
-        <span
-          class="text-xs font-medium px-2 py-0.5 rounded-full"
-          :class="props.summary[match.id].isExact
-            ? 'bg-success/15 text-success'
-            : props.summary[match.id].isCorrect
-              ? 'bg-success/10 text-success'
-              : 'bg-error/10 text-error'"
-        >
-          {{ props.summary[match.id].result.home }}–{{ props.summary[match.id].result.away }} resultado real
-        </span>
-        <UBadge
-          :color="props.summary[match.id].points > 0 ? 'success' : 'error'"
-          variant="subtle"
-          size="xs"
-        >
+      <div v-if="props.summary?.[match.id]" class="flex items-center gap-1.5 text-xs text-muted">
+        <span>Real: {{ props.summary[match.id].result.home }}–{{ props.summary[match.id].result.away }}</span>
+        <span>·</span>
+        <span :class="props.summary[match.id].points > 0 ? 'text-success font-medium' : 'text-error'">
           {{ props.summary[match.id].points > 0 ? `+${props.summary[match.id].points} pts` : '0 pts' }}
-        </UBadge>
+        </span>
       </div>
     </div>
   </div>

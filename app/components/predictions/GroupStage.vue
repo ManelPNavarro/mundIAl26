@@ -88,7 +88,10 @@ function filledCount(matches: Match[]) {
           <div
             v-for="match in group.matches.filter(m => m.matchday === day)"
             :key="match.id"
-            class="space-y-1.5"
+            class="pl-3 border-l-2 rounded-sm"
+            :class="props.summary?.[match.id]
+              ? (props.summary[match.id].isCorrect ? 'border-success' : 'border-error')
+              : 'border-transparent'"
           >
             <div class="flex items-center gap-2">
               <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
@@ -106,26 +109,12 @@ function filledCount(matches: Match[]) {
               </div>
               <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
             </div>
-
-            <!-- Result comparison -->
-            <div v-if="props.summary?.[match.id]" class="flex items-center justify-center gap-2">
-              <span
-                class="text-xs font-medium px-2 py-0.5 rounded-full"
-                :class="props.summary[match.id].isExact
-                  ? 'bg-success/15 text-success'
-                  : props.summary[match.id].isCorrect
-                    ? 'bg-success/10 text-success'
-                    : 'bg-error/10 text-error'"
-              >
-                {{ props.summary[match.id].result.home }}–{{ props.summary[match.id].result.away }} resultado real
-              </span>
-              <UBadge
-                :color="props.summary[match.id].points > 0 ? 'success' : 'error'"
-                variant="subtle"
-                size="xs"
-              >
+            <div v-if="props.summary?.[match.id]" class="flex items-center gap-1.5 mt-0.5 text-xs text-muted">
+              <span>Real: {{ props.summary[match.id].result.home }}–{{ props.summary[match.id].result.away }}</span>
+              <span>·</span>
+              <span :class="props.summary[match.id].points > 0 ? 'text-success font-medium' : 'text-error'">
                 {{ props.summary[match.id].points > 0 ? `+${props.summary[match.id].points} pts` : '0 pts' }}
-              </UBadge>
+              </span>
             </div>
           </div>
         </div>
