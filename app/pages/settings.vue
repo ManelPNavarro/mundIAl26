@@ -2,7 +2,26 @@
 definePageMeta({ middleware: 'auth' })
 
 const supabase = useSupabaseClient()
+const user = useSupabaseUser()
 const toast = useToast()
+
+const name = ref(user.value?.user_metadata?.name ?? '')
+const savingName = ref(false)
+const canSaveName = computed(() => name.value.trim().length > 0 && name.value.trim() !== (user.value?.user_metadata?.name ?? ''))
+
+async function saveName() {
+  if (!canSaveName.value) return
+  savingName.value = true
+  try {
+    const { error } = await supabase.auth.updateUser({ data: { name: name.value.trim() } })
+    if (error) throw error
+    toast.add({ title: 'Nombre actualizado', color: 'success' })
+  } catch (e: unknown) {
+    toast.add({ title: 'Error al actualizar', description: e instanceof Error ? e.message : 'Error desconocido', color: 'error' })
+  } finally {
+    savingName.value = false
+  }
+}
 
 const password = ref('')
 const confirm = ref('')
@@ -34,6 +53,20 @@ async function save() {
       <h1 class="text-2xl font-bold text-foreground">Ajustes</h1>
       <p class="text-sm text-muted mt-1">Gestiona tu cuenta.</p>
     </div>
+
+    <UCard>
+      <template #header>
+        <h2 class="font-semibold text-foreground">Nombre</h2>
+      </template>
+      <div class="space-y-4">
+        <UFormField label="Tu nombre">
+          <UInput v-model="name" type="text" placeholder="Cómo te llamamos" class="w-full" @keyup.enter="saveName" />
+        </UFormField>
+        <UButton :disabled="!canSaveName" :loading="savingName" icon="i-lucide-user" class="w-full justify-center" @click="saveName">
+          Guardar nombre
+        </UButton>
+      </div>
+    </UCard>
 
     <UCard>
       <template #header>
