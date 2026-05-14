@@ -68,26 +68,37 @@ function resolveSlot(slot: string): string | null {
   }
 
   const pos = parseInt(slot[0]!)
-  const groupLetter = slot.slice(1)
-  if (!isNaN(pos) && groupLetter.length === 1) {
-    const groupMatches = props.allMatches.filter(x => x.round === 'GROUP' && x.group_letter === groupLetter)
-    const table = new Map<string, { name: string, pts: number, gd: number, gf: number }>()
-    for (const m of groupMatches) {
-      if (!m.home_team || !m.away_team) continue
-      const s = scoreFor(m)
-      if (!s) continue
-      if (!table.has(m.home_team.id)) table.set(m.home_team.id, { name: m.home_team.name, pts: 0, gd: 0, gf: 0 })
-      if (!table.has(m.away_team.id)) table.set(m.away_team.id, { name: m.away_team.name, pts: 0, gd: 0, gf: 0 })
-      const h = table.get(m.home_team.id)!
-      const a = table.get(m.away_team.id)!
-      h.gf += s.home; h.gd += s.home - s.away
-      a.gf += s.away; a.gd += s.away - s.home
-      if (s.home > s.away) h.pts += 3
-      else if (s.home === s.away) { h.pts += 1; a.pts += 1 }
-      else a.pts += 3
+  const groupLetters = slot.slice(1).split('')
+  if (!isNaN(pos) && groupLetters.length > 0) {
+    const standing = (groupLetter: string) => {
+      const groupMatches = props.allMatches.filter(x => x.round === 'GROUP' && x.group_letter === groupLetter)
+      const table = new Map<string, { name: string, pts: number, gd: number, gf: number }>()
+      for (const m of groupMatches) {
+        if (!m.home_team || !m.away_team) continue
+        const s = scoreFor(m)
+        if (!s) continue
+        if (!table.has(m.home_team.id)) table.set(m.home_team.id, { name: m.home_team.name, pts: 0, gd: 0, gf: 0 })
+        if (!table.has(m.away_team.id)) table.set(m.away_team.id, { name: m.away_team.name, pts: 0, gd: 0, gf: 0 })
+        const h = table.get(m.home_team.id)!
+        const a = table.get(m.away_team.id)!
+        h.gf += s.home; h.gd += s.home - s.away
+        a.gf += s.away; a.gd += s.away - s.home
+        if (s.home > s.away) h.pts += 3
+        else if (s.home === s.away) { h.pts += 1; a.pts += 1 }
+        else a.pts += 3
+      }
+      return [...table.values()].sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf)
     }
-    const sorted = [...table.values()].sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf)
-    return sorted[pos - 1]?.name ?? null
+
+    if (groupLetters.length === 1) {
+      return standing(groupLetters[0]!)[pos - 1]?.name ?? null
+    }
+
+    // Multi-group slot (e.g. "3ABCDF"): pick the best Nth-place team across all listed groups
+    const candidates = groupLetters.map(l => standing(l)[pos - 1]).filter(Boolean) as { name: string, pts: number, gd: number, gf: number }[]
+    if (candidates.length === 0) return null
+    candidates.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf)
+    return candidates[0]!.name
   }
 
   return null
