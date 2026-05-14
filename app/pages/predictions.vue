@@ -59,9 +59,8 @@ interface MatchSummary {
   isCorrect: boolean
 }
 
-const [{ data: allMatches }, { data: allTeams }, { data: allPlayers }, savedPredictions, savedSideBets, matchSummary, officialAwards] = await Promise.all([
+const [{ data: allMatches }, { data: allPlayers }, savedPredictions, savedSideBets, matchSummary, officialAwards] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
-  useFetch<Team[]>('/api/teams'),
   useFetch<Player[]>('/api/players'),
   $fetch<Predictions>('/api/predictions', { headers }),
   $fetch<SideBets | null>('/api/side-bets', { headers }),
@@ -98,13 +97,6 @@ function awardResult(field: keyof SideBets): 'correct' | 'wrong' | null {
   return user.toLowerCase() === (official as string).toLowerCase() ? 'correct' : 'wrong'
 }
 
-function teamName(id: string | null): string {
-  return allTeams.value?.find(t => t.id === id)?.name ?? '—'
-}
-
-const teamOptions = computed(() =>
-  (allTeams.value ?? []).map(t => ({ label: t.name, value: t.id }))
-)
 
 // ─── Deadline & countdown ───────────────────────────────────────────────────
 const DEADLINE = new Date('2026-06-11T00:00:00')
@@ -156,8 +148,19 @@ const groupMatchIds = computed(() => groupStageGroups.value.flatMap(g => g.match
 const groupFilled = computed(() => groupMatchIds.value.filter(isFilled).length)
 const groupComplete = computed(() => groupFilled.value === groupMatchIds.value.length)
 
+const finalMatch = computed(() => allMatches.value?.find(m => m.round === 'FINAL') ?? null)
+
+const predictedWinnerTeamId = computed(() => {
+  const m = finalMatch.value
+  if (!m) return null
+  const p = predictions.value[m.id]
+  if (p?.home == null || p?.away == null) return null
+  if (p.home > p.away) return m.home_team?.id ?? null
+  if (p.away > p.home) return m.away_team?.id ?? null
+  return p.homeAdvances === true ? (m.home_team?.id ?? null) : (m.away_team?.id ?? null)
+})
+
 const sideBetsComplete = computed(() =>
-  !!sideBets.value.winner_team_id &&
   !!sideBetIds.value.best_player &&
   !!sideBetIds.value.best_young_player &&
   !!sideBetIds.value.top_scorer &&
@@ -165,7 +168,7 @@ const sideBetsComplete = computed(() =>
 )
 
 const sideBetsFilled = computed(() =>
-  [sideBets.value.winner_team_id, sideBetIds.value.best_player, sideBetIds.value.best_young_player, sideBetIds.value.top_scorer, sideBetIds.value.best_goalkeeper]
+  [sideBetIds.value.best_player, sideBetIds.value.best_young_player, sideBetIds.value.top_scorer, sideBetIds.value.best_goalkeeper]
     .filter(Boolean).length
 )
 
@@ -197,7 +200,7 @@ const steps = computed(() => [
   {
     key: 'awards',
     title: 'Premios',
-    description: `${sideBetsFilled.value}/5 apuestas`,
+    description: `${sideBetsFilled.value}/4 apuestas`,
     complete: sideBetsComplete.value,
   },
 ])
@@ -232,7 +235,7 @@ async function saveSideBets() {
     method: 'POST',
     headers: h,
     body: {
-      winner_team_id: sideBets.value.winner_team_id,
+      winner_team_id: predictedWinnerTeamId.value,
       best_player: playerNameById(sideBetIds.value.best_player),
       best_young_player: playerNameById(sideBetIds.value.best_young_player),
       top_scorer: playerNameById(sideBetIds.value.top_scorer),
@@ -348,13 +351,6 @@ function randomize() {
           <p class="text-sm text-muted mt-0.5">Adivina los ganadores de los premios individuales al final del Mundial.</p>
         </div>
         <div class="space-y-4 max-w-md">
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-medium text-foreground">Equipo campeón</label>
-            <div v-if="officialAwards?.winner_team_id" :class="['px-3 py-2 rounded-md border text-sm font-medium', awardResult('winner_team_id') === 'correct' ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
-              {{ teamName(sideBets.winner_team_id) }}
-            </div>
-            <USelect v-else v-model="sideBets.winner_team_id" :items="teamOptions" value-key="value" label-key="label" placeholder="Selecciona un equipo..." :disabled="isLocked" />
-          </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor jugador (MVP)</label>
             <div v-if="officialAwards?.best_player" :class="['px-3 py-2 rounded-md border text-sm font-medium', awardResult('best_player') === 'correct' ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
