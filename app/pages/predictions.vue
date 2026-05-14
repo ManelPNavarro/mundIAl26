@@ -10,6 +10,9 @@ interface Match {
   group_letter: string | null
   home_slot: string | null
   away_slot: string | null
+  home_score: number | null
+  away_score: number | null
+  home_advances: boolean | null
   home_team: Team | null
   away_team: Team | null
 }
@@ -337,8 +340,7 @@ function randomize() {
         <PredictionsGroupStage v-model="predictions" :groups="groupStageGroups" :locked="isLocked" :summary="matchSummary" />
       </div>
       <div v-else-if="currentRound">
-        <p class="text-sm text-muted mb-4">Los equipos se confirmarán una vez finalice la fase anterior.</p>
-        <PredictionsKnockoutRound v-model="predictions" :matches="currentRound.matches" :locked="isLocked" :summary="matchSummary" />
+        <PredictionsKnockoutRound v-model="predictions" :matches="currentRound.matches" :all-matches="allMatches ?? []" :locked="isLocked" :summary="matchSummary" />
       </div>
       <div v-else-if="isAwardsStep" class="space-y-6">
         <div>
