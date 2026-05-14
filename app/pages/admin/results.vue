@@ -29,18 +29,6 @@ async function getAuthHeaders() {
 
 const { data: matches, refresh } = await useFetch<Match[]>('/api/matches')
 
-const now = ref(new Date())
-let ticker: ReturnType<typeof setInterval>
-onMounted(() => { ticker = setInterval(() => { now.value = new Date() }, 60000) })
-onUnmounted(() => clearInterval(ticker))
-
-function isMatchEditable(match: Match): boolean {
-  if (match.home_score !== null) return true // already has a result → always allow correction
-  if (!match.kickoff_at) return true // no kickoff set → allow editing
-  const kickoff = new Date(match.kickoff_at)
-  return now.value >= new Date(kickoff.getTime() + 2 * 60 * 60 * 1000)
-}
-
 function formatKickoff(kickoffAt: string | null): string {
   if (!kickoffAt) return 'Por confirmar'
   return new Intl.DateTimeFormat('es-ES', {
@@ -246,33 +234,19 @@ function teamName(match: Match, side: 'home' | 'away'): string {
                 <div class="flex items-center gap-3">
                   <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
 
-                  <!-- Editable -->
-                  <template v-if="isMatchEditable(match)">
-                    <div class="flex items-center gap-1 shrink-0">
-                      <UInput v-model.number="getDraft(match).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
-                      <span class="text-muted font-bold text-sm">–</span>
-                      <UInput v-model.number="getDraft(match).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
-                    </div>
-                    <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
-                    <UButton
-                      size="xs"
-                      :loading="saving === match.id"
-                      :disabled="!isDirty(match) || getDraft(match).home === null || getDraft(match).away === null"
-                      icon="i-lucide-save"
-                      @click="saveResult(match)"
-                    />
-                  </template>
-
-                  <!-- Locked -->
-                  <template v-else>
-                    <div class="flex items-center gap-2 shrink-0">
-                      <span v-if="match.home_score !== null" class="font-mono font-bold text-sm text-foreground">
-                        {{ match.home_score }} – {{ match.away_score }}
-                      </span>
-                      <UIcon v-else name="i-lucide-lock" class="size-4 text-muted" />
-                    </div>
-                    <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
-                  </template>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <UInput v-model.number="getDraft(match).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
+                    <span class="text-muted font-bold text-sm">–</span>
+                    <UInput v-model.number="getDraft(match).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
+                  </div>
+                  <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
+                  <UButton
+                    size="xs"
+                    :loading="saving === match.id"
+                    :disabled="!isDirty(match) || getDraft(match).home === null || getDraft(match).away === null"
+                    :icon="match.home_score !== null ? 'i-lucide-pencil' : 'i-lucide-save'"
+                    @click="saveResult(match)"
+                  />
                 </div>
               </div>
             </div>
