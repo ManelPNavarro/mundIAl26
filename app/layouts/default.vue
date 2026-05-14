@@ -14,24 +14,23 @@ async function signOut() {
 
 const isAdmin = computed(() => user.value?.user_metadata?.is_admin === true)
 
-const menuItems = computed(() => [[
-  {
+const menuItems = computed(() => [
+  [{
     label: user.value?.email ?? '',
     slot: 'account',
     disabled: true,
-  },
-], [
-  ...(isAdmin.value ? [{
-    label: 'Panel de administración',
-    icon: 'i-lucide-shield',
-    to: '/admin/users',
-  }] : []),
-  {
+  }],
+  ...(isAdmin.value ? [[
+    { type: 'label', label: 'Administración' },
+    { label: 'Usuarios', icon: 'i-lucide-users', to: '/admin/users' },
+    { label: 'Resultados', icon: 'i-lucide-clipboard-list', to: '/admin/results' },
+  ]] : []),
+  [{
     label: 'Cerrar sesión',
     icon: 'i-lucide-log-out',
     onSelect: signOut,
-  },
-]])
+  }],
+])
 </script>
 
 <template>

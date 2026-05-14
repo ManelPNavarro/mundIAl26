@@ -1,57 +1,99 @@
 <script setup lang="ts">
-import { GROUP_STAGE } from '~/data/group-stage'
-import { KNOCKOUT_ROUNDS } from '~/data/knockout'
-
 definePageMeta({ middleware: 'auth' })
 
-type Prediction = { home: number | null, away: number | null, homeAdvances?: boolean | null }
-type Predictions = Record<number, Prediction>
+interface Team { id: string, name: string }
+interface Match {
+  id: string
+  match_no: number
+  round: string
+  matchday: number | null
+  group_letter: string | null
+  home_slot: string | null
+  away_slot: string | null
+  home_team: Team | null
+  away_team: Team | null
+}
 
-const predictions = ref<Predictions>({})
+type Prediction = { home: number | null, away: number | null, homeAdvances?: boolean | null }
+type Predictions = Record<string, Prediction>
+
+const supabase = useSupabaseClient()
+const toast = useToast()
+
+async function getAuthHeaders() {
+  const { data: { session } } = await supabase.auth.getSession()
+  return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}
+}
+
+// Load matches and existing predictions in parallel
+const headers = await getAuthHeaders()
+const [{ data: allMatches }, savedPredictions] = await Promise.all([
+  useFetch<Match[]>('/api/matches'),
+  $fetch<Predictions>('/api/predictions', { headers }),
+])
+
+const predictions = ref<Predictions>(savedPredictions ?? {})
 const currentStep = ref(0)
 
+// ─── Deadline & countdown ───────────────────────────────────────────────────
 const DEADLINE = new Date('2026-06-11T00:00:00')
-
 const now = ref(new Date())
 const isLocked = computed(() => now.value >= DEADLINE)
-
 const timeLeft = computed(() => {
   const diff = DEADLINE.getTime() - now.value.getTime()
   if (diff <= 0) return null
-  const days = Math.floor(diff / 86400000)
-  const hours = Math.floor((diff % 86400000) / 3600000)
-  const minutes = Math.floor((diff % 3600000) / 60000)
-  const seconds = Math.floor((diff % 60000) / 1000)
-  return { days, hours, minutes, seconds }
+  return {
+    days: Math.floor(diff / 86400000),
+    hours: Math.floor((diff % 86400000) / 3600000),
+    minutes: Math.floor((diff % 3600000) / 60000),
+    seconds: Math.floor((diff % 60000) / 1000),
+  }
 })
-
 let timer: ReturnType<typeof setInterval>
 onMounted(() => { timer = setInterval(() => { now.value = new Date() }, 1000) })
 onUnmounted(() => clearInterval(timer))
 
-const GROUP_TOTAL = GROUP_STAGE.reduce((acc, g) => acc + g.matches.length, 0)
-
-function countFilled(matchIds: number[]) {
-  return matchIds.filter((id) => {
-    const p = predictions.value[id]
-    return p?.home !== null && p?.away !== null && p?.home !== undefined && p?.away !== undefined
-  }).length
+// ─── Match grouping ──────────────────────────────────────────────────────────
+const ROUND_ORDER = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
+const ROUND_LABELS: Record<string, string> = {
+  GROUP: 'Fase de grupos', R32: 'Ronda de 32', R16: 'Octavos de final',
+  QF: 'Cuartos de final', SF: 'Semifinales', THIRD_PLACE: 'Tercer puesto', FINAL: 'Final',
 }
 
-const groupMatchIds = GROUP_STAGE.flatMap(g => g.matches.map(m => m.id))
-const groupFilled = computed(() => countFilled(groupMatchIds))
-const groupComplete = computed(() => groupFilled.value === GROUP_TOTAL)
+const groupStageGroups = computed(() =>
+  ['A','B','C','D','E','F','G','H','I','J','K','L'].map(letter => ({
+    letter,
+    matches: (allMatches.value ?? []).filter(m => m.round === 'GROUP' && m.group_letter === letter),
+  })).filter(g => g.matches.length > 0)
+)
+
+const knockoutRounds = computed(() =>
+  ROUND_ORDER.slice(1).map(round => ({
+    key: round,
+    label: ROUND_LABELS[round]!,
+    matches: (allMatches.value ?? []).filter(m => m.round === round),
+  })).filter(r => r.matches.length > 0)
+)
+
+// ─── Step completion ─────────────────────────────────────────────────────────
+function isFilled(id: string) {
+  const p = predictions.value[id]
+  return p?.home !== null && p?.home !== undefined && p?.away !== null && p?.away !== undefined
+}
+
+const groupMatchIds = computed(() => groupStageGroups.value.flatMap(g => g.matches.map(m => m.id)))
+const groupFilled = computed(() => groupMatchIds.value.filter(isFilled).length)
+const groupComplete = computed(() => groupFilled.value === groupMatchIds.value.length)
 
 const steps = computed(() => [
   {
     key: 'groups',
-    title: 'Fase de grupos',
-    description: `${groupFilled.value}/${GROUP_TOTAL} partidos`,
+    title: ROUND_LABELS['GROUP']!,
+    description: `${groupFilled.value}/${groupMatchIds.value.length} partidos`,
     complete: groupComplete.value,
   },
-  ...KNOCKOUT_ROUNDS.map((round) => {
-    const ids = round.matches.map(m => m.id)
-    const filled = countFilled(ids)
+  ...knockoutRounds.value.map((round) => {
+    const filled = round.matches.filter(m => isFilled(m.id)).length
     return {
       key: round.key,
       title: round.label,
@@ -61,38 +103,48 @@ const steps = computed(() => [
   }),
 ])
 
-function canAdvance() {
-  return steps.value[currentStep.value]?.complete
-}
+const currentRound = computed(() =>
+  currentStep.value > 0 ? knockoutRounds.value[currentStep.value - 1] : null
+)
 
-function advance() {
-  if (canAdvance() && currentStep.value < steps.value.length - 1) {
-    currentStep.value++
+// ─── Save ────────────────────────────────────────────────────────────────────
+const saving = ref(false)
+
+async function save() {
+  if (isLocked.value) return
+  saving.value = true
+  try {
+    const h = await getAuthHeaders()
+    const payload: Predictions = {}
+    for (const [id, p] of Object.entries(predictions.value)) {
+      if (p.home !== null && p.home !== undefined && p.away !== null && p.away !== undefined) {
+        payload[id] = p
+      }
+    }
+    await $fetch('/api/predictions', { method: 'POST', headers: h, body: payload })
+    toast.add({ title: 'Predicciones guardadas', color: 'success' })
+  } catch {
+    toast.add({ title: 'Error al guardar', color: 'error' })
+  } finally {
+    saving.value = false
   }
 }
 
-const currentRound = computed(() =>
-  currentStep.value > 0 ? KNOCKOUT_ROUNDS[currentStep.value - 1] : null
-)
+async function advance() {
+  await save()
+  if (currentStep.value < steps.value.length - 1) currentStep.value++
+}
 
+// ─── Randomize ───────────────────────────────────────────────────────────────
 function randomScore() {
-  const weights = [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 4]
-  return weights[Math.floor(Math.random() * weights.length)]!
+  return [0,0,0,1,1,1,2,2,2,3,3,4][Math.floor(Math.random() * 12)]!
 }
 
 function randomize() {
-  const allIds = [
-    ...GROUP_STAGE.flatMap(g => g.matches.map(m => m.id)),
-    ...KNOCKOUT_ROUNDS.flatMap(r => r.matches.map(m => m.id)),
-  ]
-  for (const id of allIds) {
+  for (const match of allMatches.value ?? []) {
     const home = randomScore()
     const away = randomScore()
-    predictions.value[id] = {
-      home,
-      away,
-      homeAdvances: home === away ? Math.random() > 0.5 : null,
-    }
+    predictions.value[match.id] = { home, away, homeAdvances: home === away ? Math.random() > 0.5 : null }
   }
 }
 </script>
@@ -104,14 +156,7 @@ function randomize() {
         <h1 class="text-2xl font-bold text-foreground">Predicciones</h1>
         <p class="text-sm text-muted mt-1">Introduce tus resultados para cada fase del torneo.</p>
       </div>
-      <UButton
-        v-if="!isLocked"
-        variant="outline"
-        color="neutral"
-        icon="i-lucide-shuffle"
-        size="sm"
-        @click="randomize"
-      >
+      <UButton v-if="!isLocked" variant="outline" color="neutral" icon="i-lucide-shuffle" size="sm" @click="randomize">
         Aleatorio
       </UButton>
     </div>
@@ -123,13 +168,10 @@ function randomize() {
         :key="step.key"
         class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
         :class="[
-          idx === currentStep
-            ? 'bg-primary border-primary text-white'
-            : step.complete
-              ? 'bg-success/10 border-success/30 text-success hover:bg-success/20 cursor-pointer'
-              : idx < currentStep
-                ? 'bg-muted/50 border-border text-muted hover:bg-muted cursor-pointer'
-                : 'bg-muted/20 border-border text-muted/50 cursor-not-allowed',
+          idx === currentStep ? 'bg-primary border-primary text-white'
+          : step.complete ? 'bg-success/10 border-success/30 text-success hover:bg-success/20 cursor-pointer'
+          : idx < currentStep ? 'bg-muted/50 border-border text-muted hover:bg-muted cursor-pointer'
+          : 'bg-muted/20 border-border text-muted/50 cursor-not-allowed',
         ]"
         :disabled="idx > currentStep && !steps[idx - 1]?.complete"
         @click="idx <= currentStep || steps[idx - 1]?.complete ? currentStep = idx : null"
@@ -141,16 +183,11 @@ function randomize() {
     </div>
 
     <!-- Locked banner -->
-    <UAlert
-      v-if="isLocked"
-      color="error"
-      variant="soft"
-      icon="i-lucide-lock"
+    <UAlert v-if="isLocked" color="error" variant="soft" icon="i-lucide-lock"
       title="Predicciones cerradas"
-      description="El plazo para introducir predicciones finalizó el 10 de junio. ¡Que empiece el Mundial!"
-    />
+      description="El plazo para introducir predicciones finalizó el 10 de junio. ¡Que empiece el Mundial!" />
 
-    <!-- Countdown banner -->
+    <!-- Countdown -->
     <div v-else-if="timeLeft" class="flex items-center justify-between gap-4 rounded-lg border border-border bg-muted/30 px-4 py-3">
       <div class="flex items-center gap-2 text-sm text-muted">
         <UIcon name="i-lucide-clock" class="size-4 shrink-0" />
@@ -165,65 +202,46 @@ function randomize() {
     </div>
 
     <!-- Completed banner -->
-    <UAlert
-      v-if="steps.every(s => s.complete) && !isLocked"
-      color="success"
-      variant="soft"
-      icon="i-lucide-party-popper"
-      title="¡Predicción finalizada!"
-      description="Has completado todas las fases. Puedes volver atrás para modificar cualquier resultado."
-    />
+    <UAlert v-if="steps.every(s => s.complete) && !isLocked" color="success" variant="soft"
+      icon="i-lucide-party-popper" title="¡Predicción finalizada!"
+      description="Has completado todas las fases. Puedes volver atrás para modificar cualquier resultado." />
 
     <!-- Step content -->
     <div>
-      <!-- Group stage -->
       <div v-if="currentStep === 0">
-        <PredictionsGroupStage v-model="predictions" :locked="isLocked" />
+        <PredictionsGroupStage v-model="predictions" :groups="groupStageGroups" :locked="isLocked" />
       </div>
-
-      <!-- Knockout rounds -->
       <div v-else-if="currentRound">
-        <p class="text-sm text-muted mb-4">
-          Los equipos se confirmarán una vez finalice la fase anterior.
-        </p>
-        <PredictionsKnockoutRound
-          v-model="predictions"
-          :matches="currentRound.matches"
-          :locked="isLocked"
-        />
+        <p class="text-sm text-muted mb-4">Los equipos se confirmarán una vez finalice la fase anterior.</p>
+        <PredictionsKnockoutRound v-model="predictions" :matches="currentRound.matches" :locked="isLocked" />
       </div>
     </div>
 
-    <!-- Footer action -->
+    <!-- Footer -->
     <div class="flex items-center justify-between pt-2 border-t border-border">
-      <UButton
-        v-if="currentStep > 0"
-        variant="ghost"
-        color="neutral"
-        icon="i-lucide-arrow-left"
-        @click="currentStep--"
-      >
+      <UButton v-if="currentStep > 0" variant="ghost" color="neutral" icon="i-lucide-arrow-left" @click="currentStep--">
         Anterior
       </UButton>
       <div v-else />
 
       <div class="flex items-center gap-3">
-        <span class="text-xs text-muted">
-          {{ steps[currentStep]?.description }}
-        </span>
+        <span class="text-xs text-muted">{{ steps[currentStep]?.description }}</span>
         <UButton
           v-if="currentStep < steps.length - 1"
-          :disabled="!canAdvance()"
+          :disabled="!steps[currentStep]?.complete || isLocked"
+          :loading="saving"
           trailing-icon="i-lucide-arrow-right"
           @click="advance"
         >
-          Confirmar y continuar
+          Guardar y continuar
         </UButton>
         <UButton
           v-else
-          :disabled="!canAdvance()"
+          :disabled="!steps[currentStep]?.complete || isLocked"
+          :loading="saving"
           icon="i-lucide-check"
           color="success"
+          @click="save"
         >
           Guardar predicciones
         </UButton>
