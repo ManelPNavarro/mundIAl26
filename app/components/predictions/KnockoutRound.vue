@@ -60,9 +60,16 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       <div class="flex items-center gap-2">
         <span class="flex-1 text-sm text-right font-medium text-foreground truncate">{{ teamName(match, 'home') }}</span>
         <div class="flex items-center gap-1 shrink-0">
-          <UInput v-model.number="getPrediction(match.id).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked || !!props.summary?.[match.id]" />
-          <span class="text-muted font-bold text-sm">–</span>
-          <UInput v-model.number="getPrediction(match.id).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked || !!props.summary?.[match.id]" />
+          <template v-if="props.summary?.[match.id]">
+            <span class="font-mono font-bold text-sm text-foreground w-12 text-center">{{ getPrediction(match.id).home ?? '–' }}</span>
+            <span class="text-muted font-bold text-sm">–</span>
+            <span class="font-mono font-bold text-sm text-foreground w-12 text-center">{{ getPrediction(match.id).away ?? '–' }}</span>
+          </template>
+          <template v-else>
+            <UInput v-model.number="getPrediction(match.id).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked" />
+            <span class="text-muted font-bold text-sm">–</span>
+            <UInput v-model.number="getPrediction(match.id).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked" />
+          </template>
         </div>
         <span class="flex-1 text-sm text-left font-medium text-foreground truncate">{{ teamName(match, 'away') }}</span>
       </div>
