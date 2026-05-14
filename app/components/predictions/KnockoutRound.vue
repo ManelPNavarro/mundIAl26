@@ -56,6 +56,9 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       v-for="match in props.matches"
       :key="match.id"
       class="rounded-lg overflow-hidden"
+      :class="props.summary?.[match.id]
+        ? (props.summary[match.id].isCorrect ? 'bg-success/5' : 'bg-error/5')
+        : ''"
     >
       <!-- Prediction row -->
       <div class="flex items-center gap-2 px-4 py-3">
