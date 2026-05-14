@@ -45,6 +45,15 @@ function formatKickoff(kickoffAt: string | null): string {
 type Draft = { home: number | null, away: number | null, homeAdvances: boolean | null }
 const drafts = ref<Record<string, Draft>>({})
 const saving = ref<string | null>(null)
+const editing = ref<Set<string>>(new Set())
+
+function isEditing(match: Match): boolean {
+  return match.home_score === null || editing.value.has(match.id)
+}
+
+function startEdit(match: Match) {
+  editing.value.add(match.id)
+}
 
 function getDraft(match: Match): Draft {
   if (!drafts.value[match.id]) {
@@ -86,6 +95,7 @@ async function saveResult(match: Match) {
       },
     })
     toast.add({ title: 'Resultado guardado', color: 'success' })
+    editing.value.delete(match.id)
     await refresh()
   } catch {
     toast.add({ title: 'Error al guardar', color: 'error' })
@@ -234,19 +244,38 @@ function teamName(match: Match, side: 'home' | 'away'): string {
                 <div class="flex items-center gap-3">
                   <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
 
-                  <div class="flex items-center gap-1 shrink-0">
-                    <UInput v-model.number="getDraft(match).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
-                    <span class="text-muted font-bold text-sm">–</span>
-                    <UInput v-model.number="getDraft(match).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
-                  </div>
-                  <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
-                  <UButton
-                    size="xs"
-                    :loading="saving === match.id"
-                    :disabled="!isDirty(match) || getDraft(match).home === null || getDraft(match).away === null"
-                    :icon="match.home_score !== null ? 'i-lucide-pencil' : 'i-lucide-save'"
-                    @click="saveResult(match)"
-                  />
+                  <!-- Editing / no result yet -->
+                  <template v-if="isEditing(match)">
+                    <div class="flex items-center gap-1 shrink-0">
+                      <UInput v-model.number="getDraft(match).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
+                      <span class="text-muted font-bold text-sm">–</span>
+                      <UInput v-model.number="getDraft(match).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
+                    </div>
+                    <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
+                    <UButton
+                      size="xs"
+                      color="success"
+                      :loading="saving === match.id"
+                      :disabled="getDraft(match).home === null || getDraft(match).away === null"
+                      icon="i-lucide-save"
+                      @click="saveResult(match)"
+                    />
+                  </template>
+
+                  <!-- Result saved, view mode -->
+                  <template v-else>
+                    <span class="font-mono font-bold text-sm text-foreground shrink-0">
+                      {{ match.home_score }} – {{ match.away_score }}
+                    </span>
+                    <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
+                    <UButton
+                      size="xs"
+                      color="neutral"
+                      variant="outline"
+                      icon="i-lucide-pencil"
+                      @click="startEdit(match)"
+                    />
+                  </template>
                 </div>
               </div>
             </div>
