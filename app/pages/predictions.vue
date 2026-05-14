@@ -17,6 +17,14 @@ interface Match {
 type Prediction = { home: number | null, away: number | null, homeAdvances?: boolean | null }
 type Predictions = Record<string, Prediction>
 
+interface SideBets {
+  winner_team_id: string | null
+  best_player: string | null
+  best_young_player: string | null
+  top_scorer: string | null
+  best_goalkeeper: string | null
+}
+
 const supabase = useSupabaseClient()
 const toast = useToast()
 
@@ -25,15 +33,27 @@ async function getAuthHeaders() {
   return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}
 }
 
-// Load matches and existing predictions in parallel
 const headers = await getAuthHeaders()
-const [{ data: allMatches }, savedPredictions] = await Promise.all([
+const [{ data: allMatches }, { data: allTeams }, savedPredictions, savedSideBets] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
+  useFetch<Team[]>('/api/teams'),
   $fetch<Predictions>('/api/predictions', { headers }),
+  $fetch<SideBets | null>('/api/side-bets', { headers }),
 ])
 
 const predictions = ref<Predictions>(savedPredictions ?? {})
+const sideBets = ref<SideBets>({
+  winner_team_id: savedSideBets?.winner_team_id ?? null,
+  best_player: savedSideBets?.best_player ?? null,
+  best_young_player: savedSideBets?.best_young_player ?? null,
+  top_scorer: savedSideBets?.top_scorer ?? null,
+  best_goalkeeper: savedSideBets?.best_goalkeeper ?? null,
+})
 const currentStep = ref(0)
+
+const teamOptions = computed(() =>
+  (allTeams.value ?? []).map(t => ({ label: t.name, value: t.id }))
+)
 
 // ─── Deadline & countdown ───────────────────────────────────────────────────
 const DEADLINE = new Date('2026-06-11T00:00:00')
@@ -85,6 +105,20 @@ const groupMatchIds = computed(() => groupStageGroups.value.flatMap(g => g.match
 const groupFilled = computed(() => groupMatchIds.value.filter(isFilled).length)
 const groupComplete = computed(() => groupFilled.value === groupMatchIds.value.length)
 
+const sideBetsComplete = computed(() =>
+  !!sideBets.value.winner_team_id &&
+  !!sideBets.value.best_player?.trim() &&
+  !!sideBets.value.best_young_player?.trim() &&
+  !!sideBets.value.top_scorer?.trim() &&
+  !!sideBets.value.best_goalkeeper?.trim()
+)
+
+const sideBetsFilled = computed(() => {
+  const b = sideBets.value
+  return [b.winner_team_id, b.best_player, b.best_young_player, b.top_scorer, b.best_goalkeeper]
+    .filter(v => v?.trim?.() || v).length
+})
+
 const steps = computed(() => [
   {
     key: 'groups',
@@ -101,28 +135,48 @@ const steps = computed(() => [
       complete: filled === round.matches.length,
     }
   }),
+  {
+    key: 'awards',
+    title: 'Premios',
+    description: `${sideBetsFilled.value}/5 apuestas`,
+    complete: sideBetsComplete.value,
+  },
 ])
 
+const isAwardsStep = computed(() => currentStep.value === steps.value.length - 1)
 const currentRound = computed(() =>
-  currentStep.value > 0 ? knockoutRounds.value[currentStep.value - 1] : null
+  !isAwardsStep.value && currentStep.value > 0 ? knockoutRounds.value[currentStep.value - 1] : null
 )
 
 // ─── Save ────────────────────────────────────────────────────────────────────
 const saving = ref(false)
 
+async function saveMatches() {
+  const h = await getAuthHeaders()
+  const payload: Predictions = {}
+  for (const [id, p] of Object.entries(predictions.value)) {
+    if (p.home !== null && p.home !== undefined && p.away !== null && p.away !== undefined) {
+      payload[id] = p
+    }
+  }
+  await $fetch('/api/predictions', { method: 'POST', headers: h, body: payload })
+}
+
+async function saveSideBets() {
+  const h = await getAuthHeaders()
+  await $fetch('/api/side-bets', { method: 'POST', headers: h, body: sideBets.value })
+}
+
 async function save() {
   if (isLocked.value) return
   saving.value = true
   try {
-    const h = await getAuthHeaders()
-    const payload: Predictions = {}
-    for (const [id, p] of Object.entries(predictions.value)) {
-      if (p.home !== null && p.home !== undefined && p.away !== null && p.away !== undefined) {
-        payload[id] = p
-      }
+    if (isAwardsStep.value) {
+      await saveSideBets()
+    } else {
+      await saveMatches()
     }
-    await $fetch('/api/predictions', { method: 'POST', headers: h, body: payload })
-    toast.add({ title: 'Predicciones guardadas', color: 'success' })
+    toast.add({ title: 'Guardado', color: 'success' })
   } catch {
     toast.add({ title: 'Error al guardar', color: 'error' })
   } finally {
@@ -131,8 +185,16 @@ async function save() {
 }
 
 async function advance() {
-  await save()
-  if (currentStep.value < steps.value.length - 1) currentStep.value++
+  if (isLocked.value) return
+  saving.value = true
+  try {
+    await saveMatches()
+    if (currentStep.value < steps.value.length - 1) currentStep.value++
+  } catch {
+    toast.add({ title: 'Error al guardar', color: 'error' })
+  } finally {
+    saving.value = false
+  }
 }
 
 // ─── Randomize ───────────────────────────────────────────────────────────────
@@ -156,7 +218,7 @@ function randomize() {
         <h1 class="text-2xl font-bold text-foreground">Predicciones</h1>
         <p class="text-sm text-muted mt-1">Introduce tus resultados para cada fase del torneo.</p>
       </div>
-      <UButton v-if="!isLocked" variant="outline" color="neutral" icon="i-lucide-shuffle" size="sm" @click="randomize">
+      <UButton v-if="!isLocked && !isAwardsStep" variant="outline" color="neutral" icon="i-lucide-shuffle" size="sm" @click="randomize">
         Aleatorio
       </UButton>
     </div>
@@ -204,7 +266,7 @@ function randomize() {
     <!-- Completed banner -->
     <UAlert v-if="steps.every(s => s.complete) && !isLocked" color="success" variant="soft"
       icon="i-lucide-party-popper" title="¡Predicción finalizada!"
-      description="Has completado todas las fases. Puedes volver atrás para modificar cualquier resultado." />
+      description="Has completado todas las fases y tus apuestas de premios. ¡Suerte!" />
 
     <!-- Step content -->
     <div>
@@ -214,6 +276,41 @@ function randomize() {
       <div v-else-if="currentRound">
         <p class="text-sm text-muted mb-4">Los equipos se confirmarán una vez finalice la fase anterior.</p>
         <PredictionsKnockoutRound v-model="predictions" :matches="currentRound.matches" :locked="isLocked" />
+      </div>
+      <div v-else-if="isAwardsStep" class="space-y-6">
+        <div>
+          <h2 class="text-base font-semibold text-foreground">Premios del torneo</h2>
+          <p class="text-sm text-muted mt-0.5">Adivina los ganadores de los premios individuales al final del Mundial.</p>
+        </div>
+        <div class="space-y-4 max-w-md">
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium text-foreground">Equipo campeón</label>
+            <USelect
+              v-model="sideBets.winner_team_id"
+              :items="teamOptions"
+              value-key="value"
+              label-key="label"
+              placeholder="Selecciona un equipo..."
+              :disabled="isLocked"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium text-foreground">Mejor jugador (MVP)</label>
+            <UInput v-model="sideBets.best_player" placeholder="Nombre del jugador" :disabled="isLocked" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium text-foreground">Mejor jugador joven</label>
+            <UInput v-model="sideBets.best_young_player" placeholder="Nombre del jugador" :disabled="isLocked" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium text-foreground">Máximo goleador</label>
+            <UInput v-model="sideBets.top_scorer" placeholder="Nombre del jugador" :disabled="isLocked" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-sm font-medium text-foreground">Mejor portero</label>
+            <UInput v-model="sideBets.best_goalkeeper" placeholder="Nombre del jugador" :disabled="isLocked" />
+          </div>
+        </div>
       </div>
     </div>
 
@@ -227,7 +324,7 @@ function randomize() {
       <div class="flex items-center gap-3">
         <span class="text-xs text-muted">{{ steps[currentStep]?.description }}</span>
         <UButton
-          v-if="currentStep < steps.length - 1"
+          v-if="!isAwardsStep"
           :disabled="!steps[currentStep]?.complete || isLocked"
           :loading="saving"
           trailing-icon="i-lucide-arrow-right"
@@ -237,7 +334,7 @@ function randomize() {
         </UButton>
         <UButton
           v-else
-          :disabled="!steps[currentStep]?.complete || isLocked"
+          :disabled="!sideBetsComplete || isLocked"
           :loading="saving"
           icon="i-lucide-check"
           color="success"
