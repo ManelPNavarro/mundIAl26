@@ -101,7 +101,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onClickOutside))
     <!-- Dropdown -->
     <div
       v-if="open"
-      class="absolute z-50 top-full mt-1 left-0 right-0 rounded-md border border-border bg-background shadow-lg overflow-hidden"
+      class="absolute z-50 top-full mt-1 left-0 right-0 rounded-md border border-border bg-background shadow-xl overflow-hidden"
     >
       <div class="max-h-60 overflow-y-auto">
         <div v-if="!filtered.length" class="px-3 py-6 text-center text-xs text-muted">
@@ -111,8 +111,8 @@ onUnmounted(() => document.removeEventListener('mousedown', onClickOutside))
           v-for="player in filtered"
           :key="player.id"
           type="button"
-          class="w-full flex items-center justify-between gap-3 px-3 py-2 text-sm hover:bg-muted/50 transition-colors text-left"
-          :class="player.id === model ? 'bg-primary/10 text-primary' : 'text-foreground'"
+          class="w-full flex items-center justify-between gap-3 px-3 py-2 text-sm bg-background hover:bg-muted/60 transition-colors text-left"
+          :class="player.id === model ? '!bg-primary/10 text-primary' : 'text-foreground'"
           @mousedown.prevent="select(player)"
         >
           <span class="font-medium truncate">{{ player.name }}</span>
