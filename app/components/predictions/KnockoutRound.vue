@@ -7,10 +7,21 @@ interface Match {
   away_slot: string | null
 }
 
+interface MatchSummary {
+  result: { home: number, away: number, home_advances: boolean | null }
+  points: number
+  isExact: boolean
+  isCorrect: boolean
+}
+
 type Prediction = { home: number | null, away: number | null, homeAdvances?: boolean | null }
 type Predictions = Record<string, Prediction>
 
-const props = defineProps<{ matches: Match[], locked?: boolean }>()
+const props = defineProps<{
+  matches: Match[]
+  locked?: boolean
+  summary?: Record<string, MatchSummary>
+}>()
 const predictions = defineModel<Predictions>({ required: true })
 
 function getPrediction(matchId: string): Prediction {
@@ -49,14 +60,15 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       <div class="flex items-center gap-2">
         <span class="flex-1 text-sm text-right font-medium text-foreground truncate">{{ teamName(match, 'home') }}</span>
         <div class="flex items-center gap-1 shrink-0">
-          <UInput v-model.number="getPrediction(match.id).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked" />
+          <UInput v-model.number="getPrediction(match.id).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked || !!props.summary?.[match.id]" />
           <span class="text-muted font-bold text-sm">–</span>
-          <UInput v-model.number="getPrediction(match.id).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked" />
+          <UInput v-model.number="getPrediction(match.id).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked || !!props.summary?.[match.id]" />
         </div>
         <span class="flex-1 text-sm text-left font-medium text-foreground truncate">{{ teamName(match, 'away') }}</span>
       </div>
 
-      <div v-if="isDraw(match.id)" class="flex items-center justify-center gap-3 pt-1 border-t border-border">
+      <!-- Penalties tiebreaker (only when not yet resolved) -->
+      <div v-if="isDraw(match.id) && !props.summary?.[match.id]" class="flex items-center justify-center gap-3 pt-1 border-t border-border">
         <p class="text-xs text-muted">¿Quién avanza en penaltis?</p>
         <div class="flex gap-2">
           <UButton size="xs" :variant="getPrediction(match.id).homeAdvances === true ? 'solid' : 'outline'" color="primary" :disabled="props.locked" @click="getPrediction(match.id).homeAdvances = true">
@@ -66,6 +78,27 @@ function teamName(match: Match, side: 'home' | 'away'): string {
             {{ teamName(match, 'away') }}
           </UButton>
         </div>
+      </div>
+
+      <!-- Result comparison -->
+      <div v-if="props.summary?.[match.id]" class="flex items-center justify-center gap-2 pt-1 border-t border-border">
+        <span
+          class="text-xs font-medium px-2 py-0.5 rounded-full"
+          :class="props.summary[match.id].isExact
+            ? 'bg-success/15 text-success'
+            : props.summary[match.id].isCorrect
+              ? 'bg-success/10 text-success'
+              : 'bg-error/10 text-error'"
+        >
+          {{ props.summary[match.id].result.home }}–{{ props.summary[match.id].result.away }} resultado real
+        </span>
+        <UBadge
+          :color="props.summary[match.id].points > 0 ? 'success' : 'error'"
+          variant="subtle"
+          size="xs"
+        >
+          {{ props.summary[match.id].points > 0 ? `+${props.summary[match.id].points} pts` : '0 pts' }}
+        </UBadge>
       </div>
     </div>
   </div>

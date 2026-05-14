@@ -49,12 +49,20 @@ async function getAuthHeaders() {
 }
 
 const headers = await getAuthHeaders()
-const [{ data: allMatches }, { data: allTeams }, { data: allPlayers }, savedPredictions, savedSideBets] = await Promise.all([
+interface MatchSummary {
+  result: { home: number, away: number, home_advances: boolean | null }
+  points: number
+  isExact: boolean
+  isCorrect: boolean
+}
+
+const [{ data: allMatches }, { data: allTeams }, { data: allPlayers }, savedPredictions, savedSideBets, matchSummary] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
   useFetch<Team[]>('/api/teams'),
   useFetch<Player[]>('/api/players'),
   $fetch<Predictions>('/api/predictions', { headers }),
   $fetch<SideBets | null>('/api/side-bets', { headers }),
+  $fetch<Record<string, MatchSummary>>('/api/predictions/summary', { headers }),
 ])
 
 function playerIdByName(name: string | null): string | null {
@@ -313,11 +321,11 @@ function randomize() {
     <!-- Step content -->
     <div>
       <div v-if="currentStep === 0">
-        <PredictionsGroupStage v-model="predictions" :groups="groupStageGroups" :locked="isLocked" />
+        <PredictionsGroupStage v-model="predictions" :groups="groupStageGroups" :locked="isLocked" :summary="matchSummary" />
       </div>
       <div v-else-if="currentRound">
         <p class="text-sm text-muted mb-4">Los equipos se confirmarán una vez finalice la fase anterior.</p>
-        <PredictionsKnockoutRound v-model="predictions" :matches="currentRound.matches" :locked="isLocked" />
+        <PredictionsKnockoutRound v-model="predictions" :matches="currentRound.matches" :locked="isLocked" :summary="matchSummary" />
       </div>
       <div v-else-if="isAwardsStep" class="space-y-6">
         <div>

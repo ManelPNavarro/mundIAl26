@@ -15,10 +15,21 @@ interface Group {
   matches: Match[]
 }
 
+interface MatchSummary {
+  result: { home: number, away: number, home_advances: boolean | null }
+  points: number
+  isExact: boolean
+  isCorrect: boolean
+}
+
 type Prediction = { home: number | null, away: number | null, homeAdvances?: boolean | null }
 type Predictions = Record<string, Prediction>
 
-const props = defineProps<{ groups: Group[], locked?: boolean }>()
+const props = defineProps<{
+  groups: Group[]
+  locked?: boolean
+  summary?: Record<string, MatchSummary>
+}>()
 const predictions = defineModel<Predictions>({ required: true })
 
 function getPrediction(matchId: string): Prediction {
@@ -77,15 +88,38 @@ function filledCount(matches: Match[]) {
           <div
             v-for="match in group.matches.filter(m => m.matchday === day)"
             :key="match.id"
-            class="flex items-center gap-2"
+            class="space-y-1.5"
           >
-            <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
-            <div class="flex items-center gap-1 shrink-0">
-              <UInput v-model.number="getPrediction(match.id).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked" />
-              <span class="text-muted font-bold text-sm">–</span>
-              <UInput v-model.number="getPrediction(match.id).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked" />
+            <div class="flex items-center gap-2">
+              <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
+              <div class="flex items-center gap-1 shrink-0">
+                <UInput v-model.number="getPrediction(match.id).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked || !!props.summary?.[match.id]" />
+                <span class="text-muted font-bold text-sm">–</span>
+                <UInput v-model.number="getPrediction(match.id).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked || !!props.summary?.[match.id]" />
+              </div>
+              <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
             </div>
-            <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
+
+            <!-- Result comparison -->
+            <div v-if="props.summary?.[match.id]" class="flex items-center justify-center gap-2">
+              <span
+                class="text-xs font-medium px-2 py-0.5 rounded-full"
+                :class="props.summary[match.id].isExact
+                  ? 'bg-success/15 text-success'
+                  : props.summary[match.id].isCorrect
+                    ? 'bg-success/10 text-success'
+                    : 'bg-error/10 text-error'"
+              >
+                {{ props.summary[match.id].result.home }}–{{ props.summary[match.id].result.away }} resultado real
+              </span>
+              <UBadge
+                :color="props.summary[match.id].points > 0 ? 'success' : 'error'"
+                variant="subtle"
+                size="xs"
+              >
+                {{ props.summary[match.id].points > 0 ? `+${props.summary[match.id].points} pts` : '0 pts' }}
+              </UBadge>
+            </div>
           </div>
         </div>
       </div>
