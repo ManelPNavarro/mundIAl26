@@ -27,6 +27,10 @@ const menuItems = computed(() => [
     { label: 'Puntuación', icon: 'i-lucide-sliders-horizontal', to: '/admin/scoring' },
   ]] : []),
   [{
+    label: 'Ajustes',
+    icon: 'i-lucide-settings',
+    to: '/settings',
+  }, {
     label: 'Cerrar sesión',
     icon: 'i-lucide-log-out',
     onSelect: signOut,
