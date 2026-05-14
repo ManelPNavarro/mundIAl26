@@ -95,6 +95,10 @@ function awardResult(field: keyof SideBets): 'correct' | 'wrong' | null {
   return user.toLowerCase() === (official as string).toLowerCase() ? 'correct' : 'wrong'
 }
 
+function teamName(id: string | null): string {
+  return allTeams.value?.find(t => t.id === id)?.name ?? '—'
+}
+
 const teamOptions = computed(() =>
   (allTeams.value ?? []).map(t => ({ label: t.name, value: t.id }))
 )
@@ -343,56 +347,39 @@ function randomize() {
         </div>
         <div class="space-y-4 max-w-md">
           <div class="flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <label class="text-sm font-medium text-foreground">Equipo campeón</label>
-              <UIcon v-if="awardResult('winner_team_id') === 'correct'" name="i-lucide-check-circle" class="size-4 text-success" />
-              <UIcon v-else-if="awardResult('winner_team_id') === 'wrong'" name="i-lucide-x-circle" class="size-4 text-error" />
+            <label class="text-sm font-medium text-foreground">Equipo campeón</label>
+            <div v-if="officialAwards?.winner_team_id" :class="['px-3 py-2 rounded-md border text-sm font-medium', awardResult('winner_team_id') === 'correct' ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
+              {{ teamName(sideBets.winner_team_id) }}
             </div>
-            <USelect
-              v-model="sideBets.winner_team_id"
-              :items="teamOptions"
-              value-key="value"
-              label-key="label"
-              placeholder="Selecciona un equipo..."
-              :disabled="isLocked"
-              :class="awardResult('winner_team_id') === 'correct' ? 'ring-2 ring-success rounded-md' : awardResult('winner_team_id') === 'wrong' ? 'ring-2 ring-error rounded-md' : ''"
-            />
+            <USelect v-else v-model="sideBets.winner_team_id" :items="teamOptions" value-key="value" label-key="label" placeholder="Selecciona un equipo..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <label class="text-sm font-medium text-foreground">Mejor jugador (MVP)</label>
-              <UIcon v-if="awardResult('best_player') === 'correct'" name="i-lucide-check-circle" class="size-4 text-success" />
-              <UIcon v-else-if="awardResult('best_player') === 'wrong'" name="i-lucide-x-circle" class="size-4 text-error" />
+            <label class="text-sm font-medium text-foreground">Mejor jugador (MVP)</label>
+            <div v-if="officialAwards?.best_player" :class="['px-3 py-2 rounded-md border text-sm font-medium', awardResult('best_player') === 'correct' ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
+              {{ sideBets.best_player ?? '—' }}
             </div>
-            <PlayerSelect v-model="sideBetIds.best_player" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked"
-              :class="awardResult('best_player') === 'correct' ? 'ring-2 ring-success rounded-md' : awardResult('best_player') === 'wrong' ? 'ring-2 ring-error rounded-md' : ''" />
+            <PlayerSelect v-else v-model="sideBetIds.best_player" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <label class="text-sm font-medium text-foreground">Mejor jugador joven</label>
-              <UIcon v-if="awardResult('best_young_player') === 'correct'" name="i-lucide-check-circle" class="size-4 text-success" />
-              <UIcon v-else-if="awardResult('best_young_player') === 'wrong'" name="i-lucide-x-circle" class="size-4 text-error" />
+            <label class="text-sm font-medium text-foreground">Mejor jugador joven</label>
+            <div v-if="officialAwards?.best_young_player" :class="['px-3 py-2 rounded-md border text-sm font-medium', awardResult('best_young_player') === 'correct' ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
+              {{ sideBets.best_young_player ?? '—' }}
             </div>
-            <PlayerSelect v-model="sideBetIds.best_young_player" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked"
-              :class="awardResult('best_young_player') === 'correct' ? 'ring-2 ring-success rounded-md' : awardResult('best_young_player') === 'wrong' ? 'ring-2 ring-error rounded-md' : ''" />
+            <PlayerSelect v-else v-model="sideBetIds.best_young_player" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <label class="text-sm font-medium text-foreground">Máximo goleador</label>
-              <UIcon v-if="awardResult('top_scorer') === 'correct'" name="i-lucide-check-circle" class="size-4 text-success" />
-              <UIcon v-else-if="awardResult('top_scorer') === 'wrong'" name="i-lucide-x-circle" class="size-4 text-error" />
+            <label class="text-sm font-medium text-foreground">Máximo goleador</label>
+            <div v-if="officialAwards?.top_scorer" :class="['px-3 py-2 rounded-md border text-sm font-medium', awardResult('top_scorer') === 'correct' ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
+              {{ sideBets.top_scorer ?? '—' }}
             </div>
-            <PlayerSelect v-model="sideBetIds.top_scorer" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked"
-              :class="awardResult('top_scorer') === 'correct' ? 'ring-2 ring-success rounded-md' : awardResult('top_scorer') === 'wrong' ? 'ring-2 ring-error rounded-md' : ''" />
+            <PlayerSelect v-else v-model="sideBetIds.top_scorer" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <label class="text-sm font-medium text-foreground">Mejor portero</label>
-              <UIcon v-if="awardResult('best_goalkeeper') === 'correct'" name="i-lucide-check-circle" class="size-4 text-success" />
-              <UIcon v-else-if="awardResult('best_goalkeeper') === 'wrong'" name="i-lucide-x-circle" class="size-4 text-error" />
+            <label class="text-sm font-medium text-foreground">Mejor portero</label>
+            <div v-if="officialAwards?.best_goalkeeper" :class="['px-3 py-2 rounded-md border text-sm font-medium', awardResult('best_goalkeeper') === 'correct' ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
+              {{ sideBets.best_goalkeeper ?? '—' }}
             </div>
-            <PlayerSelect v-model="sideBetIds.best_goalkeeper" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked"
-              :class="awardResult('best_goalkeeper') === 'correct' ? 'ring-2 ring-success rounded-md' : awardResult('best_goalkeeper') === 'wrong' ? 'ring-2 ring-error rounded-md' : ''" />
+            <PlayerSelect v-else v-model="sideBetIds.best_goalkeeper" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
         </div>
       </div>
