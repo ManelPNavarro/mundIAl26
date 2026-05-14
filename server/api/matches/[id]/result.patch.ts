@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
       home_score: body.home_score,
       away_score: body.away_score,
       home_advances: isClearing ? null : (body.home_advances ?? null),
-      status: isClearing ? 'TIMED' : (body.status ?? 'FINISHED'),
+      status: isClearing ? 'SCHEDULED' : (body.status ?? 'FINISHED'),
     })
     .eq('id', id)
     .select()
