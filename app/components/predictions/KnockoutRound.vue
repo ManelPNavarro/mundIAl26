@@ -55,7 +55,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
     <div
       v-for="match in props.matches"
       :key="match.id"
-      class="border border-border rounded-lg overflow-hidden"
+      class="rounded-lg overflow-hidden"
     >
       <!-- Prediction row -->
       <div class="flex items-center gap-2 px-4 py-3">
@@ -88,17 +88,19 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         </div>
       </div>
 
-      <!-- Real result strip -->
+      <!-- Real result strip — same flex layout as prediction row so numbers align -->
       <div
         v-if="props.summary?.[match.id]"
-        class="flex items-center justify-between px-4 py-1.5 text-sm font-medium"
+        class="flex items-center gap-2 px-4 py-1.5 text-xs font-medium"
         :class="props.summary[match.id].isCorrect ? 'bg-success/10 text-success' : 'bg-error/10 text-error'"
       >
-        <span class="text-xs">Resultado real</span>
-        <span class="font-mono font-bold">
-          {{ props.summary[match.id].result.home }} – {{ props.summary[match.id].result.away }}
-        </span>
-        <span class="text-xs">
+        <span class="flex-1 text-right">Resultado real</span>
+        <div class="flex items-center gap-1 shrink-0">
+          <span class="font-mono font-bold text-sm w-12 text-center">{{ props.summary[match.id].result.home }}</span>
+          <span class="font-bold text-sm">–</span>
+          <span class="font-mono font-bold text-sm w-12 text-center">{{ props.summary[match.id].result.away }}</span>
+        </div>
+        <span class="flex-1 text-left">
           {{ props.summary[match.id].points > 0 ? `+${props.summary[match.id].points} pts` : '0 pts' }}
         </span>
       </div>
