@@ -88,12 +88,10 @@ function filledCount(matches: Match[]) {
           <div
             v-for="match in group.matches.filter(m => m.matchday === day)"
             :key="match.id"
-            class="pl-3 border-l-2 rounded-sm"
-            :class="props.summary?.[match.id]
-              ? (props.summary[match.id].isCorrect ? 'border-success' : 'border-error')
-              : 'border-transparent'"
+            class="border border-border rounded-lg overflow-hidden"
           >
-            <div class="flex items-center gap-2">
+            <!-- Prediction row -->
+            <div class="flex items-center gap-2 px-3 py-2">
               <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
               <div class="flex items-center gap-1 shrink-0">
                 <template v-if="props.summary?.[match.id]">
@@ -109,10 +107,18 @@ function filledCount(matches: Match[]) {
               </div>
               <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
             </div>
-            <div v-if="props.summary?.[match.id]" class="flex items-center gap-1.5 mt-0.5 text-xs text-muted">
-              <span>Real: {{ props.summary[match.id].result.home }}–{{ props.summary[match.id].result.away }}</span>
-              <span>·</span>
-              <span :class="props.summary[match.id].points > 0 ? 'text-success font-medium' : 'text-error'">
+
+            <!-- Real result strip -->
+            <div
+              v-if="props.summary?.[match.id]"
+              class="flex items-center justify-between px-3 py-1.5 text-sm font-medium"
+              :class="props.summary[match.id].isCorrect ? 'bg-success/10 text-success' : 'bg-error/10 text-error'"
+            >
+              <span class="text-xs">Resultado real</span>
+              <span class="font-mono font-bold">
+                {{ props.summary[match.id].result.home }} – {{ props.summary[match.id].result.away }}
+              </span>
+              <span class="text-xs">
                 {{ props.summary[match.id].points > 0 ? `+${props.summary[match.id].points} pts` : '0 pts' }}
               </span>
             </div>

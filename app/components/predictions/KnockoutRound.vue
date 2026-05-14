@@ -55,12 +55,10 @@ function teamName(match: Match, side: 'home' | 'away'): string {
     <div
       v-for="match in props.matches"
       :key="match.id"
-      class="border border-border rounded-lg p-4 pl-3 border-l-4 space-y-2"
-      :class="props.summary?.[match.id]
-        ? (props.summary[match.id].isCorrect ? 'border-l-success' : 'border-l-error')
-        : 'border-l-border'"
+      class="border border-border rounded-lg overflow-hidden"
     >
-      <div class="flex items-center gap-2">
+      <!-- Prediction row -->
+      <div class="flex items-center gap-2 px-4 py-3">
         <span class="flex-1 text-sm text-right font-medium text-foreground truncate">{{ teamName(match, 'home') }}</span>
         <div class="flex items-center gap-1 shrink-0">
           <template v-if="props.summary?.[match.id]">
@@ -78,7 +76,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       </div>
 
       <!-- Penalties tiebreaker -->
-      <div v-if="isDraw(match.id) && !props.summary?.[match.id]" class="flex items-center justify-center gap-3 pt-1 border-t border-border">
+      <div v-if="isDraw(match.id) && !props.summary?.[match.id]" class="flex items-center justify-center gap-3 px-4 pb-3 border-t border-border pt-2">
         <p class="text-xs text-muted">¿Quién avanza en penaltis?</p>
         <div class="flex gap-2">
           <UButton size="xs" :variant="getPrediction(match.id).homeAdvances === true ? 'solid' : 'outline'" color="primary" :disabled="props.locked" @click="getPrediction(match.id).homeAdvances = true">
@@ -90,11 +88,17 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         </div>
       </div>
 
-      <!-- Result comparison -->
-      <div v-if="props.summary?.[match.id]" class="flex items-center gap-1.5 text-xs text-muted">
-        <span>Real: {{ props.summary[match.id].result.home }}–{{ props.summary[match.id].result.away }}</span>
-        <span>·</span>
-        <span :class="props.summary[match.id].points > 0 ? 'text-success font-medium' : 'text-error'">
+      <!-- Real result strip -->
+      <div
+        v-if="props.summary?.[match.id]"
+        class="flex items-center justify-between px-4 py-1.5 text-sm font-medium"
+        :class="props.summary[match.id].isCorrect ? 'bg-success/10 text-success' : 'bg-error/10 text-error'"
+      >
+        <span class="text-xs">Resultado real</span>
+        <span class="font-mono font-bold">
+          {{ props.summary[match.id].result.home }} – {{ props.summary[match.id].result.away }}
+        </span>
+        <span class="text-xs">
           {{ props.summary[match.id].points > 0 ? `+${props.summary[match.id].points} pts` : '0 pts' }}
         </span>
       </div>
