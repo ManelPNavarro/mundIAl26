@@ -17,8 +17,23 @@ interface Match {
 type Prediction = { home: number | null, away: number | null, homeAdvances?: boolean | null }
 type Predictions = Record<string, Prediction>
 
+interface Player {
+  id: string
+  name: string
+  position: string | null
+  team: { name: string } | null
+}
+
 interface SideBets {
   winner_team_id: string | null
+  best_player: string | null
+  best_young_player: string | null
+  top_scorer: string | null
+  best_goalkeeper: string | null
+}
+
+// UI state uses player UUIDs for the combobox; resolved to names on save
+interface SideBetIds {
   best_player: string | null
   best_young_player: string | null
   top_scorer: string | null
@@ -34,12 +49,18 @@ async function getAuthHeaders() {
 }
 
 const headers = await getAuthHeaders()
-const [{ data: allMatches }, { data: allTeams }, savedPredictions, savedSideBets] = await Promise.all([
+const [{ data: allMatches }, { data: allTeams }, { data: allPlayers }, savedPredictions, savedSideBets] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
   useFetch<Team[]>('/api/teams'),
+  useFetch<Player[]>('/api/players'),
   $fetch<Predictions>('/api/predictions', { headers }),
   $fetch<SideBets | null>('/api/side-bets', { headers }),
 ])
+
+function playerIdByName(name: string | null): string | null {
+  if (!name) return null
+  return allPlayers.value?.find(p => p.name.trim().toLowerCase() === name.trim().toLowerCase())?.id ?? null
+}
 
 const predictions = ref<Predictions>(savedPredictions ?? {})
 const sideBets = ref<SideBets>({
@@ -48,6 +69,12 @@ const sideBets = ref<SideBets>({
   best_young_player: savedSideBets?.best_young_player ?? null,
   top_scorer: savedSideBets?.top_scorer ?? null,
   best_goalkeeper: savedSideBets?.best_goalkeeper ?? null,
+})
+const sideBetIds = ref<SideBetIds>({
+  best_player: playerIdByName(savedSideBets?.best_player ?? null),
+  best_young_player: playerIdByName(savedSideBets?.best_young_player ?? null),
+  top_scorer: playerIdByName(savedSideBets?.top_scorer ?? null),
+  best_goalkeeper: playerIdByName(savedSideBets?.best_goalkeeper ?? null),
 })
 const currentStep = ref(0)
 
@@ -107,17 +134,25 @@ const groupComplete = computed(() => groupFilled.value === groupMatchIds.value.l
 
 const sideBetsComplete = computed(() =>
   !!sideBets.value.winner_team_id &&
-  !!sideBets.value.best_player?.trim() &&
-  !!sideBets.value.best_young_player?.trim() &&
-  !!sideBets.value.top_scorer?.trim() &&
-  !!sideBets.value.best_goalkeeper?.trim()
+  !!sideBetIds.value.best_player &&
+  !!sideBetIds.value.best_young_player &&
+  !!sideBetIds.value.top_scorer &&
+  !!sideBetIds.value.best_goalkeeper
 )
 
-const sideBetsFilled = computed(() => {
-  const b = sideBets.value
-  return [b.winner_team_id, b.best_player, b.best_young_player, b.top_scorer, b.best_goalkeeper]
-    .filter(v => v?.trim?.() || v).length
+const sideBetsFilled = computed(() =>
+  [sideBets.value.winner_team_id, sideBetIds.value.best_player, sideBetIds.value.best_young_player, sideBetIds.value.top_scorer, sideBetIds.value.best_goalkeeper]
+    .filter(Boolean).length
+)
+
+const totalItems = computed(() => (allMatches.value?.length ?? 0) + 5)
+const totalFilled = computed(() => {
+  const matchFilled = (allMatches.value ?? []).filter(m => isFilled(m.id)).length
+  return matchFilled + sideBetsFilled.value
 })
+const completionPct = computed(() =>
+  totalItems.value > 0 ? Math.round((totalFilled.value / totalItems.value) * 100) : 0
+)
 
 const steps = computed(() => [
   {
@@ -162,9 +197,24 @@ async function saveMatches() {
   await $fetch('/api/predictions', { method: 'POST', headers: h, body: payload })
 }
 
+function playerNameById(id: string | null): string | null {
+  if (!id) return null
+  return allPlayers.value?.find(p => p.id === id)?.name ?? null
+}
+
 async function saveSideBets() {
   const h = await getAuthHeaders()
-  await $fetch('/api/side-bets', { method: 'POST', headers: h, body: sideBets.value })
+  await $fetch('/api/side-bets', {
+    method: 'POST',
+    headers: h,
+    body: {
+      winner_team_id: sideBets.value.winner_team_id,
+      best_player: playerNameById(sideBetIds.value.best_player),
+      best_young_player: playerNameById(sideBetIds.value.best_young_player),
+      top_scorer: playerNameById(sideBetIds.value.top_scorer),
+      best_goalkeeper: playerNameById(sideBetIds.value.best_goalkeeper),
+    },
+  })
 }
 
 async function save() {
@@ -224,44 +274,36 @@ function randomize() {
     </div>
 
     <!-- Stepper -->
-    <div class="flex flex-wrap gap-2">
-      <button
-        v-for="(step, idx) in steps"
-        :key="step.key"
-        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
-        :class="[
-          idx === currentStep ? 'bg-primary border-primary text-white'
-          : step.complete ? 'bg-success/10 border-success/30 text-success hover:bg-success/20 cursor-pointer'
-          : idx < currentStep ? 'bg-muted/50 border-border text-muted hover:bg-muted cursor-pointer'
-          : 'bg-muted/20 border-border text-muted/50 cursor-not-allowed',
-        ]"
-        :disabled="idx > currentStep && !steps[idx - 1]?.complete"
-        @click="idx <= currentStep || steps[idx - 1]?.complete ? currentStep = idx : null"
-      >
-        <UIcon v-if="step.complete && idx !== currentStep" name="i-lucide-check" class="size-3" />
-        <span v-else class="font-bold">{{ idx + 1 }}</span>
-        {{ step.title }}
-      </button>
+    <div class="flex items-start justify-between gap-4">
+      <div class="flex flex-wrap gap-2 flex-1">
+        <button
+          v-for="(step, idx) in steps"
+          :key="step.key"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
+          :class="[
+            idx === currentStep ? 'bg-primary border-primary text-white'
+            : step.complete ? 'bg-success/10 border-success/30 text-success hover:bg-success/20 cursor-pointer'
+            : idx < currentStep ? 'bg-muted/50 border-border text-muted hover:bg-muted cursor-pointer'
+            : 'bg-muted/20 border-border text-muted/50 cursor-not-allowed',
+          ]"
+          :disabled="idx > currentStep && !steps[idx - 1]?.complete"
+          @click="idx <= currentStep || steps[idx - 1]?.complete ? currentStep = idx : null"
+        >
+          <UIcon v-if="step.complete && idx !== currentStep" name="i-lucide-check" class="size-3" />
+          <span v-else class="font-bold">{{ idx + 1 }}</span>
+          {{ step.title }}
+        </button>
+      </div>
+      <div class="shrink-0 flex flex-col items-center leading-none pt-1">
+        <span class="text-sm font-bold" :class="completionPct === 100 ? 'text-success' : 'text-primary'">{{ completionPct }}%</span>
+        <span class="text-xs text-muted mt-0.5">completado</span>
+      </div>
     </div>
 
     <!-- Locked banner -->
     <UAlert v-if="isLocked" color="error" variant="soft" icon="i-lucide-lock"
       title="Predicciones cerradas"
       description="El plazo para introducir predicciones finalizó el 10 de junio. ¡Que empiece el Mundial!" />
-
-    <!-- Countdown -->
-    <div v-else-if="timeLeft" class="flex items-center justify-between gap-4 rounded-lg border border-border bg-muted/30 px-4 py-3">
-      <div class="flex items-center gap-2 text-sm text-muted">
-        <UIcon name="i-lucide-clock" class="size-4 shrink-0" />
-        <span>Tiempo para cerrar predicciones</span>
-      </div>
-      <div class="flex items-center gap-3 font-mono text-sm font-semibold text-foreground shrink-0">
-        <span><span class="text-primary">{{ timeLeft.days }}</span>d</span>
-        <span><span class="text-primary">{{ String(timeLeft.hours).padStart(2, '0') }}</span>h</span>
-        <span><span class="text-primary">{{ String(timeLeft.minutes).padStart(2, '0') }}</span>m</span>
-        <span><span class="text-primary">{{ String(timeLeft.seconds).padStart(2, '0') }}</span>s</span>
-      </div>
-    </div>
 
     <!-- Completed banner -->
     <UAlert v-if="steps.every(s => s.complete) && !isLocked" color="success" variant="soft"
@@ -283,7 +325,7 @@ function randomize() {
           <p class="text-sm text-muted mt-0.5">Adivina los ganadores de los premios individuales al final del Mundial.</p>
         </div>
         <div class="space-y-4 max-w-md">
-          <div class="space-y-1.5">
+          <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Equipo campeón</label>
             <USelect
               v-model="sideBets.winner_team_id"
@@ -294,21 +336,21 @@ function randomize() {
               :disabled="isLocked"
             />
           </div>
-          <div class="space-y-1.5">
+          <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor jugador (MVP)</label>
-            <UInput v-model="sideBets.best_player" placeholder="Nombre del jugador" :disabled="isLocked" />
+            <PlayerSelect v-model="sideBetIds.best_player" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
-          <div class="space-y-1.5">
+          <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor jugador joven</label>
-            <UInput v-model="sideBets.best_young_player" placeholder="Nombre del jugador" :disabled="isLocked" />
+            <PlayerSelect v-model="sideBetIds.best_young_player" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
-          <div class="space-y-1.5">
+          <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Máximo goleador</label>
-            <UInput v-model="sideBets.top_scorer" placeholder="Nombre del jugador" :disabled="isLocked" />
+            <PlayerSelect v-model="sideBetIds.top_scorer" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
-          <div class="space-y-1.5">
+          <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor portero</label>
-            <UInput v-model="sideBets.best_goalkeeper" placeholder="Nombre del jugador" :disabled="isLocked" />
+            <PlayerSelect v-model="sideBetIds.best_goalkeeper" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
         </div>
       </div>
@@ -343,6 +385,15 @@ function randomize() {
           Guardar predicciones
         </UButton>
       </div>
+    </div>
+
+    <!-- Countdown -->
+    <div v-if="timeLeft && !isLocked" class="flex items-center justify-center gap-2 text-xs text-muted">
+      <UIcon name="i-lucide-clock" class="size-3 shrink-0" />
+      <span>Cierra en</span>
+      <span class="font-mono font-medium text-foreground">
+        {{ timeLeft.days }}d {{ String(timeLeft.hours).padStart(2, '0') }}h {{ String(timeLeft.minutes).padStart(2, '0') }}m {{ String(timeLeft.seconds).padStart(2, '0') }}s
+      </span>
     </div>
   </div>
 </template>
