@@ -77,6 +77,26 @@ function isDraw(match: Match): boolean {
   return d?.home !== null && d?.away !== null && d?.home === d?.away
 }
 
+async function clearResult(match: Match) {
+  saving.value = match.id
+  try {
+    const headers = await getAuthHeaders()
+    await $fetch(`/api/matches/${match.id}/result`, {
+      method: 'PATCH',
+      headers,
+      body: { home_score: null, away_score: null },
+    })
+    toast.add({ title: 'Resultado eliminado', color: 'success' })
+    editing.value.delete(match.id)
+    delete drafts.value[match.id]
+    await refresh()
+  } catch {
+    toast.add({ title: 'Error al eliminar', color: 'error' })
+  } finally {
+    saving.value = null
+  }
+}
+
 async function saveResult(match: Match) {
   const d = getDraft(match)
   if (d.home === null || d.away === null) return
@@ -260,6 +280,15 @@ function teamName(match: Match, side: 'home' | 'away'): string {
                       icon="i-lucide-save"
                       @click="saveResult(match)"
                     />
+                    <UButton
+                      v-if="match.home_score !== null"
+                      size="xs"
+                      color="error"
+                      variant="outline"
+                      :loading="saving === match.id"
+                      icon="i-lucide-trash-2"
+                      @click="clearResult(match)"
+                    />
                   </template>
 
                   <!-- Result saved, view mode -->
@@ -313,7 +342,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
                 <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
 
                 <!-- Editable -->
-                <template v-if="isMatchEditable(match)">
+                <template v-if="isEditing(match)">
                   <div class="flex items-center gap-1 shrink-0">
                     <UInput v-model.number="getDraft(match).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
                     <span class="text-muted font-bold text-sm">–</span>
@@ -323,21 +352,36 @@ function teamName(match: Match, side: 'home' | 'away'): string {
                   <UButton
                     size="xs"
                     :loading="saving === match.id"
-                    :disabled="!isDirty(match) || getDraft(match).home === null || getDraft(match).away === null"
+                    :disabled="getDraft(match).home === null || getDraft(match).away === null"
                     icon="i-lucide-save"
                     @click="saveResult(match)"
                   />
+                  <UButton
+                    v-if="match.home_score !== null"
+                    size="xs"
+                    color="error"
+                    variant="outline"
+                    :loading="saving === match.id"
+                    icon="i-lucide-trash-2"
+                    @click="clearResult(match)"
+                  />
                 </template>
 
-                <!-- Locked -->
+                <!-- View mode -->
                 <template v-else>
-                  <div class="flex items-center gap-2 shrink-0">
-                    <span v-if="match.home_score !== null" class="font-mono font-bold text-sm text-foreground">
-                      {{ match.home_score }} – {{ match.away_score }}
-                    </span>
-                    <UIcon v-else name="i-lucide-lock" class="size-4 text-muted" />
-                  </div>
+                  <span v-if="match.home_score !== null" class="font-mono font-bold text-sm text-foreground shrink-0">
+                    {{ match.home_score }} – {{ match.away_score }}
+                  </span>
+                  <UIcon v-else name="i-lucide-lock" class="size-4 text-muted shrink-0" />
                   <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
+                  <UButton
+                    v-if="match.home_score !== null"
+                    size="xs"
+                    color="neutral"
+                    variant="outline"
+                    icon="i-lucide-pencil"
+                    @click="startEdit(match)"
+                  />
                 </template>
               </div>
               <!-- Penalties for draws -->
