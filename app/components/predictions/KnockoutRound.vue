@@ -44,32 +44,29 @@ function isDraw(matchId: string) {
   return p?.home !== null && p?.away !== null && p?.home !== undefined && p?.away !== undefined && p.home === p.away
 }
 
+function scoreFor(m: Match): { home: number, away: number, homeAdvances: boolean | null } | null {
+  if (m.home_score !== null && m.away_score !== null)
+    return { home: m.home_score, away: m.away_score, homeAdvances: m.home_advances }
+  const p = predictions.value[m.id]
+  if (p?.home != null && p?.away != null)
+    return { home: p.home, away: p.away, homeAdvances: p.homeAdvances ?? null }
+  return null
+}
+
 function resolveSlot(slot: string): string | null {
-  // Winner of match N
-  if (slot.startsWith('W')) {
+  if (slot.startsWith('W') || slot.startsWith('L')) {
+    const winner = slot.startsWith('W')
     const matchNo = parseInt(slot.slice(1))
     const m = props.allMatches.find(x => x.match_no === matchNo)
     if (!m) return null
-    const p = predictions.value[m.id]
-    if (p?.home == null || p?.away == null) return null
-    if (p.home > p.away) return m.home_team?.name ?? null
-    if (p.away > p.home) return m.away_team?.name ?? null
-    return p.homeAdvances === true ? (m.home_team?.name ?? null) : (m.away_team?.name ?? null)
+    const s = scoreFor(m)
+    if (!s) return null
+    const homeWins = s.home > s.away || (s.home === s.away && s.homeAdvances === true)
+    const winnerTeam = homeWins ? m.home_team?.name : m.away_team?.name
+    const loserTeam = homeWins ? m.away_team?.name : m.home_team?.name
+    return (winner ? winnerTeam : loserTeam) ?? null
   }
 
-  // Loser of match N
-  if (slot.startsWith('L')) {
-    const matchNo = parseInt(slot.slice(1))
-    const m = props.allMatches.find(x => x.match_no === matchNo)
-    if (!m) return null
-    const p = predictions.value[m.id]
-    if (p?.home == null || p?.away == null) return null
-    if (p.home > p.away) return m.away_team?.name ?? null
-    if (p.away > p.home) return m.home_team?.name ?? null
-    return p.homeAdvances === true ? (m.away_team?.name ?? null) : (m.home_team?.name ?? null)
-  }
-
-  // "1A", "2B" — Nth place in group X based on user predictions
   const pos = parseInt(slot[0]!)
   const groupLetter = slot.slice(1)
   if (!isNaN(pos) && groupLetter.length === 1) {
@@ -77,16 +74,16 @@ function resolveSlot(slot: string): string | null {
     const table = new Map<string, { name: string, pts: number, gd: number, gf: number }>()
     for (const m of groupMatches) {
       if (!m.home_team || !m.away_team) continue
-      const p = predictions.value[m.id]
-      if (p?.home == null || p?.away == null) continue
+      const s = scoreFor(m)
+      if (!s) continue
       if (!table.has(m.home_team.id)) table.set(m.home_team.id, { name: m.home_team.name, pts: 0, gd: 0, gf: 0 })
       if (!table.has(m.away_team.id)) table.set(m.away_team.id, { name: m.away_team.name, pts: 0, gd: 0, gf: 0 })
       const h = table.get(m.home_team.id)!
       const a = table.get(m.away_team.id)!
-      h.gf += p.home; h.gd += p.home - p.away
-      a.gf += p.away; a.gd += p.away - p.home
-      if (p.home > p.away) h.pts += 3
-      else if (p.home === p.away) { h.pts += 1; a.pts += 1 }
+      h.gf += s.home; h.gd += s.home - s.away
+      a.gf += s.away; a.gd += s.away - s.home
+      if (s.home > s.away) h.pts += 3
+      else if (s.home === s.away) { h.pts += 1; a.pts += 1 }
       else a.pts += 3
     }
     const sorted = [...table.values()].sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf)
