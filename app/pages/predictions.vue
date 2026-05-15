@@ -174,9 +174,13 @@ const predictedWinnerTeamId = computed(() => {
 const predictedWinnerName = computed(() => {
   const m = finalMatch.value
   if (!m) return null
-  const p = predictions.value[m.id]
-  if (p?.home == null || p?.away == null) return null
-  const homeWins = p.home > p.away || (p.home === p.away && p.homeAdvances === true)
+  const home = m.home_score !== null && m.away_score !== null
+    ? { home: m.home_score, away: m.away_score, homeAdvances: m.home_advances }
+    : predictions.value[m.id]
+      ? { home: predictions.value[m.id]!.home!, away: predictions.value[m.id]!.away!, homeAdvances: predictions.value[m.id]!.homeAdvances ?? null }
+      : null
+  if (!home || home.home == null || home.away == null) return null
+  const homeWins = home.home > home.away || (home.home === home.away && home.homeAdvances === true)
   return (homeWins ? m.home_team?.name : m.away_team?.name) ?? null
 })
 
