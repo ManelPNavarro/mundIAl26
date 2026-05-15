@@ -161,6 +161,35 @@ const groupComplete = computed(() => groupFilled.value === groupMatchIds.value.l
 
 const finalMatch = computed(() => allMatches.value?.find(m => m.round === 'FINAL') ?? null)
 
+function scoreFor(m: Match): { home: number, away: number, homeAdvances: boolean | null } | null {
+  if (m.home_score !== null && m.away_score !== null)
+    return { home: m.home_score, away: m.away_score, homeAdvances: m.home_advances }
+  const p = predictions.value[m.id]
+  if (p?.home != null && p?.away != null)
+    return { home: p.home, away: p.away, homeAdvances: p.homeAdvances ?? null }
+  return null
+}
+
+function resolveMatchSide(m: Match, side: 'home' | 'away'): string | null {
+  const team = side === 'home' ? m.home_team : m.away_team
+  if (team) return team.name
+  const slot = side === 'home' ? m.home_slot : m.away_slot
+  return slot ? resolveSlotName(slot) : null
+}
+
+function resolveSlotName(slot: string): string | null {
+  if (!slot.startsWith('W') && !slot.startsWith('L')) return null
+  const isWinner = slot.startsWith('W')
+  const m = allMatches.value?.find(x => x.match_no === parseInt(slot.slice(1)))
+  if (!m) return null
+  const s = scoreFor(m)
+  if (!s) return null
+  const homeWins = s.home > s.away || (s.home === s.away && s.homeAdvances === true)
+  return isWinner
+    ? (homeWins ? resolveMatchSide(m, 'home') : resolveMatchSide(m, 'away'))
+    : (homeWins ? resolveMatchSide(m, 'away') : resolveMatchSide(m, 'home'))
+}
+
 const predictedWinnerTeamId = computed(() => {
   const m = finalMatch.value
   if (!m) return null
@@ -174,14 +203,10 @@ const predictedWinnerTeamId = computed(() => {
 const predictedWinnerName = computed(() => {
   const m = finalMatch.value
   if (!m) return null
-  const home = m.home_score !== null && m.away_score !== null
-    ? { home: m.home_score, away: m.away_score, homeAdvances: m.home_advances }
-    : predictions.value[m.id]
-      ? { home: predictions.value[m.id]!.home!, away: predictions.value[m.id]!.away!, homeAdvances: predictions.value[m.id]!.homeAdvances ?? null }
-      : null
-  if (!home || home.home == null || home.away == null) return null
-  const homeWins = home.home > home.away || (home.home === home.away && home.homeAdvances === true)
-  return (homeWins ? m.home_team?.name : m.away_team?.name) ?? null
+  const s = scoreFor(m)
+  if (!s) return null
+  const homeWins = s.home > s.away || (s.home === s.away && s.homeAdvances === true)
+  return homeWins ? resolveMatchSide(m, 'home') : resolveMatchSide(m, 'away')
 })
 
 const winnerResult = computed(() => {
