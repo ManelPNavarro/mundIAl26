@@ -41,7 +41,6 @@ function formatKickoff(kickoffAt: string | null): string {
   }).format(new Date(kickoffAt))
 }
 
-// Draft edits per match: { [matchId]: { home, away, homeAdvances } }
 type Draft = { home: number | null, away: number | null, homeAdvances: boolean | null }
 const drafts = ref<Record<string, Draft>>({})
 const saving = ref<string | null>(null)
@@ -57,11 +56,7 @@ function startEdit(match: Match) {
 
 function getDraft(match: Match): Draft {
   if (!drafts.value[match.id]) {
-    drafts.value[match.id] = {
-      home: match.home_score,
-      away: match.away_score,
-      homeAdvances: match.home_advances,
-    }
+    drafts.value[match.id] = { home: match.home_score, away: match.away_score, homeAdvances: match.home_advances }
   }
   return drafts.value[match.id]!
 }
@@ -77,30 +72,9 @@ function isDraw(match: Match): boolean {
   return d?.home !== null && d?.away !== null && d?.home === d?.away
 }
 
-async function clearResult(match: Match) {
-  saving.value = match.id
-  try {
-    const headers = await getAuthHeaders()
-    await $fetch(`/api/matches/${match.id}/result`, {
-      method: 'PATCH',
-      headers,
-      body: { home_score: null, away_score: null },
-    })
-    toast.add({ title: 'Resultado eliminado', color: 'success' })
-    editing.value.delete(match.id)
-    delete drafts.value[match.id]
-    await refresh()
-  } catch {
-    toast.add({ title: 'Error al eliminar', color: 'error' })
-  } finally {
-    saving.value = null
-  }
-}
-
 async function saveResult(match: Match) {
   const d = getDraft(match)
   if (d.home === null || d.away === null) return
-
   saving.value = match.id
   try {
     const headers = await getAuthHeaders()
@@ -124,43 +98,76 @@ async function saveResult(match: Match) {
   }
 }
 
+async function clearResult(match: Match) {
+  saving.value = match.id
+  try {
+    const headers = await getAuthHeaders()
+    await $fetch(`/api/matches/${match.id}/result`, {
+      method: 'PATCH',
+      headers,
+      body: { home_score: null, away_score: null },
+    })
+    toast.add({ title: 'Resultado eliminado', color: 'success' })
+    editing.value.delete(match.id)
+    delete drafts.value[match.id]
+    await refresh()
+  } catch {
+    toast.add({ title: 'Error al eliminar', color: 'error' })
+  } finally {
+    saving.value = null
+  }
+}
+
 const ROUNDS = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
 const ROUND_LABELS: Record<string, string> = {
-  GROUP: 'Fase de grupos',
+  GROUP: 'Grupos',
   R32: 'Ronda de 32',
-  R16: 'Octavos de final',
-  QF: 'Cuartos de final',
+  R16: 'Octavos',
+  QF: 'Cuartos',
   SF: 'Semifinales',
-  THIRD_PLACE: 'Tercer y cuarto puesto',
+  THIRD_PLACE: '3er puesto',
   FINAL: 'Final',
 }
 
-const groupedMatches = computed(() => {
-  const all = matches.value ?? []
-  return ROUNDS.map(round => ({
-    round,
-    label: ROUND_LABELS[round]!,
-    groups: round === 'GROUP'
-      ? ['A','B','C','D','E','F','G','H','I','J','K','L'].map(letter => ({
-          letter,
-          matches: all.filter(m => m.round === 'GROUP' && m.group_letter === letter),
-        })).filter(g => g.matches.length > 0)
-      : null,
-    matches: round !== 'GROUP' ? all.filter(m => m.round === round) : [],
-  }))
-})
-
-const openSections = ref<string[]>(['GROUP-A'])
-
-function toggleSection(key: string) {
-  const idx = openSections.value.indexOf(key)
-  if (idx === -1) openSections.value.push(key)
-  else openSections.value.splice(idx, 1)
-}
+const GROUP_LETTERS = ['A','B','C','D','E','F','G','H','I','J','K','L']
 
 function finishedCount(matchList: Match[]) {
   return matchList.filter(m => m.status === 'FINISHED').length
 }
+
+const steps = computed(() => {
+  const all = matches.value ?? []
+  return ROUNDS.map(round => {
+    const roundMatches = round === 'GROUP'
+      ? all.filter(m => m.round === 'GROUP')
+      : all.filter(m => m.round === round)
+    if (roundMatches.length === 0) return null
+    return {
+      key: round,
+      label: ROUND_LABELS[round]!,
+      matches: roundMatches,
+      complete: finishedCount(roundMatches) === roundMatches.length,
+    }
+  }).filter(Boolean) as { key: string, label: string, matches: Match[], complete: boolean }[]
+})
+
+const currentStep = ref(0)
+
+const currentStepData = computed(() => steps.value[currentStep.value] ?? null)
+
+const groupsForCurrentStep = computed(() => {
+  if (currentStepData.value?.key !== 'GROUP') return null
+  return GROUP_LETTERS.map(letter => ({
+    letter,
+    matches: currentStepData.value!.matches.filter(m => m.group_letter === letter),
+  })).filter(g => g.matches.length > 0)
+})
+
+const totalMatches = computed(() => (matches.value ?? []).length)
+const finishedTotal = computed(() => finishedCount(matches.value ?? []))
+const completionPct = computed(() =>
+  totalMatches.value > 0 ? Math.round((finishedTotal.value / totalMatches.value) * 100) : 0
+)
 
 const syncing = ref(false)
 
@@ -204,67 +211,48 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <h1 class="text-2xl font-bold text-foreground">Resultados</h1>
         <p class="text-sm text-muted mt-1">Introduce los resultados reales de cada partido.</p>
       </div>
-      <UButton
-        icon="i-lucide-refresh-cw"
-        color="neutral"
-        variant="outline"
-        size="sm"
-        :loading="syncing"
-        @click="syncMatches"
-      >
+      <UButton icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncing" @click="syncMatches">
         Sincronizar
       </UButton>
     </div>
 
-    <div v-for="section in groupedMatches" :key="section.round" class="space-y-2">
-      <h2 class="text-sm font-semibold text-muted uppercase tracking-wide">
-        {{ section.label }}
-      </h2>
-
-      <!-- Group stage: accordion per group -->
-      <template v-if="section.groups">
-        <div
-          v-for="group in section.groups"
-          :key="group.letter"
-          class="border border-border rounded-lg overflow-hidden"
+    <!-- Stepper -->
+    <div class="flex items-start justify-between gap-4">
+      <div class="flex flex-wrap gap-2 flex-1">
+        <button
+          v-for="(step, idx) in steps"
+          :key="step.key"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
+          :class="[
+            idx === currentStep ? 'bg-primary border-primary text-white'
+            : step.complete ? 'bg-success/10 border-success/30 text-success hover:bg-success/20'
+            : 'bg-muted/20 border-border text-muted hover:bg-muted/40',
+          ]"
+          @click="currentStep = idx"
         >
-          <button
-            class="w-full flex items-center justify-between px-4 py-3 bg-muted/40 hover:bg-muted/70 transition-colors text-left"
-            @click="toggleSection(`GROUP-${group.letter}`)"
-          >
-            <span class="font-semibold text-sm text-foreground">Grupo {{ group.letter }}</span>
-            <div class="flex items-center gap-3">
-              <UBadge
-                :color="finishedCount(group.matches) === group.matches.length ? 'success' : 'neutral'"
-                variant="subtle"
-                size="xs"
-              >
-                {{ finishedCount(group.matches) }}/{{ group.matches.length }}
-              </UBadge>
-              <UIcon
-                :name="openSections.includes(`GROUP-${group.letter}`) ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
-                class="size-4 text-muted"
-              />
-            </div>
-          </button>
+          <UIcon v-if="step.complete && idx !== currentStep" name="i-lucide-check" class="size-3" />
+          <span v-else class="font-bold">{{ idx + 1 }}</span>
+          {{ step.label }}
+        </button>
+      </div>
+      <div class="shrink-0 flex flex-col items-center leading-none pt-1">
+        <span class="text-sm font-bold" :class="completionPct === 100 ? 'text-success' : 'text-primary'">{{ completionPct }}%</span>
+        <span class="text-xs text-muted mt-0.5">completado</span>
+      </div>
+    </div>
 
-          <div v-if="openSections.includes(`GROUP-${group.letter}`)" class="divide-y divide-border">
-            <div
-              v-for="day in [1, 2, 3]"
-              :key="day"
-              class="px-4 py-3 space-y-3"
-            >
+    <!-- Group stage -->
+    <template v-if="currentStepData?.key === 'GROUP' && groupsForCurrentStep">
+      <div v-for="group in groupsForCurrentStep" :key="group.letter" class="space-y-1">
+        <p class="text-xs font-semibold text-muted uppercase tracking-wide">Grupo {{ group.letter }}</p>
+        <div class="border border-border rounded-lg divide-y divide-border">
+          <div v-for="day in [1, 2, 3]" :key="day">
+            <div v-if="group.matches.filter(m => m.matchday === day).length > 0" class="px-4 py-3 space-y-3">
               <p class="text-xs font-medium text-muted uppercase tracking-wide">Jornada {{ day }}</p>
-              <div
-                v-for="match in group.matches.filter(m => m.matchday === day)"
-                :key="match.id"
-                class="space-y-1"
-              >
+              <div v-for="match in group.matches.filter(m => m.matchday === day)" :key="match.id" class="space-y-1">
                 <p class="text-xs text-muted text-center">{{ formatKickoff(match.kickoff_at) }}</p>
                 <div class="flex items-center gap-3">
                   <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
-
-                  <!-- Editing / no result yet -->
                   <template v-if="isEditing(match)">
                     <div class="flex items-center gap-1 shrink-0">
                       <UInput v-model.number="getDraft(match).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
@@ -272,134 +260,55 @@ function teamName(match: Match, side: 'home' | 'away'): string {
                       <UInput v-model.number="getDraft(match).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
                     </div>
                     <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
-                    <UButton
-                      size="xs"
-                      color="success"
-                      :loading="saving === match.id"
-                      :disabled="getDraft(match).home === null || getDraft(match).away === null"
-                      icon="i-lucide-save"
-                      @click="saveResult(match)"
-                    />
-                    <UButton
-                      v-if="match.home_score !== null"
-                      size="xs"
-                      color="error"
-                      variant="outline"
-                      :loading="saving === match.id"
-                      icon="i-lucide-trash-2"
-                      @click="clearResult(match)"
-                    />
+                    <UButton size="xs" color="success" :loading="saving === match.id" :disabled="getDraft(match).home === null || getDraft(match).away === null" icon="i-lucide-save" @click="saveResult(match)" />
+                    <UButton v-if="match.home_score !== null" size="xs" color="error" variant="outline" :loading="saving === match.id" icon="i-lucide-trash-2" @click="clearResult(match)" />
                   </template>
-
-                  <!-- Result saved, view mode -->
                   <template v-else>
-                    <span class="font-mono font-bold text-sm text-foreground shrink-0">
-                      {{ match.home_score }} – {{ match.away_score }}
-                    </span>
+                    <span class="font-mono font-bold text-sm text-foreground shrink-0">{{ match.home_score }} – {{ match.away_score }}</span>
                     <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
-                    <UButton
-                      size="xs"
-                      color="neutral"
-                      variant="outline"
-                      icon="i-lucide-pencil"
-                      @click="startEdit(match)"
-                    />
+                    <UButton size="xs" color="neutral" variant="outline" icon="i-lucide-pencil" @click="startEdit(match)" />
                   </template>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </template>
+      </div>
+    </template>
 
-      <!-- Knockout rounds -->
-      <template v-else>
-        <div class="border border-border rounded-lg overflow-hidden">
-          <button
-            class="w-full flex items-center justify-between px-4 py-3 bg-muted/40 hover:bg-muted/70 transition-colors text-left"
-            @click="toggleSection(section.round)"
-          >
-            <span class="font-semibold text-sm text-foreground">{{ section.label }}</span>
-            <div class="flex items-center gap-3">
-              <UBadge
-                :color="finishedCount(section.matches) === section.matches.length ? 'success' : 'neutral'"
-                variant="subtle"
-                size="xs"
-              >
-                {{ finishedCount(section.matches) }}/{{ section.matches.length }}
-              </UBadge>
-              <UIcon
-                :name="openSections.includes(section.round) ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
-                class="size-4 text-muted"
-              />
-            </div>
-          </button>
-
-          <div v-if="openSections.includes(section.round)" class="px-4 py-3 space-y-4">
-            <div v-for="match in section.matches" :key="match.id" class="space-y-2">
-              <p class="text-xs text-muted text-center">{{ formatKickoff(match.kickoff_at) }}</p>
-              <div class="flex items-center gap-3">
-                <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
-
-                <!-- Editable -->
-                <template v-if="isEditing(match)">
-                  <div class="flex items-center gap-1 shrink-0">
-                    <UInput v-model.number="getDraft(match).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
-                    <span class="text-muted font-bold text-sm">–</span>
-                    <UInput v-model.number="getDraft(match).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
-                  </div>
-                  <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
-                  <UButton
-                    size="xs"
-                    :loading="saving === match.id"
-                    :disabled="getDraft(match).home === null || getDraft(match).away === null"
-                    icon="i-lucide-save"
-                    @click="saveResult(match)"
-                  />
-                  <UButton
-                    v-if="match.home_score !== null"
-                    size="xs"
-                    color="error"
-                    variant="outline"
-                    :loading="saving === match.id"
-                    icon="i-lucide-trash-2"
-                    @click="clearResult(match)"
-                  />
-                </template>
-
-                <!-- View mode -->
-                <template v-else>
-                  <span v-if="match.home_score !== null" class="font-mono font-bold text-sm text-foreground shrink-0">
-                    {{ match.home_score }} – {{ match.away_score }}
-                  </span>
-                  <UIcon v-else name="i-lucide-lock" class="size-4 text-muted shrink-0" />
-                  <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
-                  <UButton
-                    v-if="match.home_score !== null"
-                    size="xs"
-                    color="neutral"
-                    variant="outline"
-                    icon="i-lucide-pencil"
-                    @click="startEdit(match)"
-                  />
-                </template>
+    <!-- Knockout rounds -->
+    <template v-else-if="currentStepData">
+      <div class="border border-border rounded-lg divide-y divide-border">
+        <div v-for="match in currentStepData.matches" :key="match.id" class="px-4 py-3 space-y-2">
+          <p class="text-xs text-muted text-center">{{ formatKickoff(match.kickoff_at) }}</p>
+          <div class="flex items-center gap-3">
+            <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
+            <template v-if="isEditing(match)">
+              <div class="flex items-center gap-1 shrink-0">
+                <UInput v-model.number="getDraft(match).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
+                <span class="text-muted font-bold text-sm">–</span>
+                <UInput v-model.number="getDraft(match).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
               </div>
-              <!-- Penalties for draws -->
-              <div v-if="isDraw(match)" class="flex items-center justify-center gap-3 pt-1 border-t border-border">
-                <p class="text-xs text-muted">¿Quién avanza en penaltis?</p>
-                <div class="flex gap-2">
-                  <UButton size="xs" :variant="getDraft(match).homeAdvances === true ? 'solid' : 'outline'" color="primary" @click="getDraft(match).homeAdvances = true">
-                    {{ teamName(match, 'home') }}
-                  </UButton>
-                  <UButton size="xs" :variant="getDraft(match).homeAdvances === false ? 'solid' : 'outline'" color="primary" @click="getDraft(match).homeAdvances = false">
-                    {{ teamName(match, 'away') }}
-                  </UButton>
-                </div>
-              </div>
+              <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
+              <UButton size="xs" color="success" :loading="saving === match.id" :disabled="getDraft(match).home === null || getDraft(match).away === null" icon="i-lucide-save" @click="saveResult(match)" />
+              <UButton v-if="match.home_score !== null" size="xs" color="error" variant="outline" :loading="saving === match.id" icon="i-lucide-trash-2" @click="clearResult(match)" />
+            </template>
+            <template v-else>
+              <span v-if="match.home_score !== null" class="font-mono font-bold text-sm text-foreground shrink-0">{{ match.home_score }} – {{ match.away_score }}</span>
+              <UIcon v-else name="i-lucide-lock" class="size-4 text-muted shrink-0" />
+              <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
+              <UButton v-if="match.home_score !== null" size="xs" color="neutral" variant="outline" icon="i-lucide-pencil" @click="startEdit(match)" />
+            </template>
+          </div>
+          <div v-if="isDraw(match)" class="flex items-center justify-center gap-3 pt-1 border-t border-border">
+            <p class="text-xs text-muted">¿Quién avanza en penaltis?</p>
+            <div class="flex gap-2">
+              <UButton size="xs" :variant="getDraft(match).homeAdvances === true ? 'solid' : 'outline'" color="primary" @click="getDraft(match).homeAdvances = true">{{ teamName(match, 'home') }}</UButton>
+              <UButton size="xs" :variant="getDraft(match).homeAdvances === false ? 'solid' : 'outline'" color="primary" @click="getDraft(match).homeAdvances = false">{{ teamName(match, 'away') }}</UButton>
             </div>
           </div>
         </div>
-      </template>
-    </div>
+      </div>
+    </template>
   </div>
 </template>
