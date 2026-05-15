@@ -287,10 +287,10 @@ const completionPct = computed(() =>
   totalMatches.value > 0 ? Math.round((finishedTotal.value / totalMatches.value) * 100) : 0
 )
 
-const syncing = ref(false)
+const syncingMatches = ref(false)
 
 async function syncMatches() {
-  syncing.value = true
+  syncingMatches.value = true
   try {
     const headers = await getAuthHeaders()
     const result = await $fetch<{ updated: number, skipped: number, total: number }>(
@@ -310,7 +310,7 @@ async function syncMatches() {
       color: 'error',
     })
   } finally {
-    syncing.value = false
+    syncingMatches.value = false
   }
 }
 
@@ -383,7 +383,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <h1 class="text-2xl font-bold text-foreground">Resultados</h1>
         <p class="text-sm text-muted mt-1">Introduce los resultados reales de cada partido.</p>
       </div>
-      <UButton v-if="!isAwardsStep" icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncing" @click="syncMatches">
+      <UButton v-if="!isAwardsStep" icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncingMatches" @click="syncMatches">
         Sincronizar
       </UButton>
     </div>
