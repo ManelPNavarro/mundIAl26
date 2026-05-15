@@ -1,27 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ['auth', 'admin'] })
 
-interface Team { id: string, name: string }
-interface Player {
-  id: string
-  name: string
-  position: string | null
-  team: { name: string } | null
-}
-interface Awards {
-  winner_team_id: string | null
-  best_player: string | null
-  best_young_player: string | null
-  top_scorer: string | null
-  best_goalkeeper: string | null
-}
-interface AwardIds {
-  best_player: string | null
-  best_young_player: string | null
-  top_scorer: string | null
-  best_goalkeeper: string | null
-}
-
 type ScoringConfig = Record<string, number>
 
 const supabase = useSupabaseClient()
@@ -33,12 +12,7 @@ async function getAuthHeaders() {
 }
 
 const headers = await getAuthHeaders()
-const [originalConfig, { data: allTeams }, { data: allPlayers }, fetchedAwards] = await Promise.all([
-  $fetch<ScoringConfig>('/api/admin/scoring-config', { headers }),
-  useFetch<Team[]>('/api/teams'),
-  useFetch<Player[]>('/api/players'),
-  $fetch<Awards>('/api/admin/awards', { headers }),
-])
+const originalConfig = await $fetch<ScoringConfig>('/api/admin/scoring-config', { headers })
 
 // ─── Scoring config ──────────────────────────────────────────────────────────
 const config = ref<ScoringConfig>({ ...originalConfig })
@@ -83,97 +57,7 @@ const AWARD_POINT_ROWS = [
   { label: 'Mejor portero',          key: 'award_best_goalkeeper' },
 ]
 
-// ─── Official awards ─────────────────────────────────────────────────────────
-function playerIdByName(name: string | null): string | null {
-  if (!name) return null
-  return allPlayers.value?.find(p => p.name.trim().toLowerCase() === name.trim().toLowerCase())?.id ?? null
-}
 
-function playerNameById(id: string | null): string | null {
-  if (!id) return null
-  return allPlayers.value?.find(p => p.id === id)?.name ?? null
-}
-
-const awards = ref<Awards>({
-  winner_team_id: fetchedAwards?.winner_team_id ?? null,
-  best_player: fetchedAwards?.best_player ?? null,
-  best_young_player: fetchedAwards?.best_young_player ?? null,
-  top_scorer: fetchedAwards?.top_scorer ?? null,
-  best_goalkeeper: fetchedAwards?.best_goalkeeper ?? null,
-})
-
-const awardIds = ref<AwardIds>({
-  best_player: playerIdByName(fetchedAwards?.best_player ?? null),
-  best_young_player: playerIdByName(fetchedAwards?.best_young_player ?? null),
-  top_scorer: playerIdByName(fetchedAwards?.top_scorer ?? null),
-  best_goalkeeper: playerIdByName(fetchedAwards?.best_goalkeeper ?? null),
-})
-
-const originalAwards = { ...awards.value }
-const originalAwardIds = { ...awardIds.value }
-
-const isAwardsDirty = computed(() =>
-  awards.value.winner_team_id !== originalAwards.winner_team_id ||
-  (Object.keys(awardIds.value) as (keyof AwardIds)[]).some(k => awardIds.value[k] !== originalAwardIds[k])
-)
-
-const savingAwards = ref(false)
-const syncing = ref(false)
-
-const teamOptions = computed(() =>
-  (allTeams.value ?? []).map(t => ({ label: t.name, value: t.id }))
-)
-
-async function saveAwards() {
-  savingAwards.value = true
-  try {
-    const h = await getAuthHeaders()
-    await $fetch('/api/admin/awards', {
-      method: 'PATCH',
-      headers: h,
-      body: {
-        winner_team_id: awards.value.winner_team_id,
-        best_player: playerNameById(awardIds.value.best_player),
-        best_young_player: playerNameById(awardIds.value.best_young_player),
-        top_scorer: playerNameById(awardIds.value.top_scorer),
-        best_goalkeeper: playerNameById(awardIds.value.best_goalkeeper),
-      },
-    })
-    Object.assign(originalAwards, awards.value)
-    Object.assign(originalAwardIds, awardIds.value)
-    toast.add({ title: 'Premios guardados', color: 'success' })
-  } catch {
-    toast.add({ title: 'Error al guardar', color: 'error' })
-  } finally {
-    savingAwards.value = false
-  }
-}
-
-function resetAwards() {
-  awards.value = { ...originalAwards }
-  awardIds.value = { ...originalAwardIds }
-}
-
-async function syncPlayers() {
-  syncing.value = true
-  try {
-    const h = await getAuthHeaders()
-    const result = await $fetch<{ synced: number }>('/api/admin/sync-players', { method: 'POST', headers: h })
-    await refreshNuxtData()
-    toast.add({ title: `${result.synced} jugadores sincronizados`, color: 'success' })
-  } catch {
-    toast.add({ title: 'Error al sincronizar jugadores', color: 'error' })
-  } finally {
-    syncing.value = false
-  }
-}
-
-const AWARD_FIELDS: { key: keyof AwardIds, label: string }[] = [
-  { key: 'best_player', label: 'Mejor jugador (MVP)' },
-  { key: 'best_young_player', label: 'Mejor jugador joven' },
-  { key: 'top_scorer', label: 'Máximo goleador' },
-  { key: 'best_goalkeeper', label: 'Mejor portero' },
-]
 </script>
 
 <template>
@@ -240,42 +124,6 @@ const AWARD_FIELDS: { key: keyof AwardIds, label: string }[] = [
           <div v-for="row in AWARD_POINT_ROWS" :key="row.key" class="flex items-center justify-between gap-4">
             <span class="text-sm text-foreground">{{ row.label }}</span>
             <UInput v-model.number="config[row.key]" type="number" min="0" max="999" class="w-20 text-center" size="sm" />
-          </div>
-        </div>
-      </UCard>
-    </div>
-
-    <UDivider />
-
-    <!-- Official awards -->
-    <div class="space-y-4">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <h2 class="text-xl font-bold text-foreground">Premios oficiales</h2>
-          <p class="text-sm text-muted mt-1">Ganadores reales del torneo, para calcular puntuaciones.</p>
-        </div>
-        <div class="flex gap-2">
-          <UButton variant="outline" color="neutral" size="sm" :loading="syncing" icon="i-lucide-refresh-cw" @click="syncPlayers">
-            Sync jugadores
-          </UButton>
-          <UButton variant="outline" color="neutral" size="sm" :disabled="!isAwardsDirty" @click="resetAwards">
-            Descartar
-          </UButton>
-          <UButton size="sm" :loading="savingAwards" :disabled="!isAwardsDirty" icon="i-lucide-save" @click="saveAwards">
-            Guardar
-          </UButton>
-        </div>
-      </div>
-
-      <UCard>
-        <div class="space-y-4">
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-medium text-foreground">Equipo campeón</label>
-            <USelect v-model="awards.winner_team_id" :items="teamOptions" value-key="value" label-key="label" placeholder="Selecciona un equipo..." />
-          </div>
-          <div v-for="field in AWARD_FIELDS" :key="field.key" class="flex flex-col gap-2">
-            <label class="text-sm font-medium text-foreground">{{ field.label }}</label>
-            <PlayerSelect v-model="awardIds[field.key]" :players="allPlayers ?? []" placeholder="Buscar jugador..." />
           </div>
         </div>
       </UCard>

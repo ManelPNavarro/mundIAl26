@@ -19,6 +19,28 @@ interface Match {
   away_team: Team | null
 }
 
+interface Player {
+  id: string
+  name: string
+  position: string | null
+  team: { name: string } | null
+}
+
+interface Awards {
+  winner_team_id: string | null
+  best_player: string | null
+  best_young_player: string | null
+  top_scorer: string | null
+  best_goalkeeper: string | null
+}
+
+interface AwardIds {
+  best_player: string | null
+  best_young_player: string | null
+  top_scorer: string | null
+  best_goalkeeper: string | null
+}
+
 const supabase = useSupabaseClient()
 const toast = useToast()
 
@@ -27,7 +49,13 @@ async function getAuthHeaders() {
   return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}
 }
 
-const { data: matches, refresh } = await useFetch<Match[]>('/api/matches')
+const headers = await getAuthHeaders()
+const [{ data: matches, refresh }, { data: allTeams }, { data: allPlayers }, fetchedAwards] = await Promise.all([
+  useFetch<Match[]>('/api/matches'),
+  useFetch<Team[]>('/api/teams'),
+  useFetch<Player[]>('/api/players'),
+  $fetch<Awards>('/api/admin/awards', { headers }),
+])
 
 function formatKickoff(kickoffAt: string | null): string {
   if (!kickoffAt) return 'Por confirmar'
@@ -118,6 +146,91 @@ async function clearResult(match: Match) {
   }
 }
 
+// ─── Awards ──────────────────────────────────────────────────────────────────
+function playerIdByName(name: string | null): string | null {
+  if (!name) return null
+  return allPlayers.value?.find(p => p.name.trim().toLowerCase() === name.trim().toLowerCase())?.id ?? null
+}
+
+function playerNameById(id: string | null): string | null {
+  if (!id) return null
+  return allPlayers.value?.find(p => p.id === id)?.name ?? null
+}
+
+const awards = ref<Awards>({
+  winner_team_id: fetchedAwards?.winner_team_id ?? null,
+  best_player: fetchedAwards?.best_player ?? null,
+  best_young_player: fetchedAwards?.best_young_player ?? null,
+  top_scorer: fetchedAwards?.top_scorer ?? null,
+  best_goalkeeper: fetchedAwards?.best_goalkeeper ?? null,
+})
+
+const awardIds = ref<AwardIds>({
+  best_player: playerIdByName(fetchedAwards?.best_player ?? null),
+  best_young_player: playerIdByName(fetchedAwards?.best_young_player ?? null),
+  top_scorer: playerIdByName(fetchedAwards?.top_scorer ?? null),
+  best_goalkeeper: playerIdByName(fetchedAwards?.best_goalkeeper ?? null),
+})
+
+const savingAwards = ref(false)
+const syncing = ref(false)
+
+const teamOptions = computed(() =>
+  (allTeams.value ?? []).map(t => ({ label: t.name, value: t.id }))
+)
+
+const awardsComplete = computed(() =>
+  !!awards.value.winner_team_id &&
+  !!awardIds.value.best_player &&
+  !!awardIds.value.best_young_player &&
+  !!awardIds.value.top_scorer &&
+  !!awardIds.value.best_goalkeeper
+)
+
+async function saveAwards() {
+  savingAwards.value = true
+  try {
+    const h = await getAuthHeaders()
+    await $fetch('/api/admin/awards', {
+      method: 'PATCH',
+      headers: h,
+      body: {
+        winner_team_id: awards.value.winner_team_id,
+        best_player: playerNameById(awardIds.value.best_player),
+        best_young_player: playerNameById(awardIds.value.best_young_player),
+        top_scorer: playerNameById(awardIds.value.top_scorer),
+        best_goalkeeper: playerNameById(awardIds.value.best_goalkeeper),
+      },
+    })
+    toast.add({ title: 'Premios guardados', color: 'success' })
+  } catch {
+    toast.add({ title: 'Error al guardar', color: 'error' })
+  } finally {
+    savingAwards.value = false
+  }
+}
+
+async function syncPlayers() {
+  syncing.value = true
+  try {
+    const h = await getAuthHeaders()
+    const result = await $fetch<{ synced: number }>('/api/admin/sync-players', { method: 'POST', headers: h })
+    await refreshNuxtData()
+    toast.add({ title: `${result.synced} jugadores sincronizados`, color: 'success' })
+  } catch {
+    toast.add({ title: 'Error al sincronizar jugadores', color: 'error' })
+  } finally {
+    syncing.value = false
+  }
+}
+
+const AWARD_FIELDS: { key: keyof AwardIds, label: string }[] = [
+  { key: 'best_player', label: 'Mejor jugador (MVP)' },
+  { key: 'best_young_player', label: 'Mejor jugador joven' },
+  { key: 'top_scorer', label: 'Máximo goleador' },
+  { key: 'best_goalkeeper', label: 'Mejor portero' },
+]
+
 const ROUNDS = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
 const ROUND_LABELS: Record<string, string> = {
   GROUP: 'Grupos',
@@ -148,12 +261,17 @@ const steps = computed(() => {
       matches: roundMatches,
       complete: finishedCount(roundMatches) === roundMatches.length,
     }
-  }).filter(Boolean) as { key: string, label: string, matches: Match[], complete: boolean }[]
+  }).filter(Boolean).concat([{
+    key: 'AWARDS',
+    label: 'Premios',
+    matches: [],
+    complete: awardsComplete.value,
+  }]) as { key: string, label: string, matches: Match[], complete: boolean }[]
 })
 
 const currentStep = ref(0)
-
-const currentStepData = computed(() => steps.value[currentStep.value] ?? null)
+const isAwardsStep = computed(() => steps.value[currentStep.value]?.key === 'AWARDS')
+const currentStepData = computed(() => isAwardsStep.value ? null : (steps.value[currentStep.value] ?? null))
 
 const groupsForCurrentStep = computed(() => {
   if (currentStepData.value?.key !== 'GROUP') return null
@@ -265,7 +383,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <h1 class="text-2xl font-bold text-foreground">Resultados</h1>
         <p class="text-sm text-muted mt-1">Introduce los resultados reales de cada partido.</p>
       </div>
-      <UButton icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncing" @click="syncMatches">
+      <UButton v-if="!isAwardsStep" icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncing" @click="syncMatches">
         Sincronizar
       </UButton>
     </div>
@@ -327,6 +445,35 @@ function teamName(match: Match, side: 'home' | 'away'): string {
             </div>
           </div>
         </div>
+      </div>
+    </template>
+
+    <!-- Awards -->
+    <template v-else-if="isAwardsStep">
+      <div class="space-y-4 max-w-md">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-muted">Ganadores reales del torneo.</p>
+          <div class="flex gap-2">
+            <UButton size="sm" variant="outline" color="neutral" :loading="syncing" icon="i-lucide-refresh-cw" @click="syncPlayers">
+              Sync jugadores
+            </UButton>
+            <UButton size="sm" color="success" :loading="savingAwards" icon="i-lucide-save" @click="saveAwards">
+              Guardar premios
+            </UButton>
+          </div>
+        </div>
+        <UCard>
+          <div class="space-y-4">
+            <div class="flex flex-col gap-2">
+              <label class="text-sm font-medium text-foreground">Equipo campeón</label>
+              <USelect v-model="awards.winner_team_id" :items="teamOptions" value-key="value" label-key="label" placeholder="Selecciona un equipo..." />
+            </div>
+            <div v-for="field in AWARD_FIELDS" :key="field.key" class="flex flex-col gap-2">
+              <label class="text-sm font-medium text-foreground">{{ field.label }}</label>
+              <PlayerSelect v-model="awardIds[field.key]" :players="allPlayers ?? []" placeholder="Buscar jugador..." />
+            </div>
+          </div>
+        </UCard>
       </div>
     </template>
 
