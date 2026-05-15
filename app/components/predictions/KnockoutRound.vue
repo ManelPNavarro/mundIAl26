@@ -53,6 +53,13 @@ function scoreFor(m: Match): { home: number, away: number, homeAdvances: boolean
   return null
 }
 
+function matchSideName(m: Match, side: 'home' | 'away'): string | null {
+  const team = side === 'home' ? m.home_team : m.away_team
+  if (team) return team.name
+  const slot = side === 'home' ? m.home_slot : m.away_slot
+  return slot ? resolveSlot(slot) : null
+}
+
 function resolveSlot(slot: string): string | null {
   if (slot.startsWith('W') || slot.startsWith('L')) {
     const winner = slot.startsWith('W')
@@ -62,9 +69,9 @@ function resolveSlot(slot: string): string | null {
     const s = scoreFor(m)
     if (!s) return null
     const homeWins = s.home > s.away || (s.home === s.away && s.homeAdvances === true)
-    const winnerTeam = homeWins ? m.home_team?.name : m.away_team?.name
-    const loserTeam = homeWins ? m.away_team?.name : m.home_team?.name
-    return (winner ? winnerTeam : loserTeam) ?? null
+    return winner
+      ? (homeWins ? matchSideName(m, 'home') : matchSideName(m, 'away'))
+      : (homeWins ? matchSideName(m, 'away') : matchSideName(m, 'home'))
   }
 
   const pos = parseInt(slot[0]!)
