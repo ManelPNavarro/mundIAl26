@@ -196,11 +196,65 @@ async function syncMatches() {
   }
 }
 
-function teamName(match: Match, side: 'home' | 'away'): string {
-  const team = side === 'home' ? match.home_team : match.away_team
+function resolveSlot(slot: string): string | null {
+  const all = matches.value ?? []
+
+  if (slot.startsWith('W') || slot.startsWith('L')) {
+    const winner = slot.startsWith('W')
+    const m = all.find(x => x.match_no === parseInt(slot.slice(1)))
+    if (!m || m.home_score === null || m.away_score === null) return null
+    const homeWins = m.home_score > m.away_score || (m.home_score === m.away_score && m.home_advances === true)
+    const pick = winner ? (homeWins ? 'home' : 'away') : (homeWins ? 'away' : 'home')
+    return matchSideName(m, pick)
+  }
+
+  const pos = parseInt(slot[0]!)
+  const groupLetters = slot.slice(1).split('')
+  if (!isNaN(pos) && groupLetters.length > 0) {
+    const standing = (letter: string) => {
+      const groupMatches = all.filter(x => x.round === 'GROUP' && x.group_letter === letter && x.home_score !== null)
+      const table = new Map<string, { name: string, pts: number, gd: number, gf: number }>()
+      for (const m of groupMatches) {
+        if (!m.home_team || !m.away_team || m.home_score === null || m.away_score === null) continue
+        if (!table.has(m.home_team.id)) table.set(m.home_team.id, { name: m.home_team.name, pts: 0, gd: 0, gf: 0 })
+        if (!table.has(m.away_team.id)) table.set(m.away_team.id, { name: m.away_team.name, pts: 0, gd: 0, gf: 0 })
+        const h = table.get(m.home_team.id)!
+        const a = table.get(m.away_team.id)!
+        h.gf += m.home_score; h.gd += m.home_score - m.away_score
+        a.gf += m.away_score; a.gd += m.away_score - m.home_score
+        if (m.home_score > m.away_score) h.pts += 3
+        else if (m.home_score === m.away_score) { h.pts += 1; a.pts += 1 }
+        else a.pts += 3
+      }
+      return [...table.values()].sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf)
+    }
+    if (groupLetters.length === 1) return standing(groupLetters[0]!)[pos - 1]?.name ?? null
+    const candidates = groupLetters.map(l => standing(l)[pos - 1]).filter(Boolean) as { name: string, pts: number, gd: number, gf: number }[]
+    candidates.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf)
+    return candidates[0]?.name ?? null
+  }
+
+  return null
+}
+
+function matchSideName(m: Match, side: 'home' | 'away'): string | null {
+  const team = side === 'home' ? m.home_team : m.away_team
   if (team) return team.name
+  const slot = side === 'home' ? m.home_slot : m.away_slot
+  return slot ? resolveSlot(slot) : null
+}
+
+function teamName(match: Match, side: 'home' | 'away'): string {
+  const resolved = matchSideName(match, side)
+  if (resolved) return resolved
   const slot = side === 'home' ? match.home_slot : match.away_slot
-  return slot ?? '?'
+  if (!slot) return '?'
+  if (slot.startsWith('W')) return `Gan. P${slot.slice(1)}`
+  if (slot.startsWith('L')) return `Perd. P${slot.slice(1)}`
+  const pos = parseInt(slot[0]!)
+  const group = slot.slice(1)
+  if (!isNaN(pos) && group) return `${pos}º Grupo ${group}`
+  return slot
 }
 </script>
 
