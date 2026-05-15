@@ -178,16 +178,47 @@ function resolveMatchSide(m: Match, side: 'home' | 'away'): string | null {
 }
 
 function resolveSlotName(slot: string): string | null {
-  if (!slot.startsWith('W') && !slot.startsWith('L')) return null
-  const isWinner = slot.startsWith('W')
-  const m = allMatches.value?.find(x => x.match_no === parseInt(slot.slice(1)))
-  if (!m) return null
-  const s = scoreFor(m)
-  if (!s) return null
-  const homeWins = s.home > s.away || (s.home === s.away && s.homeAdvances === true)
-  return isWinner
-    ? (homeWins ? resolveMatchSide(m, 'home') : resolveMatchSide(m, 'away'))
-    : (homeWins ? resolveMatchSide(m, 'away') : resolveMatchSide(m, 'home'))
+  if (slot.startsWith('W') || slot.startsWith('L')) {
+    const isWinner = slot.startsWith('W')
+    const m = allMatches.value?.find(x => x.match_no === parseInt(slot.slice(1)))
+    if (!m) return null
+    const s = scoreFor(m)
+    if (!s) return null
+    const homeWins = s.home > s.away || (s.home === s.away && s.homeAdvances === true)
+    return isWinner
+      ? (homeWins ? resolveMatchSide(m, 'home') : resolveMatchSide(m, 'away'))
+      : (homeWins ? resolveMatchSide(m, 'away') : resolveMatchSide(m, 'home'))
+  }
+
+  const pos = parseInt(slot[0]!)
+  const groupLetters = slot.slice(1).split('')
+  if (!isNaN(pos) && groupLetters.length > 0) {
+    const standing = (letter: string) => {
+      const groupMatches = (allMatches.value ?? []).filter(x => x.round === 'GROUP' && x.group_letter === letter)
+      const table = new Map<string, { name: string, pts: number, gd: number, gf: number }>()
+      for (const m of groupMatches) {
+        if (!m.home_team || !m.away_team) continue
+        const s = scoreFor(m)
+        if (!s) continue
+        if (!table.has(m.home_team.id)) table.set(m.home_team.id, { name: m.home_team.name, pts: 0, gd: 0, gf: 0 })
+        if (!table.has(m.away_team.id)) table.set(m.away_team.id, { name: m.away_team.name, pts: 0, gd: 0, gf: 0 })
+        const h = table.get(m.home_team.id)!
+        const a = table.get(m.away_team.id)!
+        h.gf += s.home; h.gd += s.home - s.away
+        a.gf += s.away; a.gd += s.away - s.home
+        if (s.home > s.away) h.pts += 3
+        else if (s.home === s.away) { h.pts += 1; a.pts += 1 }
+        else a.pts += 3
+      }
+      return [...table.values()].sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf)
+    }
+    if (groupLetters.length === 1) return standing(groupLetters[0]!)[pos - 1]?.name ?? null
+    const candidates = groupLetters.map(l => standing(l)[pos - 1]).filter(Boolean) as { name: string, pts: number, gd: number, gf: number }[]
+    candidates.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf)
+    return candidates[0]?.name ?? null
+  }
+
+  return null
 }
 
 const predictedWinnerTeamId = computed(() => {
