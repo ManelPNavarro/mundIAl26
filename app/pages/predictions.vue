@@ -171,6 +171,23 @@ const predictedWinnerTeamId = computed(() => {
   return p.homeAdvances === true ? (m.home_team?.id ?? null) : (m.away_team?.id ?? null)
 })
 
+const predictedWinnerName = computed(() => {
+  const m = finalMatch.value
+  if (!m) return null
+  const p = predictions.value[m.id]
+  if (p?.home == null || p?.away == null) return null
+  const homeWins = p.home > p.away || (p.home === p.away && p.homeAdvances === true)
+  return (homeWins ? m.home_team?.name : m.away_team?.name) ?? null
+})
+
+const winnerResult = computed(() => {
+  const official = officialAwards?.winner_team_id
+  if (!official) return null
+  const predicted = predictedWinnerTeamId.value
+  const correct = !!predicted && predicted === official
+  return { correct, pts: correct ? (scoringConfig?.award_winner ?? 0) : 0 }
+})
+
 const sideBetsComplete = computed(() =>
   !!sideBetIds.value.best_player &&
   !!sideBetIds.value.best_young_player &&
@@ -362,6 +379,27 @@ function randomize() {
           <p class="text-sm text-muted mt-0.5">Adivina los ganadores de los premios individuales al final del Mundial.</p>
         </div>
         <div class="space-y-4 max-w-md">
+          <!-- Champion derived from Final prediction -->
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium text-foreground">Equipo campeón</label>
+            <div
+              v-if="predictedWinnerName"
+              :class="[
+                'px-4 py-3 rounded-md border-2 text-sm font-semibold flex items-center justify-between',
+                winnerResult?.correct ? 'border-success text-success bg-success/10' :
+                winnerResult?.correct === false ? 'border-error text-error bg-error/10' :
+                'border-primary text-primary bg-primary/10'
+              ]"
+            >
+              <div class="flex items-center gap-2">
+                <UIcon name="i-lucide-trophy" class="size-4 shrink-0" />
+                <span>{{ predictedWinnerName }}</span>
+              </div>
+              <span v-if="winnerResult?.correct" class="text-xs font-semibold">+{{ winnerResult.pts }} pts</span>
+            </div>
+            <p v-else class="text-xs text-muted">Se determinará según tu predicción de la Final.</p>
+          </div>
+
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor jugador (MVP)</label>
             <div v-if="officialAwards?.best_player" :class="['px-3 py-2 rounded-md border text-sm font-medium flex items-center justify-between', awardResult('best_player')?.correct ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
