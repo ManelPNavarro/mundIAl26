@@ -200,7 +200,7 @@ const sideBetsFilled = computed(() =>
     .filter(Boolean).length
 )
 
-const totalItems = computed(() => (allMatches.value?.length ?? 0) + 5)
+const totalItems = computed(() => (allMatches.value?.length ?? 0) + 4)
 const totalFilled = computed(() => {
   const matchFilled = (allMatches.value ?? []).filter(m => isFilled(m.id)).length
   return matchFilled + sideBetsFilled.value
