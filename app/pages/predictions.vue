@@ -59,13 +59,14 @@ interface MatchSummary {
   isCorrect: boolean
 }
 
-const [{ data: allMatches }, { data: allPlayers }, savedPredictions, savedSideBets, matchSummary, officialAwards] = await Promise.all([
+const [{ data: allMatches }, { data: allPlayers }, savedPredictions, savedSideBets, matchSummary, officialAwards, scoringConfig] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
   useFetch<Player[]>('/api/players'),
   $fetch<Predictions>('/api/predictions', { headers }),
   $fetch<SideBets | null>('/api/side-bets', { headers }),
   $fetch<Record<string, MatchSummary>>('/api/predictions/summary', { headers }),
   $fetch<SideBets | null>('/api/awards'),
+  $fetch<Record<string, number>>('/api/scoring-config'),
 ])
 
 function playerIdByName(name: string | null): string | null {
@@ -89,12 +90,22 @@ const sideBetIds = ref<SideBetIds>({
 })
 const currentStep = ref(0)
 
-function awardResult(field: keyof SideBets): 'correct' | 'wrong' | null {
+const AWARD_SCORE_KEY: Partial<Record<keyof SideBets, string>> = {
+  winner_team_id: 'award_winner',
+  best_player: 'award_best_player',
+  best_young_player: 'award_best_young_player',
+  top_scorer: 'award_top_scorer',
+  best_goalkeeper: 'award_best_goalkeeper',
+}
+
+function awardResult(field: keyof SideBets): { correct: boolean, pts: number } | null {
   const official = officialAwards?.[field]
   if (!official) return null
   const user = sideBets.value[field]
   if (!user) return null
-  return user.toLowerCase() === (official as string).toLowerCase() ? 'correct' : 'wrong'
+  const correct = user.toLowerCase() === (official as string).toLowerCase()
+  const pts = correct ? (scoringConfig?.[AWARD_SCORE_KEY[field]!] ?? 0) : 0
+  return { correct, pts }
 }
 
 
@@ -353,29 +364,33 @@ function randomize() {
         <div class="space-y-4 max-w-md">
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor jugador (MVP)</label>
-            <div v-if="officialAwards?.best_player" :class="['px-3 py-2 rounded-md border text-sm font-medium', awardResult('best_player') === 'correct' ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
-              {{ sideBets.best_player ?? '—' }}
+            <div v-if="officialAwards?.best_player" :class="['px-3 py-2 rounded-md border text-sm font-medium flex items-center justify-between', awardResult('best_player')?.correct ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
+              <span>{{ sideBets.best_player ?? '—' }}</span>
+              <span v-if="awardResult('best_player')?.correct" class="text-xs font-semibold">+{{ awardResult('best_player')!.pts }} pts</span>
             </div>
             <PlayerSelect v-else v-model="sideBetIds.best_player" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor jugador joven</label>
-            <div v-if="officialAwards?.best_young_player" :class="['px-3 py-2 rounded-md border text-sm font-medium', awardResult('best_young_player') === 'correct' ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
-              {{ sideBets.best_young_player ?? '—' }}
+            <div v-if="officialAwards?.best_young_player" :class="['px-3 py-2 rounded-md border text-sm font-medium flex items-center justify-between', awardResult('best_young_player')?.correct ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
+              <span>{{ sideBets.best_young_player ?? '—' }}</span>
+              <span v-if="awardResult('best_young_player')?.correct" class="text-xs font-semibold">+{{ awardResult('best_young_player')!.pts }} pts</span>
             </div>
             <PlayerSelect v-else v-model="sideBetIds.best_young_player" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Máximo goleador</label>
-            <div v-if="officialAwards?.top_scorer" :class="['px-3 py-2 rounded-md border text-sm font-medium', awardResult('top_scorer') === 'correct' ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
-              {{ sideBets.top_scorer ?? '—' }}
+            <div v-if="officialAwards?.top_scorer" :class="['px-3 py-2 rounded-md border text-sm font-medium flex items-center justify-between', awardResult('top_scorer')?.correct ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
+              <span>{{ sideBets.top_scorer ?? '—' }}</span>
+              <span v-if="awardResult('top_scorer')?.correct" class="text-xs font-semibold">+{{ awardResult('top_scorer')!.pts }} pts</span>
             </div>
             <PlayerSelect v-else v-model="sideBetIds.top_scorer" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor portero</label>
-            <div v-if="officialAwards?.best_goalkeeper" :class="['px-3 py-2 rounded-md border text-sm font-medium', awardResult('best_goalkeeper') === 'correct' ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
-              {{ sideBets.best_goalkeeper ?? '—' }}
+            <div v-if="officialAwards?.best_goalkeeper" :class="['px-3 py-2 rounded-md border text-sm font-medium flex items-center justify-between', awardResult('best_goalkeeper')?.correct ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
+              <span>{{ sideBets.best_goalkeeper ?? '—' }}</span>
+              <span v-if="awardResult('best_goalkeeper')?.correct" class="text-xs font-semibold">+{{ awardResult('best_goalkeeper')!.pts }} pts</span>
             </div>
             <PlayerSelect v-else v-model="sideBetIds.best_goalkeeper" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
