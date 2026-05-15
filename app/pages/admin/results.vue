@@ -173,7 +173,7 @@ const awardIds = ref<AwardIds>({
 })
 
 const savingAwards = ref(false)
-const syncing = ref(false)
+const syncingPlayers = ref(false)
 
 const teamOptions = computed(() =>
   (allTeams.value ?? []).map(t => ({ label: t.name, value: t.id }))
@@ -211,7 +211,7 @@ async function saveAwards() {
 }
 
 async function syncPlayers() {
-  syncing.value = true
+  syncingPlayers.value = true
   try {
     const h = await getAuthHeaders()
     const result = await $fetch<{ synced: number }>('/api/admin/sync-players', { method: 'POST', headers: h })
@@ -220,7 +220,7 @@ async function syncPlayers() {
   } catch {
     toast.add({ title: 'Error al sincronizar jugadores', color: 'error' })
   } finally {
-    syncing.value = false
+    syncingPlayers.value = false
   }
 }
 
@@ -454,7 +454,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <div class="flex items-center justify-between">
           <p class="text-sm text-muted">Ganadores reales del torneo.</p>
           <div class="flex gap-2">
-            <UButton size="sm" variant="outline" color="neutral" :loading="syncing" icon="i-lucide-refresh-cw" @click="syncPlayers">
+            <UButton size="sm" variant="outline" color="neutral" :loading="syncingPlayers" icon="i-lucide-refresh-cw" @click="syncPlayers">
               Sync jugadores
             </UButton>
             <UButton size="sm" color="success" :loading="savingAwards" icon="i-lucide-save" @click="saveAwards">
