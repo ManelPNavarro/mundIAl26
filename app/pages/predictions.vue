@@ -448,7 +448,7 @@ function randomize() {
                 'px-4 py-3 rounded-md border-2 text-sm font-semibold flex items-center justify-between',
                 winnerResult?.correct ? 'border-success text-success bg-success/10' :
                 winnerResult?.correct === false ? 'border-error text-error bg-error/10' :
-                'border-primary text-primary bg-primary/10'
+                'border-border text-muted bg-muted/20'
               ]"
             >
               <div class="flex items-center gap-2">
