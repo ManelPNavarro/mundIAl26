@@ -175,9 +175,23 @@ const awardIds = ref<AwardIds>({
 const savingAwards = ref(false)
 const syncingPlayers = ref(false)
 
-const teamOptions = computed(() =>
-  (allTeams.value ?? []).map(t => ({ label: t.name, value: t.id }))
-)
+const finalMatch = computed(() => (matches.value ?? []).find(m => m.round === 'FINAL') ?? null)
+
+const finalWinnerId = computed((): string | null => {
+  const m = finalMatch.value
+  if (!m || m.home_score === null || m.away_score === null) return null
+  const homeWins = m.home_score > m.away_score || (m.home_score === m.away_score && m.home_advances === true)
+  return homeWins ? (m.home_team?.id ?? null) : (m.away_team?.id ?? null)
+})
+
+const finalWinnerName = computed((): string | null => {
+  const m = finalMatch.value
+  if (!m || m.home_score === null || m.away_score === null) return null
+  const homeWins = m.home_score > m.away_score || (m.home_score === m.away_score && m.home_advances === true)
+  return homeWins ? (m.home_team?.name ?? null) : (m.away_team?.name ?? null)
+})
+
+watch(finalWinnerId, id => { awards.value.winner_team_id = id }, { immediate: true })
 
 const awardsComplete = computed(() =>
   !!awards.value.winner_team_id &&
@@ -464,9 +478,13 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         </div>
         <UCard>
           <div class="space-y-4">
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-1">
               <label class="text-sm font-medium text-foreground">Equipo campeón</label>
-              <USelect v-model="awards.winner_team_id" :items="teamOptions" value-key="value" label-key="label" placeholder="Selecciona un equipo..." />
+              <p v-if="finalWinnerName" class="text-sm font-semibold text-success flex items-center gap-1.5">
+                <UIcon name="i-lucide-trophy" class="size-4" />
+                {{ finalWinnerName }}
+              </p>
+              <p v-else class="text-sm text-muted italic">Se determinará al finalizar la Final</p>
             </div>
             <div v-for="field in AWARD_FIELDS" :key="field.key" class="flex flex-col gap-2">
               <label class="text-sm font-medium text-foreground">{{ field.label }}</label>
