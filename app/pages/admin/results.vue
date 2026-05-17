@@ -177,18 +177,17 @@ const syncingPlayers = ref(false)
 
 const finalMatch = computed(() => (matches.value ?? []).find(m => m.round === 'FINAL') ?? null)
 
-const finalWinnerId = computed((): string | null => {
-  const m = finalMatch.value
-  if (!m || m.home_score === null || m.away_score === null) return null
-  const homeWins = m.home_score > m.away_score || (m.home_score === m.away_score && m.home_advances === true)
-  return homeWins ? (m.home_team?.id ?? null) : (m.away_team?.id ?? null)
-})
-
 const finalWinnerName = computed((): string | null => {
   const m = finalMatch.value
   if (!m || m.home_score === null || m.away_score === null) return null
   const homeWins = m.home_score > m.away_score || (m.home_score === m.away_score && m.home_advances === true)
-  return homeWins ? (m.home_team?.name ?? null) : (m.away_team?.name ?? null)
+  return matchSideName(m, homeWins ? 'home' : 'away')
+})
+
+const finalWinnerId = computed((): string | null => {
+  const name = finalWinnerName.value
+  if (!name) return null
+  return allTeams.value?.find(t => t.name === name)?.id ?? null
 })
 
 watch(finalWinnerId, id => { awards.value.winner_team_id = id }, { immediate: true })
