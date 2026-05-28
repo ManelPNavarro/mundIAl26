@@ -469,7 +469,7 @@ function randomize() {
             <PlayerSelect v-else v-model="sideBetIds.best_player" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
-            <label class="text-sm font-medium text-foreground">Mejor jugador joven</label>
+            <label class="text-sm font-medium text-foreground">Mejor jugador joven <span class="text-muted-foreground font-normal">(-21 años)</span></label>
             <div v-if="officialAwards?.best_young_player" :class="['px-3 py-2 rounded-md border text-sm font-medium flex items-center justify-between', awardResult('best_young_player')?.correct ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
               <span>{{ sideBets.best_young_player ?? '—' }}</span>
               <span v-if="awardResult('best_young_player')?.correct" class="text-xs font-semibold">+{{ awardResult('best_young_player')!.pts }} pts</span>
