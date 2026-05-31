@@ -197,7 +197,7 @@ function isFilled(id: string) {
 
 const groupMatchIds = computed(() => groupStageGroups.value.flatMap(g => g.matches.map(m => m.id)))
 const groupFilled = computed(() => groupMatchIds.value.filter(isFilled).length)
-const groupComplete = computed(() => groupFilled.value === groupMatchIds.value.length)
+const groupComplete = computed(() => groupMatchIds.value.length > 0 && groupFilled.value === groupMatchIds.value.length)
 
 const finalMatch = computed(() => allMatches.value?.find(m => m.round === 'FINAL') ?? null)
 
@@ -322,7 +322,7 @@ const steps = computed(() => [
       key: round.key,
       title: round.label,
       description: `${filled}/${round.matches.length} partidos`,
-      complete: filled === round.matches.length,
+      complete: round.matches.length > 0 && filled === round.matches.length,
     }
   }),
   {
