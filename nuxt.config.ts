@@ -18,6 +18,5 @@ export default defineNuxtConfig({
     supabaseUrl: process.env.SUPABASE_URL,
     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY,
     footballDataApiKey: process.env.FOOTBALL_DATA_API_KEY,
-    apiSportsKey: process.env.API_SPORTS_KEY,
   },
 })
