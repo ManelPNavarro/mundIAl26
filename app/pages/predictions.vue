@@ -441,10 +441,6 @@ function randomize() {
           {{ step.title }}
         </button>
       </div>
-      <div class="shrink-0 flex flex-col items-center leading-none pt-1">
-        <span class="text-sm font-bold" :class="completionPct === 100 ? 'text-success' : 'text-primary'">{{ completionPct }}%</span>
-        <span class="text-xs text-muted mt-0.5">completado</span>
-      </div>
     </div>
 
     <!-- Locked banners -->
