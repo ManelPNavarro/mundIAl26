@@ -461,28 +461,7 @@ async function save() {
           <p class="text-sm text-muted mt-0.5">Adivina los ganadores de los premios individuales al final del Mundial.</p>
         </div>
         <div class="space-y-4 max-w-md">
-          <!-- Champion derived from Final prediction -->
-          <div class="flex flex-col gap-2">
-            <label class="text-sm font-medium text-foreground">Equipo campeón</label>
-            <div
-              v-if="predictedWinnerName"
-              :class="[
-                'px-4 py-3 rounded-md border-2 text-sm font-semibold flex items-center justify-between',
-                winnerResult?.correct ? 'border-success text-success bg-success/10' :
-                winnerResult?.correct === false ? 'border-error text-error bg-error/10' :
-                'border-border text-muted bg-muted/20'
-              ]"
-            >
-              <div class="flex items-center gap-2">
-                <UIcon name="i-lucide-trophy" class="size-4 shrink-0" />
-                <span>{{ predictedWinnerName }}</span>
-              </div>
-              <span v-if="winnerResult?.correct" class="text-xs font-semibold">+{{ winnerResult.pts }} pts</span>
-            </div>
-            <p v-else class="text-xs text-muted">Se determinará según tu predicción de la Final.</p>
-          </div>
-
-          <div class="flex flex-col gap-2">
+<div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor jugador (MVP)</label>
             <div v-if="officialAwards?.best_player" :class="['px-3 py-2 rounded-md border text-sm font-medium flex items-center justify-between', awardResult('best_player')?.correct ? 'border-success text-success bg-success/10' : 'border-error text-error bg-error/10']">
               <span>{{ sideBets.best_player ?? '—' }}</span>
