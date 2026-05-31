@@ -89,7 +89,7 @@ const sideBetIds = ref<SideBetIds>({
   top_scorer: playerIdByName(savedSideBets?.top_scorer ?? null),
   best_goalkeeper: playerIdByName(savedSideBets?.best_goalkeeper ?? null),
 })
-const currentStep = ref(openStepIndex.value)
+const currentStep = ref(0)
 
 const AWARD_SCORE_KEY: Partial<Record<keyof SideBets, string>> = {
   winner_team_id: 'award_winner',
@@ -125,7 +125,10 @@ const timeLeft = computed(() => {
   }
 })
 let timer: ReturnType<typeof setInterval>
-onMounted(() => { timer = setInterval(() => { now.value = new Date() }, 1000) })
+onMounted(() => {
+  timer = setInterval(() => { now.value = new Date() }, 1000)
+  currentStep.value = openStepIndex.value
+})
 onUnmounted(() => clearInterval(timer))
 
 const openRound = computed(() => {
