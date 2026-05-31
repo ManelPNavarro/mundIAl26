@@ -534,8 +534,8 @@ async function save() {
       </div>
     </div>
 
-    <!-- Countdown -->
-    <div v-if="timeLeft && !isLocked" class="flex items-center justify-center gap-2 text-xs text-muted">
+    <!-- Countdown (only relevant for group phase and premios) -->
+    <div v-if="timeLeft && !isLocked && (currentStep === 0 || isAwardsStep)" class="flex items-center justify-center gap-2 text-xs text-muted">
       <UIcon name="i-lucide-clock" class="size-3 shrink-0" />
       <span>Cierra en</span>
       <span class="font-mono font-medium text-foreground">
