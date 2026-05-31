@@ -396,18 +396,6 @@ async function save() {
   }
 }
 
-// ─── Randomize ───────────────────────────────────────────────────────────────
-function randomScore() {
-  return [0,0,0,1,1,1,2,2,2,3,3,4][Math.floor(Math.random() * 12)]!
-}
-
-function randomize() {
-  for (const match of allMatches.value ?? []) {
-    const home = randomScore()
-    const away = randomScore()
-    predictions.value[match.id] = { home, away, homeAdvances: home === away ? Math.random() > 0.5 : null }
-  }
-}
 </script>
 
 <template>
@@ -417,9 +405,6 @@ function randomize() {
         <h1 class="text-2xl font-bold text-foreground">Predicciones</h1>
         <p class="text-sm text-muted mt-1">Introduce tus resultados para cada fase del torneo.</p>
       </div>
-      <UButton v-if="!isLocked && !isAwardsStep" variant="outline" color="neutral" icon="i-lucide-shuffle" size="sm" @click="randomize">
-        Aleatorio
-      </UButton>
     </div>
 
     <!-- Stepper -->
