@@ -416,14 +416,14 @@ async function save() {
           class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
           :class="[
             idx === currentStep ? 'bg-primary border-primary text-white'
+            : !isStepNavigable(idx) ? 'bg-muted/20 border-border text-muted/50 cursor-not-allowed'
             : step.complete ? 'bg-success/10 border-success/30 text-success hover:bg-success/20 cursor-pointer'
-            : isStepNavigable(idx) ? 'bg-muted/50 border-border text-muted hover:bg-muted cursor-pointer'
-            : 'bg-muted/20 border-border text-muted/50 cursor-not-allowed',
+            : 'bg-muted/50 border-border text-muted hover:bg-muted cursor-pointer',
           ]"
           :disabled="!isStepNavigable(idx)"
           @click="isStepNavigable(idx) ? currentStep = idx : null"
         >
-          <UIcon v-if="step.complete && idx !== currentStep" name="i-lucide-check" class="size-3" />
+          <UIcon v-if="step.complete && idx !== currentStep && isStepNavigable(idx)" name="i-lucide-check" class="size-3" />
           <UIcon v-else-if="!isStepNavigable(idx)" name="i-lucide-lock" class="size-3" />
           <span v-else class="font-bold">{{ idx + 1 }}</span>
           {{ step.title }}
