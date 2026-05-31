@@ -427,6 +427,7 @@ async function save() {
           <UIcon v-else-if="!isStepNavigable(idx)" name="i-lucide-lock" class="size-3" />
           <span v-else class="font-bold">{{ idx + 1 }}</span>
           {{ step.title }}
+          <span v-if="step.key === 'awards' && !step.complete && !groupDeadlinePassed" class="size-2 rounded-full bg-warning animate-pulse shrink-0" />
         </button>
       </div>
     </div>
@@ -446,6 +447,11 @@ async function save() {
     <UAlert v-if="steps.every(s => s.complete) && !isLocked" color="success" variant="soft"
       icon="i-lucide-party-popper" title="¡Predicción finalizada!"
       description="Has completado todas las fases y tus apuestas de premios. ¡Suerte!" />
+
+    <!-- Premios nudge (shown on group step while deadline hasn't passed and premios unfilled) -->
+    <UAlert v-if="currentStep === 0 && !groupDeadlinePassed && !sideBetsComplete" color="warning" variant="soft"
+      icon="i-lucide-trophy" title="Recuerda rellenar los Premios"
+      description="Los premios también cierran el 11 de junio. Encuéntralos en la última pestaña." />
 
     <!-- Step content -->
     <div>
