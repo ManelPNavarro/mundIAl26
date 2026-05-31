@@ -6,6 +6,7 @@ interface Match {
   id: string
   match_no: number
   round: string
+  status: string
   matchday: number | null
   group_letter: string | null
   home_slot: string | null
@@ -88,7 +89,7 @@ const sideBetIds = ref<SideBetIds>({
   top_scorer: playerIdByName(savedSideBets?.top_scorer ?? null),
   best_goalkeeper: playerIdByName(savedSideBets?.best_goalkeeper ?? null),
 })
-const currentStep = ref(0)
+const currentStep = ref(openStepIndex.value)
 
 const AWARD_SCORE_KEY: Partial<Record<keyof SideBets, string>> = {
   winner_team_id: 'award_winner',
@@ -109,12 +110,12 @@ function awardResult(field: keyof SideBets): { correct: boolean, pts: number } |
 }
 
 
-// ─── Deadline & countdown ───────────────────────────────────────────────────
-const DEADLINE = new Date('2026-06-11T00:00:00')
+// ─── Deadline & phase locking ────────────────────────────────────────────────
+const GROUP_DEADLINE = new Date('2026-06-11T00:00:00')
 const now = ref(new Date())
-const isLocked = computed(() => now.value >= DEADLINE)
+const groupDeadlinePassed = computed(() => now.value >= GROUP_DEADLINE)
 const timeLeft = computed(() => {
-  const diff = DEADLINE.getTime() - now.value.getTime()
+  const diff = GROUP_DEADLINE.getTime() - now.value.getTime()
   if (diff <= 0) return null
   return {
     days: Math.floor(diff / 86400000),
@@ -126,6 +127,42 @@ const timeLeft = computed(() => {
 let timer: ReturnType<typeof setInterval>
 onMounted(() => { timer = setInterval(() => { now.value = new Date() }, 1000) })
 onUnmounted(() => clearInterval(timer))
+
+const openRound = computed(() => {
+  const matches = allMatches.value ?? []
+  for (const round of ROUND_ORDER) {
+    const roundMatches = matches.filter(m => m.round === round)
+    if (roundMatches.length === 0) continue
+    if (roundMatches.every(m => m.status === 'FINISHED')) continue
+    return round
+  }
+  return null
+})
+
+function isRoundLocked(round: string): boolean {
+  if (round === 'GROUP') return groupDeadlinePassed.value || openRound.value !== 'GROUP'
+  return openRound.value !== round
+}
+
+function isStepNavigable(idx: number): boolean {
+  const step = steps.value[idx]
+  if (!step) return false
+  if (step.key === 'awards') return true
+  const round = step.key === 'groups' ? 'GROUP' : step.key
+  const roundMatches = (allMatches.value ?? []).filter(m => m.round === round)
+  if (roundMatches.length === 0) return false
+  return roundMatches.every(m => m.status === 'FINISHED') || openRound.value === round
+}
+
+const currentStepRound = computed(() => {
+  if (isAwardsStep.value) return null
+  return currentStep.value === 0 ? 'GROUP' : (currentRound.value?.key ?? null)
+})
+
+const isLocked = computed(() => {
+  if (isAwardsStep.value) return openRound.value === null
+  return !currentStepRound.value || isRoundLocked(currentStepRound.value)
+})
 
 // ─── Match grouping ──────────────────────────────────────────────────────────
 const ROUND_ORDER = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
@@ -298,6 +335,13 @@ const currentRound = computed(() =>
   !isAwardsStep.value && currentStep.value > 0 ? knockoutRounds.value[currentStep.value - 1] : null
 )
 
+const openStepIndex = computed(() => {
+  if (!openRound.value) return steps.value.length - 1
+  if (openRound.value === 'GROUP') return 0
+  const idx = knockoutRounds.value.findIndex(r => r.key === openRound.value)
+  return idx >= 0 ? idx + 1 : 0
+})
+
 // ─── Save ────────────────────────────────────────────────────────────────────
 const saving = ref(false)
 
@@ -349,19 +393,6 @@ async function save() {
   }
 }
 
-async function advance() {
-  if (isLocked.value) return
-  saving.value = true
-  try {
-    await saveMatches()
-    if (currentStep.value < steps.value.length - 1) currentStep.value++
-  } catch {
-    toast.add({ title: 'Error al guardar', color: 'error' })
-  } finally {
-    saving.value = false
-  }
-}
-
 // ─── Randomize ───────────────────────────────────────────────────────────────
 function randomScore() {
   return [0,0,0,1,1,1,2,2,2,3,3,4][Math.floor(Math.random() * 12)]!
@@ -398,13 +429,14 @@ function randomize() {
           :class="[
             idx === currentStep ? 'bg-primary border-primary text-white'
             : step.complete ? 'bg-success/10 border-success/30 text-success hover:bg-success/20 cursor-pointer'
-            : idx < currentStep ? 'bg-muted/50 border-border text-muted hover:bg-muted cursor-pointer'
+            : isStepNavigable(idx) ? 'bg-muted/50 border-border text-muted hover:bg-muted cursor-pointer'
             : 'bg-muted/20 border-border text-muted/50 cursor-not-allowed',
           ]"
-          :disabled="idx > currentStep && !steps[idx - 1]?.complete"
-          @click="idx <= currentStep || steps[idx - 1]?.complete ? currentStep = idx : null"
+          :disabled="!isStepNavigable(idx)"
+          @click="isStepNavigable(idx) ? currentStep = idx : null"
         >
           <UIcon v-if="step.complete && idx !== currentStep" name="i-lucide-check" class="size-3" />
+          <UIcon v-else-if="!isStepNavigable(idx)" name="i-lucide-lock" class="size-3" />
           <span v-else class="font-bold">{{ idx + 1 }}</span>
           {{ step.title }}
         </button>
@@ -415,10 +447,16 @@ function randomize() {
       </div>
     </div>
 
-    <!-- Locked banner -->
-    <UAlert v-if="isLocked" color="error" variant="soft" icon="i-lucide-lock"
-      title="Predicciones cerradas"
-      description="El plazo para introducir predicciones finalizó el 10 de junio. ¡Que empiece el Mundial!" />
+    <!-- Locked banners -->
+    <UAlert v-if="isLocked && currentStepRound === 'GROUP' && groupDeadlinePassed" color="error" variant="soft" icon="i-lucide-lock"
+      title="Fase de grupos cerrada"
+      description="El plazo para predecir la fase de grupos finalizó el 10 de junio." />
+    <UAlert v-else-if="isLocked && !isAwardsStep && currentStepRound && openRound && ROUND_ORDER.indexOf(currentStepRound) > ROUND_ORDER.indexOf(openRound)" color="neutral" variant="soft" icon="i-lucide-lock"
+      :title="`${ROUND_LABELS[currentStepRound]} bloqueada`"
+      :description="`Esta fase se desbloqueará cuando ${ROUND_LABELS[openRound]} haya finalizado.`" />
+    <UAlert v-else-if="isLocked && !isAwardsStep && openRound === null" color="neutral" variant="soft" icon="i-lucide-flag"
+      title="Torneo finalizado"
+      description="Todas las fases han concluido." />
 
     <!-- Completed banner -->
     <UAlert v-if="steps.every(s => s.complete) && !isLocked" color="success" variant="soft"
@@ -507,12 +545,12 @@ function randomize() {
         <span class="text-xs text-muted">{{ steps[currentStep]?.description }}</span>
         <UButton
           v-if="!isAwardsStep"
-          :disabled="!steps[currentStep]?.complete || isLocked"
+          :disabled="isLocked"
           :loading="saving"
-          trailing-icon="i-lucide-arrow-right"
-          @click="advance"
+          icon="i-lucide-save"
+          @click="save"
         >
-          Guardar y continuar
+          Guardar
         </UButton>
         <UButton
           v-else
