@@ -163,7 +163,7 @@ const currentStepRound = computed(() => {
 })
 
 const isLocked = computed(() => {
-  if (isAwardsStep.value) return openRound.value === null
+  if (isAwardsStep.value) return groupDeadlinePassed.value
   return !currentStepRound.value || isRoundLocked(currentStepRound.value)
 })
 
