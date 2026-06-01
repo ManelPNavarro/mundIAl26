@@ -61,9 +61,10 @@ interface MatchSummary {
   isCorrect: boolean
 }
 
-const [{ data: allMatches }, { data: allPlayers }, savedPredictions, savedSideBets, matchSummary, officialAwards, scoringConfig] = await Promise.all([
+const [{ data: allMatches }, { data: allPlayers }, { data: roundLocks }, savedPredictions, savedSideBets, matchSummary, officialAwards, scoringConfig] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
   useFetch<Player[]>('/api/players'),
+  useFetch<Record<string, boolean>>('/api/round-locks'),
   $fetch<Predictions>('/api/predictions', { headers }),
   $fetch<SideBets | null>('/api/side-bets', { headers }),
   $fetch<Record<string, MatchSummary>>('/api/predictions/summary', { headers }),
@@ -111,51 +112,13 @@ function awardResult(field: keyof SideBets): { correct: boolean, pts: number } |
 }
 
 
-// ─── Deadline & phase locking ────────────────────────────────────────────────
-const GROUP_DEADLINE = new Date('2026-06-11T00:00:00')
-const now = ref(new Date())
-const groupDeadlinePassed = computed(() => now.value >= GROUP_DEADLINE)
-const timeLeft = computed(() => {
-  const diff = GROUP_DEADLINE.getTime() - now.value.getTime()
-  if (diff <= 0) return null
-  return {
-    days: Math.floor(diff / 86400000),
-    hours: Math.floor((diff % 86400000) / 3600000),
-    minutes: Math.floor((diff % 3600000) / 60000),
-    seconds: Math.floor((diff % 60000) / 1000),
-  }
-})
-let timer: ReturnType<typeof setInterval>
-onMounted(() => {
-  timer = setInterval(() => { now.value = new Date() }, 1000)
-  currentStep.value = openStepIndex.value
-})
-onUnmounted(() => clearInterval(timer))
-
-const openRound = computed(() => {
-  const matches = allMatches.value ?? []
-  for (const round of ROUND_ORDER) {
-    const roundMatches = matches.filter(m => m.round === round)
-    if (roundMatches.length === 0) continue
-    if (roundMatches.every(m => m.status === 'FINISHED')) continue
-    return round
-  }
-  return null
-})
-
-function isRoundLocked(round: string): boolean {
-  if (round === 'GROUP') return groupDeadlinePassed.value || openRound.value !== 'GROUP'
-  return openRound.value !== round
+// ─── Round locks (admin-controlled semaphores) ───────────────────────────────
+function isRoundOpen(round: string): boolean {
+  return roundLocks.value?.[round] === true
 }
 
 function isStepNavigable(idx: number): boolean {
-  const step = steps.value[idx]
-  if (!step) return false
-  if (step.key === 'awards') return true
-  const round = step.key === 'groups' ? 'GROUP' : step.key
-  const roundMatches = (allMatches.value ?? []).filter(m => m.round === round)
-  if (roundMatches.length === 0) return false
-  return roundMatches.every(m => m.status === 'FINISHED') || openRound.value === round
+  return true
 }
 
 const currentStepRound = computed(() => {
@@ -164,9 +127,11 @@ const currentStepRound = computed(() => {
 })
 
 const isLocked = computed(() => {
-  if (isAwardsStep.value) return groupDeadlinePassed.value
-  return !currentStepRound.value || isRoundLocked(currentStepRound.value)
+  if (isAwardsStep.value) return !isRoundOpen('GROUP')
+  return !currentStepRound.value || !isRoundOpen(currentStepRound.value)
 })
+
+onMounted(() => { currentStep.value = openStepIndex.value })
 
 // ─── Match grouping ──────────────────────────────────────────────────────────
 const ROUND_ORDER = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
@@ -340,10 +305,11 @@ const currentRound = computed(() =>
 )
 
 const openStepIndex = computed(() => {
-  if (!openRound.value) return steps.value.length - 1
-  if (openRound.value === 'GROUP') return 0
-  const idx = knockoutRounds.value.findIndex(r => r.key === openRound.value)
-  return idx >= 0 ? idx + 1 : 0
+  if (isRoundOpen('GROUP')) return 0
+  for (let i = 0; i < knockoutRounds.value.length; i++) {
+    if (isRoundOpen(knockoutRounds.value[i]!.key)) return i + 1
+  }
+  return steps.value.length - 1
 })
 
 // ─── Save ────────────────────────────────────────────────────────────────────
@@ -417,42 +383,34 @@ async function save() {
           class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
           :class="[
             idx === currentStep ? 'bg-primary border-primary text-white'
-            : !isStepNavigable(idx) ? 'bg-muted/20 border-border text-muted/50 cursor-not-allowed'
             : step.complete ? 'bg-success/10 border-success/30 text-success hover:bg-success/20 cursor-pointer'
             : 'bg-muted/50 border-border text-muted hover:bg-muted cursor-pointer',
           ]"
-          :disabled="!isStepNavigable(idx)"
-          @click="isStepNavigable(idx) ? currentStep = idx : null"
+          @click="currentStep = idx"
         >
-          <UIcon v-if="step.complete && idx !== currentStep && isStepNavigable(idx)" name="i-lucide-check" class="size-3" />
-          <UIcon v-else-if="!isStepNavigable(idx)" name="i-lucide-lock" class="size-3" />
+          <UIcon v-if="step.complete && idx !== currentStep" name="i-lucide-check" class="size-3" />
+          <UIcon v-else-if="isLocked && idx === currentStep" name="i-lucide-lock" class="size-3" />
           <span v-else class="font-bold">{{ idx + 1 }}</span>
           {{ step.title }}
-          <span v-if="step.key === 'awards' && !step.complete && !groupDeadlinePassed" class="size-2 rounded-full bg-warning animate-pulse shrink-0" />
+          <span v-if="step.key === 'awards' && !step.complete && isRoundOpen('GROUP')" class="size-2 rounded-full bg-warning animate-pulse shrink-0" />
         </button>
       </div>
     </div>
 
-    <!-- Locked banners -->
-    <UAlert v-if="isLocked && currentStepRound === 'GROUP' && groupDeadlinePassed" color="error" variant="soft" icon="i-lucide-lock"
-      title="Fase de grupos cerrada"
-      description="El plazo para predecir la fase de grupos finalizó el 10 de junio." />
-    <UAlert v-else-if="isLocked && !isAwardsStep && currentStepRound && openRound && ROUND_ORDER.indexOf(currentStepRound) > ROUND_ORDER.indexOf(openRound)" color="neutral" variant="soft" icon="i-lucide-lock"
-      :title="`${ROUND_LABELS[currentStepRound]} bloqueada`"
-      :description="`Esta fase se desbloqueará cuando ${ROUND_LABELS[openRound]} haya finalizado.`" />
-    <UAlert v-else-if="isLocked && !isAwardsStep && openRound === null" color="neutral" variant="soft" icon="i-lucide-flag"
-      title="Torneo finalizado"
-      description="Todas las fases han concluido." />
+    <!-- Locked banner -->
+    <UAlert v-if="isLocked && !steps.every(s => s.complete)" color="neutral" variant="soft" icon="i-lucide-lock"
+      :title="isAwardsStep ? 'Premios cerrados' : `${ROUND_LABELS[currentStepRound ?? ''] ?? 'Esta fase'} cerrada`"
+      description="El administrador abrirá esta fase cuando corresponda." />
 
     <!-- Completed banner -->
     <UAlert v-if="steps.every(s => s.complete) && !isLocked" color="success" variant="soft"
       icon="i-lucide-party-popper" title="¡Predicción finalizada!"
       description="Has completado todas las fases y tus apuestas de premios. ¡Suerte!" />
 
-    <!-- Premios nudge (shown on group step while deadline hasn't passed and premios unfilled) -->
-    <UAlert v-if="currentStep === 0 && !groupDeadlinePassed && !sideBetsComplete" color="warning" variant="soft"
+    <!-- Premios nudge -->
+    <UAlert v-if="currentStep === 0 && isRoundOpen('GROUP') && !sideBetsComplete" color="warning" variant="soft"
       icon="i-lucide-trophy" title="Recuerda rellenar los Premios"
-      description="Los premios también cierran el 11 de junio. Encuéntralos en la última pestaña." />
+      description="Los premios también se cierran cuando el admin cierre la fase de grupos. Encuéntralos en la última pestaña." />
 
     <!-- Step content -->
     <div>
@@ -535,13 +493,5 @@ async function save() {
       </div>
     </div>
 
-    <!-- Countdown (only relevant for group phase and premios) -->
-    <div v-if="timeLeft && !isLocked && (currentStep === 0 || isAwardsStep)" class="flex items-center justify-center gap-2 text-xs text-muted">
-      <UIcon name="i-lucide-clock" class="size-3 shrink-0" />
-      <span>Cierra en</span>
-      <span class="font-mono font-medium text-foreground">
-        {{ timeLeft.days }}d {{ String(timeLeft.hours).padStart(2, '0') }}h {{ String(timeLeft.minutes).padStart(2, '0') }}m {{ String(timeLeft.seconds).padStart(2, '0') }}s
-      </span>
-    </div>
   </div>
 </template>

@@ -54,7 +54,6 @@ const openGroups = ref<string[]>(['A'])
 function isMatchLocked(match: Match): boolean {
   if (props.locked) return true
   if (match.status !== 'SCHEDULED') return true
-  if (match.kickoff_at && new Date(match.kickoff_at) <= new Date()) return true
   return false
 }
 

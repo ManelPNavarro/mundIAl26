@@ -6,14 +6,19 @@ interface SideBetsBody {
   best_goalkeeper?: string | null
 }
 
-const GROUP_DEADLINE = new Date('2026-06-11T00:00:00Z')
-
 export default defineEventHandler(async (event) => {
-  if (new Date() >= GROUP_DEADLINE) {
-    throw createError({ statusCode: 403, message: 'El plazo para los premios ha terminado' })
+  const supabase = useSupabaseAdmin()
+
+  const { data: lock } = await supabase
+    .from('round_locks')
+    .select('is_open')
+    .eq('round', 'GROUP')
+    .single()
+
+  if (!lock?.is_open) {
+    throw createError({ statusCode: 403, message: 'Los premios están cerrados' })
   }
 
-  const supabase = useSupabaseAdmin()
   const user = await requireUser(event)
   const body = await readBody<SideBetsBody>(event)
 

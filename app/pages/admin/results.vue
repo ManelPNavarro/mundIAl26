@@ -50,12 +50,35 @@ async function getAuthHeaders() {
 }
 
 const headers = await getAuthHeaders()
-const [{ data: matches, refresh }, { data: allTeams }, { data: allPlayers }, fetchedAwards] = await Promise.all([
+const [{ data: matches, refresh }, { data: allTeams }, { data: allPlayers }, { data: roundLocks, refresh: refreshLocks }, fetchedAwards] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
   useFetch<Team[]>('/api/teams'),
   useFetch<Player[]>('/api/players'),
+  useFetch<Record<string, boolean>>('/api/round-locks'),
   $fetch<Awards>('/api/admin/awards', { headers }),
 ])
+
+const ROUND_LABELS: Record<string, string> = {
+  GROUP: 'Fase de grupos', R32: 'Ronda de 32', R16: 'Octavos',
+  QF: 'Cuartos', SF: 'Semifinales', THIRD_PLACE: 'Tercer puesto', FINAL: 'Final',
+}
+const ROUND_ORDER = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
+
+const togglingRound = ref<string | null>(null)
+async function toggleRound(round: string) {
+  togglingRound.value = round
+  try {
+    const h = await getAuthHeaders()
+    const current = roundLocks.value?.[round] ?? false
+    await $fetch(`/api/admin/round-locks/${round}`, { method: 'PATCH', headers: h, body: { is_open: !current } })
+    await refreshLocks()
+    toast.add({ title: `${ROUND_LABELS[round]} ${!current ? 'abierta' : 'cerrada'}`, color: 'success' })
+  } catch {
+    toast.add({ title: 'Error al cambiar estado', color: 'error' })
+  } finally {
+    togglingRound.value = null
+  }
+}
 
 function formatKickoff(kickoffAt: string | null): string {
   if (!kickoffAt) return 'Por confirmar'
@@ -414,6 +437,26 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       <UButton v-if="!isAwardsStep" icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncingMatches" @click="syncMatches">
         Sincronizar
       </UButton>
+    </div>
+
+    <!-- Round locks -->
+    <div class="border border-border rounded-lg p-4 space-y-3">
+      <p class="text-xs font-semibold text-muted uppercase tracking-wide">Control de fases</p>
+      <div class="flex flex-wrap gap-2">
+        <button
+          v-for="round in ROUND_ORDER"
+          :key="round"
+          class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
+          :class="roundLocks?.[round]
+            ? 'bg-success/10 border-success/30 text-success hover:bg-success/20'
+            : 'bg-muted/20 border-border text-muted hover:bg-muted/40'"
+          :disabled="togglingRound === round"
+          @click="toggleRound(round)"
+        >
+          <UIcon :name="roundLocks?.[round] ? 'i-lucide-lock-open' : 'i-lucide-lock'" class="size-3" />
+          {{ ROUND_LABELS[round] }}
+        </button>
+      </div>
     </div>
 
     <!-- Stepper -->
