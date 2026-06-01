@@ -293,7 +293,7 @@ const steps = computed(() => [
   }),
   {
     key: 'awards',
-    title: 'Premios',
+    title: 'Premios individuales',
     description: `${sideBetsFilled.value}/4 apuestas`,
     complete: sideBetsComplete.value,
   },

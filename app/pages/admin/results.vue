@@ -285,7 +285,7 @@ const ROUND_LABELS: Record<string, string> = {
   SF: 'Semifinales',
   THIRD_PLACE: '3er puesto',
   FINAL: 'Final',
-  PREMIOS: 'Premios',
+  PREMIOS: 'Premios individuales',
 }
 
 const GROUP_LETTERS = ['A','B','C','D','E','F','G','H','I','J','K','L']
@@ -309,7 +309,7 @@ const steps = computed(() => {
     }
   }).filter(Boolean).concat([{
     key: 'AWARDS',
-    label: 'Premios',
+    label: 'Premios individuales',
     matches: [],
     complete: awardsComplete.value,
   }]) as { key: string, label: string, matches: Match[], complete: boolean }[]
