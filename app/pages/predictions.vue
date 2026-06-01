@@ -312,6 +312,14 @@ const openStepIndex = computed(() => {
   return steps.value.length - 1
 })
 
+const currentPhaseMatchesAllPlayed = computed(() => {
+  if (isAwardsStep.value) return false
+  const matches = currentStep.value === 0
+    ? groupStageGroups.value.flatMap(g => g.matches)
+    : (currentRound.value?.matches ?? [])
+  return matches.length > 0 && matches.every(m => m.home_score !== null)
+})
+
 // ─── Save ────────────────────────────────────────────────────────────────────
 const saving = ref(false)
 
@@ -398,7 +406,7 @@ async function save() {
     </div>
 
     <!-- Locked banner -->
-    <UAlert v-if="isLocked && !steps.every(s => s.complete)" color="neutral" variant="soft" icon="i-lucide-lock"
+    <UAlert v-if="isLocked && !steps.every(s => s.complete) && !currentPhaseMatchesAllPlayed" color="neutral" variant="soft" icon="i-lucide-lock"
       :title="isAwardsStep ? 'Premios cerrados' : `${ROUND_LABELS[currentStepRound ?? ''] ?? 'Esta fase'} cerrada`"
       description="El administrador abrirá esta fase cuando corresponda." />
 
