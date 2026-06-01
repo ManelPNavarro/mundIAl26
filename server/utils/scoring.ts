@@ -47,7 +47,6 @@ export function calcAwardPoints(
 ): number {
   if (!bets || !official) return 0
   let pts = 0
-  if (bets.winner_team_id && bets.winner_team_id === official.winner_team_id) pts += config.award_winner ?? 0
   if (bets.best_player && official.best_player && bets.best_player.trim().toLowerCase() === official.best_player.trim().toLowerCase()) pts += config.award_best_player ?? 0
   if (bets.best_young_player && official.best_young_player && bets.best_young_player.trim().toLowerCase() === official.best_young_player.trim().toLowerCase()) pts += config.award_best_young_player ?? 0
   if (bets.top_scorer && official.top_scorer && bets.top_scorer.trim().toLowerCase() === official.top_scorer.trim().toLowerCase()) pts += config.award_top_scorer ?? 0

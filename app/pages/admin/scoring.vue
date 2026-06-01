@@ -19,7 +19,7 @@ const NUMERIC_KEYS = [
   'sf_correct', 'sf_exact',
   'third_place_correct', 'third_place_exact',
   'final_correct', 'final_exact',
-  'award_winner', 'award_best_player', 'award_best_young_player',
+  'award_best_player', 'award_best_young_player',
   'award_top_scorer', 'award_best_goalkeeper',
 ]
 
@@ -70,7 +70,6 @@ const MATCH_ROWS = [
 ]
 
 const AWARD_POINT_ROWS = [
-  { label: 'Equipo campeón',         key: 'award_winner' },
   { label: 'Mejor jugador (MVP)',     key: 'award_best_player' },
   { label: 'Mejor jugador joven',    key: 'award_best_young_player' },
   { label: 'Máximo goleador',        key: 'award_top_scorer' },

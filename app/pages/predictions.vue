@@ -94,7 +94,6 @@ const sideBetIds = ref<SideBetIds>({
 const currentStep = ref(0)
 
 const AWARD_SCORE_KEY: Partial<Record<keyof SideBets, string>> = {
-  winner_team_id: 'award_winner',
   best_player: 'award_best_player',
   best_young_player: 'award_best_young_player',
   top_scorer: 'award_top_scorer',
@@ -237,22 +236,6 @@ const predictedWinnerTeamId = computed(() => {
   return p.homeAdvances === true ? (m.home_team?.id ?? null) : (m.away_team?.id ?? null)
 })
 
-const predictedWinnerName = computed(() => {
-  const m = finalMatch.value
-  if (!m) return null
-  const s = scoreFor(m)
-  if (!s) return null
-  const homeWins = s.home > s.away || (s.home === s.away && s.homeAdvances === true)
-  return homeWins ? resolveMatchSide(m, 'home') : resolveMatchSide(m, 'away')
-})
-
-const winnerResult = computed(() => {
-  const official = officialAwards?.winner_team_id
-  if (!official) return null
-  const predicted = predictedWinnerTeamId.value
-  const correct = !!predicted && predicted === official
-  return { correct, pts: correct ? (scoringConfig?.award_winner ?? 0) : 0 }
-})
 
 const sideBetsComplete = computed(() =>
   !!sideBetIds.value.best_player &&
