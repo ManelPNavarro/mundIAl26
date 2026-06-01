@@ -10,13 +10,15 @@ export default defineEventHandler(async (event) => {
 
   const matchById = new Map(matches.map(m => [m.match_no, m.id]))
 
-  let updated = 0
-  for (const { match_no, kickoff_at } of schedule) {
-    const id = matchById.get(match_no)
-    if (!id) continue
-    await supabase.from('matches').update({ kickoff_at }).eq('id', id)
-    updated++
-  }
+  const updates = schedule
+    .map(({ match_no, kickoff_at }) => {
+      const id = matchById.get(match_no)
+      return id ? { id, kickoff_at } : null
+    })
+    .filter((u): u is { id: string, kickoff_at: string } => u !== null)
 
-  return { updated }
+  const { error } = await supabase.from('matches').upsert(updates, { onConflict: 'id' })
+  if (error) throw createError({ statusCode: 500, message: error.message })
+
+  return { updated: updates.length }
 })
