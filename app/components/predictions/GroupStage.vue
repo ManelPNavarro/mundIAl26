@@ -9,6 +9,9 @@ interface Match {
   home_slot: string | null
   away_slot: string | null
   kickoff_at: string | null
+  status: string
+  home_score: number | null
+  away_score: number | null
 }
 
 interface Group {
@@ -47,6 +50,17 @@ function teamName(match: Match, side: 'home' | 'away'): string {
 }
 
 const openGroups = ref<string[]>(['A'])
+
+function isMatchLocked(match: Match): boolean {
+  if (props.locked) return true
+  if (match.status !== 'SCHEDULED') return true
+  if (match.kickoff_at && new Date(match.kickoff_at) <= new Date()) return true
+  return false
+}
+
+function hasResult(match: Match): boolean {
+  return match.home_score !== null && match.away_score !== null
+}
 
 function formatKickoff(kickoff_at: string | null): string | null {
   if (!kickoff_at) return null
@@ -110,34 +124,36 @@ function filledCount(matches: Match[]) {
             <div class="flex items-center gap-2 px-3 py-2">
               <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
               <div class="flex items-center gap-1 shrink-0">
-                <template v-if="props.summary?.[match.id]">
+                <template v-if="isMatchLocked(match)">
                   <span class="font-mono font-bold text-sm text-foreground w-12 text-center">{{ getPrediction(match.id).home ?? '–' }}</span>
                   <span class="text-muted font-bold text-sm">–</span>
                   <span class="font-mono font-bold text-sm text-foreground w-12 text-center">{{ getPrediction(match.id).away ?? '–' }}</span>
                 </template>
                 <template v-else>
-                  <UInput v-model.number="getPrediction(match.id).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked" />
+                  <UInput v-model.number="getPrediction(match.id).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="false" />
                   <span class="text-muted font-bold text-sm">–</span>
-                  <UInput v-model.number="getPrediction(match.id).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="props.locked" />
+                  <UInput v-model.number="getPrediction(match.id).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="false" />
                 </template>
               </div>
               <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
             </div>
 
-            <!-- Real result strip — same flex layout as prediction row so numbers align -->
+            <!-- Real result strip -->
             <div
-              v-if="props.summary?.[match.id]"
+              v-if="hasResult(match)"
               class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium"
-              :class="props.summary[match.id].isCorrect ? 'bg-success/10 text-success' : 'bg-error/10 text-error'"
+              :class="props.summary?.[match.id]
+                ? (props.summary[match.id].isCorrect ? 'bg-success/10 text-success' : 'bg-error/10 text-error')
+                : 'bg-muted/30 text-muted'"
             >
               <span class="flex-1 text-right">Resultado real</span>
               <div class="flex items-center gap-1 shrink-0">
-                <span class="font-mono font-bold text-sm w-12 text-center">{{ props.summary[match.id].result.home }}</span>
+                <span class="font-mono font-bold text-sm w-12 text-center">{{ match.home_score }}</span>
                 <span class="font-bold text-sm">–</span>
-                <span class="font-mono font-bold text-sm w-12 text-center">{{ props.summary[match.id].result.away }}</span>
+                <span class="font-mono font-bold text-sm w-12 text-center">{{ match.away_score }}</span>
               </div>
               <span class="flex-1 text-left">
-                {{ props.summary[match.id].points > 0 ? `+${props.summary[match.id].points} pts` : '0 pts' }}
+                {{ props.summary?.[match.id] ? (props.summary[match.id].points > 0 ? `+${props.summary[match.id].points} pts` : '0 pts') : '' }}
               </span>
             </div>
           </div>
