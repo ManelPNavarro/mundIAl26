@@ -6,6 +6,8 @@ interface AppUser {
   email: string
   created_at: string
   is_admin: boolean
+  predictions_filled: number
+  total_matches: number
 }
 
 const supabase = useSupabaseClient()
@@ -104,6 +106,7 @@ function formatDate(dateStr: string) {
 const columns = [
   { accessorKey: 'email', header: 'Correo electrónico' },
   { accessorKey: 'is_admin', header: 'Rol' },
+  { accessorKey: 'predictions_filled', header: 'Partidos' },
   { accessorKey: 'created_at', header: 'Registro' },
   { id: 'actions', header: '' },
 ]
@@ -163,6 +166,20 @@ const columns = [
           >
             {{ row.original.is_admin ? 'Admin' : 'Jugador' }}
           </UBadge>
+        </template>
+
+        <template #predictions_filled-cell="{ row }">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-foreground tabular-nums">
+              {{ row.original.predictions_filled }}/{{ row.original.total_matches }}
+            </span>
+            <div class="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+              <div
+                class="h-full rounded-full bg-primary transition-all"
+                :style="{ width: `${row.original.total_matches ? Math.round(row.original.predictions_filled / row.original.total_matches * 100) : 0}%` }"
+              />
+            </div>
+          </div>
         </template>
 
         <template #created_at-cell="{ row }">
