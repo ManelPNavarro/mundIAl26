@@ -11,14 +11,30 @@ async function getAuthHeaders() {
   return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}
 }
 
-const headers = await getAuthHeaders()
-const originalConfig = await $fetch<ScoringConfig>('/api/admin/scoring-config', { headers })
+const NUMERIC_KEYS = [
+  'group_correct', 'group_exact',
+  'r32_correct', 'r32_exact',
+  'r16_correct', 'r16_exact',
+  'qf_correct', 'qf_exact',
+  'sf_correct', 'sf_exact',
+  'third_place_correct', 'third_place_exact',
+  'final_correct', 'final_exact',
+  'award_winner', 'award_best_player', 'award_best_young_player',
+  'award_top_scorer', 'award_best_goalkeeper',
+]
 
-// ─── Scoring config ──────────────────────────────────────────────────────────
-const config = ref<ScoringConfig>({ ...originalConfig })
+const headers = await getAuthHeaders()
+const raw = await $fetch<ScoringConfig>('/api/admin/scoring-config', { headers })
+
+function extractNumeric(data: ScoringConfig): ScoringConfig {
+  return Object.fromEntries(NUMERIC_KEYS.map(k => [k, Number(data[k] ?? 0)]))
+}
+
+const original = extractNumeric(raw)
+const config = ref<ScoringConfig>({ ...original })
 
 const isConfigDirty = computed(() =>
-  Object.keys(config.value).some(k => config.value[k] !== originalConfig[k])
+  NUMERIC_KEYS.some(k => config.value[k] !== original[k])
 )
 
 const savingConfig = ref(false)
@@ -28,7 +44,7 @@ async function saveConfig() {
   try {
     const h = await getAuthHeaders()
     await $fetch('/api/admin/scoring-config', { method: 'PATCH', headers: h, body: config.value })
-    Object.assign(originalConfig, config.value)
+    NUMERIC_KEYS.forEach(k => { original[k] = config.value[k]! })
     toast.add({ title: 'Configuración guardada', color: 'success' })
   } catch {
     toast.add({ title: 'Error al guardar', color: 'error' })
@@ -37,7 +53,11 @@ async function saveConfig() {
   }
 }
 
-function resetConfig() { config.value = { ...originalConfig } }
+function resetConfig() { config.value = { ...original } }
+
+function updateKey(key: string, val: string) {
+  config.value = { ...config.value, [key]: Number(val) }
+}
 
 const MATCH_ROWS = [
   { label: 'Fase de grupos',   correct: 'group_correct',       exact: 'group_exact' },
@@ -56,8 +76,6 @@ const AWARD_POINT_ROWS = [
   { label: 'Máximo goleador',        key: 'award_top_scorer' },
   { label: 'Mejor portero',          key: 'award_best_goalkeeper' },
 ]
-
-
 </script>
 
 <template>
@@ -104,10 +122,18 @@ const AWARD_POINT_ROWS = [
               <tr v-for="row in MATCH_ROWS" :key="row.correct">
                 <td class="py-3 text-foreground">{{ row.label }}</td>
                 <td class="py-3 text-center">
-                  <UInput v-model.number="config[row.correct]" type="number" min="0" max="99" class="w-16 mx-auto text-center" size="sm" />
+                  <UInput
+                    type="number" min="0" max="99" class="w-16 mx-auto text-center" size="sm"
+                    :model-value="config[row.correct]"
+                    @update:model-value="updateKey(row.correct, String($event))"
+                  />
                 </td>
                 <td class="py-3 text-center">
-                  <UInput v-model.number="config[row.exact]" type="number" min="0" max="99" class="w-16 mx-auto text-center" size="sm" />
+                  <UInput
+                    type="number" min="0" max="99" class="w-16 mx-auto text-center" size="sm"
+                    :model-value="config[row.exact]"
+                    @update:model-value="updateKey(row.exact, String($event))"
+                  />
                 </td>
               </tr>
             </tbody>
@@ -123,7 +149,11 @@ const AWARD_POINT_ROWS = [
         <div class="space-y-3">
           <div v-for="row in AWARD_POINT_ROWS" :key="row.key" class="flex items-center justify-between gap-4">
             <span class="text-sm text-foreground">{{ row.label }}</span>
-            <UInput v-model.number="config[row.key]" type="number" min="0" max="999" class="w-20 text-center" size="sm" />
+            <UInput
+              type="number" min="0" max="999" class="w-20 text-center" size="sm"
+              :model-value="config[row.key]"
+              @update:model-value="updateKey(row.key, String($event))"
+            />
           </div>
         </div>
       </UCard>
