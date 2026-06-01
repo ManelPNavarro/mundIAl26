@@ -417,7 +417,7 @@ async function save() {
 
     <!-- Premios nudge -->
     <UAlert v-if="currentStep === 0 && isRoundOpen('PREMIOS') && !sideBetsComplete" color="warning" variant="soft"
-      icon="i-lucide-trophy" title="Recuerda rellenar los Premios"
+      icon="i-lucide-trophy" title="Recuerda rellenar los Premios individuales"
       description="Los premios también se cierran cuando el admin cierre la fase de grupos. Encuéntralos en la última pestaña." />
 
     <!-- Step content -->
