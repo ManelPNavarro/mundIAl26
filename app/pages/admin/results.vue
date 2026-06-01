@@ -276,7 +276,7 @@ const AWARD_FIELDS: { key: keyof AwardIds, label: string }[] = [
   { key: 'best_goalkeeper', label: 'Mejor portero' },
 ]
 
-const ROUNDS = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
+const ROUNDS = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL', 'PREMIOS']
 const ROUND_LABELS: Record<string, string> = {
   GROUP: 'Grupos',
   R32: 'Ronda de 32',
@@ -285,6 +285,7 @@ const ROUND_LABELS: Record<string, string> = {
   SF: 'Semifinales',
   THIRD_PLACE: '3er puesto',
   FINAL: 'Final',
+  PREMIOS: 'Premios',
 }
 
 const GROUP_LETTERS = ['A','B','C','D','E','F','G','H','I','J','K','L']

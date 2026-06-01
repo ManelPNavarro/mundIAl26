@@ -127,7 +127,7 @@ const currentStepRound = computed(() => {
 })
 
 const isLocked = computed(() => {
-  if (isAwardsStep.value) return !isRoundOpen('GROUP')
+  if (isAwardsStep.value) return !isRoundOpen('PREMIOS')
   return !currentStepRound.value || !isRoundOpen(currentStepRound.value)
 })
 
@@ -400,7 +400,7 @@ async function save() {
           <UIcon v-else-if="isLocked && idx === currentStep" name="i-lucide-lock" class="size-3" />
           <span v-else class="font-bold">{{ idx + 1 }}</span>
           {{ step.title }}
-          <span v-if="step.key === 'awards' && !step.complete && isRoundOpen('GROUP')" class="size-2 rounded-full bg-warning animate-pulse shrink-0" />
+          <span v-if="step.key === 'awards' && !step.complete && isRoundOpen('PREMIOS')" class="size-2 rounded-full bg-warning animate-pulse shrink-0" />
         </button>
       </div>
     </div>
@@ -416,7 +416,7 @@ async function save() {
       description="Has completado todas las fases y tus apuestas de premios. ¡Suerte!" />
 
     <!-- Premios nudge -->
-    <UAlert v-if="currentStep === 0 && isRoundOpen('GROUP') && !sideBetsComplete" color="warning" variant="soft"
+    <UAlert v-if="currentStep === 0 && isRoundOpen('PREMIOS') && !sideBetsComplete" color="warning" variant="soft"
       icon="i-lucide-trophy" title="Recuerda rellenar los Premios"
       description="Los premios también se cierran cuando el admin cierre la fase de grupos. Encuéntralos en la última pestaña." />
 

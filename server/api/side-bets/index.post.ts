@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const { data: lock } = await supabase
     .from('round_locks')
     .select('is_open')
-    .eq('round', 'GROUP')
+    .eq('round', 'PREMIOS')
     .single()
 
   if (!lock?.is_open) {
