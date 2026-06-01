@@ -17,8 +17,12 @@ export default defineEventHandler(async (event) => {
     })
     .filter((u): u is { id: string, kickoff_at: string } => u !== null)
 
-  const { error } = await supabase.from('matches').upsert(updates, { onConflict: 'id' })
-  if (error) throw createError({ statusCode: 500, message: error.message })
+  const results = await Promise.all(
+    updates.map(u => supabase.from('matches').update({ kickoff_at: u.kickoff_at }).eq('id', u.id))
+  )
+
+  const failed = results.filter(r => r.error)
+  if (failed.length) throw createError({ statusCode: 500, message: failed[0]!.error!.message })
 
   return { updated: updates.length }
 })
