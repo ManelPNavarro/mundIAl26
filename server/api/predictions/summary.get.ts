@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     { data: userPredictions },
     { data: config },
   ] = await Promise.all([
-    supabase.from('matches').select('id, round, home_score, away_score, home_advances').eq('status', 'FINISHED'),
+    supabase.from('matches').select('id, round, home_score, away_score, home_advances').not('home_score', 'is', null),
     supabase.from('predictions').select('match_id, home_score, away_score, home_advances').eq('user_id', user.id),
     supabase.from('scoring_config').select('*').single(),
   ])
