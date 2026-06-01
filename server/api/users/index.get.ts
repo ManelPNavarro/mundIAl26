@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     countByUser.set(p.user_id, (countByUser.get(p.user_id) ?? 0) + 1)
   }
 
-  return authData.users.map(user => ({
+  return authData.users.sort((a, b) => (a.email ?? '').localeCompare(b.email ?? '')).map(user => ({
     id: user.id,
     email: user.email ?? '',
     created_at: user.created_at,
