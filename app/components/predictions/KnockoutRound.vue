@@ -12,6 +12,7 @@ interface Match {
   home_score: number | null
   away_score: number | null
   home_advances: boolean | null
+  kickoff_at: string | null
 }
 
 interface MatchSummary {
@@ -111,6 +112,14 @@ function resolveSlot(slot: string): string | null {
   return null
 }
 
+function formatKickoff(kickoff_at: string | null): string | null {
+  if (!kickoff_at) return null
+  return new Intl.DateTimeFormat('es-ES', {
+    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+    timeZone: 'Europe/Madrid', hour12: false,
+  }).format(new Date(kickoff_at))
+}
+
 function teamName(match: Match, side: 'home' | 'away'): string {
   const team = side === 'home' ? match.home_team : match.away_team
   if (team) return team.name
@@ -138,6 +147,10 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         ? (props.summary[match.id].isCorrect ? 'bg-success/5' : 'bg-error/5')
         : ''"
     >
+      <!-- Kickoff time -->
+      <div v-if="match.kickoff_at" class="px-4 pt-2 text-xs text-muted text-center">
+        {{ formatKickoff(match.kickoff_at) }}
+      </div>
       <!-- Prediction row -->
       <div class="flex items-center gap-2 px-4 py-3">
         <span class="flex-1 text-sm text-right font-medium text-foreground truncate">{{ teamName(match, 'home') }}</span>

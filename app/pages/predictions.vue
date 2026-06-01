@@ -7,6 +7,7 @@ interface Match {
   match_no: number
   round: string
   status: string
+  kickoff_at: string | null
   matchday: number | null
   group_letter: string | null
   home_slot: string | null

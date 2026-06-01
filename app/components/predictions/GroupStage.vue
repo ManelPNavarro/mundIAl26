@@ -8,6 +8,7 @@ interface Match {
   away_team: { name: string } | null
   home_slot: string | null
   away_slot: string | null
+  kickoff_at: string | null
 }
 
 interface Group {
@@ -46,6 +47,14 @@ function teamName(match: Match, side: 'home' | 'away'): string {
 }
 
 const openGroups = ref<string[]>(['A'])
+
+function formatKickoff(kickoff_at: string | null): string | null {
+  if (!kickoff_at) return null
+  return new Intl.DateTimeFormat('es-ES', {
+    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+    timeZone: 'Europe/Madrid', hour12: false,
+  }).format(new Date(kickoff_at))
+}
 
 function filledCount(matches: Match[]) {
   return matches.filter((m) => {
@@ -93,6 +102,10 @@ function filledCount(matches: Match[]) {
               ? (props.summary[match.id].isCorrect ? 'bg-success/5' : 'bg-error/5')
               : ''"
           >
+            <!-- Kickoff time -->
+            <div v-if="match.kickoff_at" class="px-3 pt-2 text-xs text-muted text-center">
+              {{ formatKickoff(match.kickoff_at) }}
+            </div>
             <!-- Prediction row -->
             <div class="flex items-center gap-2 px-3 py-2">
               <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
