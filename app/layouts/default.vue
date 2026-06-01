@@ -13,6 +13,8 @@ async function signOut() {
 }
 
 const isAdmin = computed(() => user.value?.user_metadata?.is_admin === true)
+const route = useRoute()
+const isAdminPage = computed(() => route.path.startsWith('/admin'))
 
 const menuItems = computed(() => [
   [{
@@ -40,10 +42,12 @@ const menuItems = computed(() => [
 
 <template>
   <div class="min-h-screen bg-background">
-    <header class="border-b border-border bg-background/80 backdrop-blur sticky top-0 z-50">
+    <header class="border-b sticky top-0 z-50 backdrop-blur transition-colors"
+      :class="isAdminPage ? 'bg-amber-950/90 border-amber-800' : 'bg-background/80 border-border'"
+    >
       <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         <div class="flex items-center gap-6">
-          <NuxtLink to="/" class="font-bold text-lg tracking-tight text-foreground">
+          <NuxtLink to="/" class="font-bold text-lg tracking-tight" :class="isAdminPage ? 'text-amber-100' : 'text-foreground'">
             mundIAl 26
           </NuxtLink>
           <nav class="hidden sm:flex items-center gap-4">
