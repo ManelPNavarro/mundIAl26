@@ -116,6 +116,7 @@ function resolveSlot(slot: string): string | null {
 function isMatchLocked(match: Match): boolean {
   if (props.locked) return true
   if (match.status !== 'SCHEDULED') return true
+  if (match.home_score !== null) return true
   return false
 }
 
