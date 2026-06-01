@@ -174,6 +174,7 @@ const awardIds = ref<AwardIds>({
 
 const savingAwards = ref(false)
 const syncingPlayers = ref(false)
+const seedingSchedule = ref(false)
 
 const finalMatch = computed(() => (matches.value ?? []).find(m => m.round === 'FINAL') ?? null)
 
@@ -220,6 +221,20 @@ async function saveAwards() {
     toast.add({ title: 'Error al guardar', color: 'error' })
   } finally {
     savingAwards.value = false
+  }
+}
+
+async function seedSchedule() {
+  seedingSchedule.value = true
+  try {
+    const h = await getAuthHeaders()
+    const result = await $fetch<{ updated: number }>('/api/admin/seed-schedule', { method: 'POST', headers: h })
+    await refreshNuxtData()
+    toast.add({ title: `${result.updated} horarios actualizados`, color: 'success' })
+  } catch {
+    toast.add({ title: 'Error al actualizar horarios', color: 'error' })
+  } finally {
+    seedingSchedule.value = false
   }
 }
 
@@ -467,6 +482,9 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <div class="flex items-center justify-between">
           <p class="text-sm text-muted">Ganadores reales del torneo.</p>
           <div class="flex gap-2">
+            <UButton size="sm" variant="outline" color="neutral" :loading="seedingSchedule" icon="i-lucide-clock" @click="seedSchedule">
+              Seed horarios
+            </UButton>
             <UButton size="sm" variant="outline" color="neutral" :loading="syncingPlayers" icon="i-lucide-refresh-cw" @click="syncPlayers">
               Sync jugadores
             </UButton>
