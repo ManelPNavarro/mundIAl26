@@ -58,12 +58,6 @@ const [{ data: matches, refresh }, { data: allTeams }, { data: allPlayers }, { d
   $fetch<Awards>('/api/admin/awards', { headers }),
 ])
 
-const ROUND_LABELS: Record<string, string> = {
-  GROUP: 'Fase de grupos', R32: 'Ronda de 32', R16: 'Octavos',
-  QF: 'Cuartos', SF: 'Semifinales', THIRD_PLACE: 'Tercer puesto', FINAL: 'Final',
-}
-const ROUND_ORDER = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
-
 const togglingRound = ref<string | null>(null)
 async function toggleRound(round: string) {
   togglingRound.value = round
