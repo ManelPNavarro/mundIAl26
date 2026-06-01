@@ -429,9 +429,14 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <h1 class="text-2xl font-bold text-foreground">Resultados</h1>
         <p class="text-sm text-muted mt-1">Introduce los resultados reales de cada partido.</p>
       </div>
-      <UButton v-if="!isAwardsStep" icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncingMatches" @click="syncMatches">
-        Sincronizar
-      </UButton>
+      <div class="flex gap-2">
+        <UButton v-if="!isAwardsStep" icon="i-lucide-clock" color="neutral" variant="outline" size="sm" :loading="seedingSchedule" @click="seedSchedule">
+          Seed horarios
+        </UButton>
+        <UButton v-if="!isAwardsStep" icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncingMatches" @click="syncMatches">
+          Sincronizar
+        </UButton>
+      </div>
     </div>
 
     <!-- Round locks -->
@@ -520,9 +525,6 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <div class="flex items-center justify-between">
           <p class="text-sm text-muted">Ganadores reales del torneo.</p>
           <div class="flex gap-2">
-            <UButton size="sm" variant="outline" color="neutral" :loading="seedingSchedule" icon="i-lucide-clock" @click="seedSchedule">
-              Seed horarios
-            </UButton>
             <UButton size="sm" variant="outline" color="neutral" :loading="syncingPlayers" icon="i-lucide-refresh-cw" @click="syncPlayers">
               Sync jugadores
             </UButton>
