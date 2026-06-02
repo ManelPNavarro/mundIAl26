@@ -26,17 +26,19 @@ function slotToTeamId(
     const m = allMatches.find(x => x.match_no === matchNo)
     if (!m) return null
 
-    let hs = m.home_score
-    let as_ = m.away_score
-    let ha = m.home_advances
+    let hs: number | null = null
+    let as_: number | null = null
+    let ha: boolean | null = null
 
-    if (hs === null) {
-      if (realOnly) return null
+    if (!realOnly) {
       const p = predMap.get(m.id)
-      if (!p) return null
-      hs = p.home_score; as_ = p.away_score; ha = p.home_advances
+      if (p) { hs = p.home_score; as_ = p.away_score; ha = p.home_advances }
     }
-    if (as_ === null) return null
+    if (hs === null) {
+      if (realOnly && m.home_score === null) return null
+      hs = m.home_score; as_ = m.away_score; ha = m.home_advances
+    }
+    if (hs === null || as_ === null) return null
 
     const homeWins = hs > as_ || (hs === as_ && ha === true)
     const winningSide: 'home' | 'away' = homeWins ? 'home' : 'away'
