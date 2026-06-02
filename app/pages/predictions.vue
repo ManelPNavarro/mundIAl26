@@ -167,11 +167,19 @@ const groupComplete = computed(() => groupMatchIds.value.length > 0 && groupFill
 const finalMatch = computed(() => allMatches.value?.find(m => m.round === 'FINAL') ?? null)
 
 function scoreFor(m: Match): { home: number, away: number, homeAdvances: boolean | null } | null {
-  if (m.home_score !== null && m.away_score !== null)
-    return { home: m.home_score, away: m.away_score, homeAdvances: m.home_advances }
+  if (m.round === 'GROUP') {
+    if (m.home_score !== null && m.away_score !== null)
+      return { home: m.home_score, away: m.away_score, homeAdvances: m.home_advances }
+    const p = predictions.value[m.id]
+    if (p?.home != null && p?.away != null)
+      return { home: p.home, away: p.away, homeAdvances: p.homeAdvances ?? null }
+    return null
+  }
   const p = predictions.value[m.id]
   if (p?.home != null && p?.away != null)
     return { home: p.home, away: p.away, homeAdvances: p.homeAdvances ?? null }
+  if (m.home_score !== null && m.away_score !== null)
+    return { home: m.home_score, away: m.away_score, homeAdvances: m.home_advances }
   return null
 }
 
