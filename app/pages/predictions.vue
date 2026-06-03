@@ -61,7 +61,7 @@ interface MatchSummary {
   isCorrect: boolean
 }
 
-const [{ data: allMatches }, { data: allPlayers }, { data: roundLocks }, savedPredictions, savedSideBets, matchSummary, officialAwards, scoringConfig] = await Promise.all([
+const [{ data: allMatches }, { data: allPlayers }, { data: roundLocks }, savedPredictions, savedSideBets, matchSummary, officialAwards, scoringConfig, lastUpdatedRes] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
   useFetch<Player[]>('/api/players'),
   useFetch<Record<string, boolean>>('/api/round-locks'),
@@ -70,7 +70,12 @@ const [{ data: allMatches }, { data: allPlayers }, { data: roundLocks }, savedPr
   $fetch<Record<string, MatchSummary>>('/api/predictions/summary', { headers }),
   $fetch<SideBets | null>('/api/awards'),
   $fetch<Record<string, number>>('/api/scoring-config'),
+  $fetch<{ updated_at: string | null }>('/api/matches/last-updated'),
 ])
+
+const lastResultsUpdate = lastUpdatedRes?.updated_at
+  ? new Intl.DateTimeFormat('es-ES', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(lastUpdatedRes.updated_at))
+  : null
 
 function playerIdByName(name: string | null): string | null {
   if (!name) return null
@@ -371,6 +376,9 @@ async function save() {
         <h1 class="text-2xl font-bold text-foreground">Predicciones</h1>
         <p class="text-sm text-muted mt-1">Introduce tus resultados para cada fase del torneo.</p>
       </div>
+      <p v-if="lastResultsUpdate" class="text-xs text-muted shrink-0 mt-1">
+        Última actualización: <span class="font-medium text-foreground">{{ lastResultsUpdate }}</span>
+      </p>
     </div>
 
     <!-- Stepper -->
