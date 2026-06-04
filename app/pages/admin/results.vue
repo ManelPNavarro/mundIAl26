@@ -434,10 +434,10 @@ function teamName(match: Match, side: 'home' | 'away'): string {
           Seed horarios
         </UButton>
         <UButton v-if="!isAwardsStep" icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncingMatches" @click="syncMatches">
-          Sincronizar
+          Sync resultados
         </UButton>
         <UButton icon="i-lucide-cloud-download" color="neutral" variant="outline" size="sm" :loading="syncingPlayersApi" @click="syncPlayersApi">
-          Sync desde API
+          Sync jugadores
         </UButton>
       </div>
     </div>
