@@ -463,7 +463,7 @@ async function save() {
               <span>{{ sideBets.best_goalkeeper ?? '—' }}</span>
               <span v-if="awardResult('best_goalkeeper')?.correct" class="text-xs font-semibold">+{{ awardResult('best_goalkeeper')!.pts }} pts</span>
             </div>
-            <PlayerSelect v-else v-model="sideBetIds.best_goalkeeper" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
+            <PlayerSelect v-else v-model="sideBetIds.best_goalkeeper" :players="allPlayers ?? []" position-filter="GK" placeholder="Buscar jugador..." :disabled="isLocked" />
           </div>
         </div>
       </div>

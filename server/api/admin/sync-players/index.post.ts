@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   let synced = 0
   let skipped = 0
 
-  for (const [teamName, players] of Object.entries(squads)) {
+  for (const [teamName, squad] of Object.entries(squads)) {
     const teamId = teamByName.get(teamName)
 
     if (!teamId) {
@@ -21,9 +21,16 @@ export default defineEventHandler(async (event) => {
       continue
     }
 
-    const rows = players.map(name => ({
+    const positionMap: Record<string, string> = {
+      ...Object.fromEntries(squad.gk.map(n => [n, 'GK'])),
+      ...Object.fromEntries(squad.def.map(n => [n, 'DEF'])),
+      ...Object.fromEntries(squad.mid.map(n => [n, 'MID'])),
+      ...Object.fromEntries(squad.fwd.map(n => [n, 'FWD'])),
+    }
+    const rows = [...squad.gk, ...squad.def, ...squad.mid, ...squad.fwd].map(name => ({
       name,
       team_id: teamId,
+      position: positionMap[name],
       updated_at: new Date().toISOString(),
     }))
 

@@ -10,6 +10,7 @@ const props = defineProps<{
   players: Player[]
   placeholder?: string
   disabled?: boolean
+  positionFilter?: string
 }>()
 
 const model = defineModel<string | null>()
@@ -23,9 +24,12 @@ function normalize(s: string) {
 }
 
 const filtered = computed(() => {
+  const list = props.positionFilter
+    ? props.players.filter(p => p.position === props.positionFilter)
+    : props.players
   const q = normalize(query.value.trim())
-  if (!q) return props.players
-  return props.players.filter(p =>
+  if (!q) return list
+  return list.filter(p =>
     normalize(p.name).includes(q) ||
     normalize(p.team?.name ?? '').includes(q)
   )

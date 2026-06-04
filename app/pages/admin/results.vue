@@ -269,11 +269,11 @@ async function syncPlayers() {
   }
 }
 
-const AWARD_FIELDS: { key: keyof AwardIds, label: string }[] = [
+const AWARD_FIELDS: { key: keyof AwardIds, label: string, positionFilter?: string }[] = [
   { key: 'best_player', label: 'Mejor jugador (MVP)' },
   { key: 'best_young_player', label: 'Mejor jugador joven' },
   { key: 'top_scorer', label: 'Máximo goleador' },
-  { key: 'best_goalkeeper', label: 'Mejor portero' },
+  { key: 'best_goalkeeper', label: 'Mejor portero', positionFilter: 'GK' },
 ]
 
 const ROUNDS = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL', 'PREMIOS']
@@ -548,7 +548,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
             </div>
             <div v-for="field in AWARD_FIELDS" :key="field.key" class="flex flex-col gap-2">
               <label class="text-sm font-medium text-foreground">{{ field.label }}</label>
-              <PlayerSelect v-model="awardIds[field.key]" :players="allPlayers ?? []" placeholder="Buscar jugador..." />
+              <PlayerSelect v-model="awardIds[field.key]" :players="allPlayers ?? []" :position-filter="field.positionFilter" placeholder="Buscar jugador..." />
             </div>
           </div>
         </UCard>
