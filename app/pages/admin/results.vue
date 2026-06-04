@@ -525,7 +525,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
             </div>
             <div v-for="field in AWARD_FIELDS" :key="field.key" class="flex flex-col gap-2">
               <label class="text-sm font-medium text-foreground">{{ field.label }}</label>
-              <UInput v-model="awards[field.key]" list="players-list" placeholder="Nombre del jugador..." />
+              <input v-model="awards[field.key]" list="players-list" placeholder="Nombre del jugador..." class="w-full px-3 py-2 text-sm rounded-md border border-input bg-background text-foreground placeholder:text-muted outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
             </div>
           </div>
         </UCard>
