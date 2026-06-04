@@ -22,13 +22,6 @@ interface Match {
 type Prediction = { home: number | null, away: number | null, homeAdvances?: boolean | null }
 type Predictions = Record<string, Prediction>
 
-interface Player {
-  id: string
-  name: string
-  position: string | null
-  team: { name: string } | null
-}
-
 interface SideBets {
   winner_team_id: string | null
   best_player: string | null
@@ -37,13 +30,6 @@ interface SideBets {
   best_goalkeeper: string | null
 }
 
-// UI state uses player UUIDs for the combobox; resolved to names on save
-interface SideBetIds {
-  best_player: string | null
-  best_young_player: string | null
-  top_scorer: string | null
-  best_goalkeeper: string | null
-}
 
 const supabase = useSupabaseClient()
 const toast = useToast()
@@ -61,9 +47,8 @@ interface MatchSummary {
   isCorrect: boolean
 }
 
-const [{ data: allMatches }, { data: allPlayers }, { data: roundLocks }, savedPredictions, savedSideBets, matchSummary, officialAwards, scoringConfig, lastUpdatedRes] = await Promise.all([
+const [{ data: allMatches }, { data: roundLocks }, savedPredictions, savedSideBets, matchSummary, officialAwards, scoringConfig, lastUpdatedRes] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
-  useFetch<Player[]>('/api/players'),
   useFetch<Record<string, boolean>>('/api/round-locks'),
   $fetch<Predictions>('/api/predictions', { headers }),
   $fetch<SideBets | null>('/api/side-bets', { headers }),
@@ -77,11 +62,6 @@ const lastResultsUpdate = lastUpdatedRes?.updated_at
   ? new Intl.DateTimeFormat('es-ES', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(lastUpdatedRes.updated_at))
   : null
 
-function playerIdByName(name: string | null): string | null {
-  if (!name) return null
-  return allPlayers.value?.find(p => p.name.trim().toLowerCase() === name.trim().toLowerCase())?.id ?? null
-}
-
 const predictions = ref<Predictions>(savedPredictions ?? {})
 const sideBets = ref<SideBets>({
   winner_team_id: savedSideBets?.winner_team_id ?? null,
@@ -89,12 +69,6 @@ const sideBets = ref<SideBets>({
   best_young_player: savedSideBets?.best_young_player ?? null,
   top_scorer: savedSideBets?.top_scorer ?? null,
   best_goalkeeper: savedSideBets?.best_goalkeeper ?? null,
-})
-const sideBetIds = ref<SideBetIds>({
-  best_player: playerIdByName(savedSideBets?.best_player ?? null),
-  best_young_player: playerIdByName(savedSideBets?.best_young_player ?? null),
-  top_scorer: playerIdByName(savedSideBets?.top_scorer ?? null),
-  best_goalkeeper: playerIdByName(savedSideBets?.best_goalkeeper ?? null),
 })
 const currentStep = ref(0)
 
@@ -251,14 +225,14 @@ const predictedWinnerTeamId = computed(() => {
 
 
 const sideBetsComplete = computed(() =>
-  !!sideBetIds.value.best_player &&
-  !!sideBetIds.value.best_young_player &&
-  !!sideBetIds.value.top_scorer &&
-  !!sideBetIds.value.best_goalkeeper
+  !!sideBets.value.best_player &&
+  !!sideBets.value.best_young_player &&
+  !!sideBets.value.top_scorer &&
+  !!sideBets.value.best_goalkeeper
 )
 
 const sideBetsFilled = computed(() =>
-  [sideBetIds.value.best_player, sideBetIds.value.best_young_player, sideBetIds.value.top_scorer, sideBetIds.value.best_goalkeeper]
+  [sideBets.value.best_player, sideBets.value.best_young_player, sideBets.value.top_scorer, sideBets.value.best_goalkeeper]
     .filter(Boolean).length
 )
 
@@ -330,11 +304,6 @@ async function saveMatches() {
   await $fetch('/api/predictions', { method: 'POST', headers: h, body: payload })
 }
 
-function playerNameById(id: string | null): string | null {
-  if (!id) return null
-  return allPlayers.value?.find(p => p.id === id)?.name ?? null
-}
-
 async function saveSideBets() {
   const h = await getAuthHeaders()
   await $fetch('/api/side-bets', {
@@ -342,10 +311,10 @@ async function saveSideBets() {
     headers: h,
     body: {
       winner_team_id: predictedWinnerTeamId.value,
-      best_player: playerNameById(sideBetIds.value.best_player),
-      best_young_player: playerNameById(sideBetIds.value.best_young_player),
-      top_scorer: playerNameById(sideBetIds.value.top_scorer),
-      best_goalkeeper: playerNameById(sideBetIds.value.best_goalkeeper),
+      best_player: sideBets.value.best_player,
+      best_young_player: sideBets.value.best_young_player,
+      top_scorer: sideBets.value.top_scorer,
+      best_goalkeeper: sideBets.value.best_goalkeeper,
     },
   })
 }
@@ -439,7 +408,7 @@ async function save() {
               <span>{{ sideBets.best_player ?? '—' }}</span>
               <span v-if="awardResult('best_player')?.correct" class="text-xs font-semibold">+{{ awardResult('best_player')!.pts }} pts</span>
             </div>
-            <PlayerSelect v-else v-model="sideBetIds.best_player" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
+            <UInput v-else v-model="sideBets.best_player" placeholder="Nombre del jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor jugador joven <span class="text-muted-foreground font-normal">(-21 años)</span></label>
@@ -447,7 +416,7 @@ async function save() {
               <span>{{ sideBets.best_young_player ?? '—' }}</span>
               <span v-if="awardResult('best_young_player')?.correct" class="text-xs font-semibold">+{{ awardResult('best_young_player')!.pts }} pts</span>
             </div>
-            <PlayerSelect v-else v-model="sideBetIds.best_young_player" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
+            <UInput v-else v-model="sideBets.best_young_player" placeholder="Nombre del jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Máximo goleador</label>
@@ -455,7 +424,7 @@ async function save() {
               <span>{{ sideBets.top_scorer ?? '—' }}</span>
               <span v-if="awardResult('top_scorer')?.correct" class="text-xs font-semibold">+{{ awardResult('top_scorer')!.pts }} pts</span>
             </div>
-            <PlayerSelect v-else v-model="sideBetIds.top_scorer" :players="allPlayers ?? []" placeholder="Buscar jugador..." :disabled="isLocked" />
+            <UInput v-else v-model="sideBets.top_scorer" placeholder="Nombre del jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor portero</label>
@@ -463,7 +432,7 @@ async function save() {
               <span>{{ sideBets.best_goalkeeper ?? '—' }}</span>
               <span v-if="awardResult('best_goalkeeper')?.correct" class="text-xs font-semibold">+{{ awardResult('best_goalkeeper')!.pts }} pts</span>
             </div>
-            <PlayerSelect v-else v-model="sideBetIds.best_goalkeeper" :players="allPlayers ?? []" position-filter="GK" placeholder="Buscar jugador..." :disabled="isLocked" />
+            <UInput v-else v-model="sideBets.best_goalkeeper" placeholder="Nombre del jugador..." :disabled="isLocked" />
           </div>
         </div>
       </div>
