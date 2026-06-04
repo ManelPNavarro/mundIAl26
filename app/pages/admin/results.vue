@@ -527,14 +527,9 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       <div class="space-y-4 max-w-md">
         <div class="flex items-center justify-between">
           <p class="text-sm text-muted">Ganadores reales del torneo.</p>
-          <div class="flex gap-2">
-            <UButton size="sm" variant="outline" color="neutral" :loading="syncingPlayers" icon="i-lucide-refresh-cw" @click="syncPlayers">
-              Sync jugadores
-            </UButton>
-            <UButton size="sm" color="success" :loading="savingAwards" icon="i-lucide-save" @click="saveAwards">
-              Guardar premios
-            </UButton>
-          </div>
+          <UButton size="sm" color="success" :loading="savingAwards" icon="i-lucide-save" @click="saveAwards">
+            Guardar premios
+          </UButton>
         </div>
         <UCard>
           <div class="space-y-4">
