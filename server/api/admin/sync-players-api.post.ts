@@ -118,7 +118,7 @@ export default defineEventHandler(async (event) => {
 
     await supabase
       .from('players')
-      .upsert(rows, { onConflict: 'external_id' })
+      .upsert(rows, { onConflict: 'external_id', ignoreDuplicates: true })
 
     synced += rows.length
   }

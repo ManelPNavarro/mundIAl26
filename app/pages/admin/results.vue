@@ -190,7 +190,6 @@ const awardIds = ref<AwardIds>({
 })
 
 const savingAwards = ref(false)
-const syncingPlayers = ref(false)
 const syncingPlayersApi = ref(false)
 const seedingSchedule = ref(false)
 
@@ -253,20 +252,6 @@ async function seedSchedule() {
     toast.add({ title: 'Error al actualizar horarios', color: 'error' })
   } finally {
     seedingSchedule.value = false
-  }
-}
-
-async function syncPlayers() {
-  syncingPlayers.value = true
-  try {
-    const h = await getAuthHeaders()
-    const result = await $fetch<{ synced: number }>('/api/admin/sync-players', { method: 'POST', headers: h })
-    await refreshNuxtData()
-    toast.add({ title: `${result.synced} jugadores sincronizados`, color: 'success' })
-  } catch {
-    toast.add({ title: 'Error al sincronizar jugadores', color: 'error' })
-  } finally {
-    syncingPlayers.value = false
   }
 }
 
@@ -450,9 +435,6 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         </UButton>
         <UButton v-if="!isAwardsStep" icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncingMatches" @click="syncMatches">
           Sincronizar
-        </UButton>
-        <UButton icon="i-lucide-users" color="neutral" variant="outline" size="sm" :loading="syncingPlayers" @click="syncPlayers">
-          Sync jugadores
         </UButton>
         <UButton icon="i-lucide-cloud-download" color="neutral" variant="outline" size="sm" :loading="syncingPlayersApi" @click="syncPlayersApi">
           Sync desde API
