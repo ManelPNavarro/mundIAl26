@@ -34,12 +34,6 @@ interface Awards {
   best_goalkeeper: string | null
 }
 
-interface AwardIds {
-  best_player: string | null
-  best_young_player: string | null
-  top_scorer: string | null
-  best_goalkeeper: string | null
-}
 
 const supabase = useSupabaseClient()
 const toast = useToast()
@@ -50,10 +44,9 @@ async function getAuthHeaders() {
 }
 
 const headers = await getAuthHeaders()
-const [{ data: matches, refresh }, { data: allTeams }, { data: allPlayers }, { data: roundLocks, refresh: refreshLocks }, fetchedAwards] = await Promise.all([
+const [{ data: matches, refresh }, { data: allTeams }, { data: roundLocks, refresh: refreshLocks }, fetchedAwards] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
   useFetch<Team[]>('/api/teams'),
-  useFetch<Player[]>('/api/players'),
   useFetch<Record<string, boolean>>('/api/round-locks'),
   $fetch<Awards>('/api/admin/awards', { headers }),
 ])
@@ -164,29 +157,12 @@ async function clearResult(match: Match) {
 }
 
 // ─── Awards ──────────────────────────────────────────────────────────────────
-function playerIdByName(name: string | null): string | null {
-  if (!name) return null
-  return allPlayers.value?.find(p => p.name.trim().toLowerCase() === name.trim().toLowerCase())?.id ?? null
-}
-
-function playerNameById(id: string | null): string | null {
-  if (!id) return null
-  return allPlayers.value?.find(p => p.id === id)?.name ?? null
-}
-
 const awards = ref<Awards>({
   winner_team_id: fetchedAwards?.winner_team_id ?? null,
   best_player: fetchedAwards?.best_player ?? null,
   best_young_player: fetchedAwards?.best_young_player ?? null,
   top_scorer: fetchedAwards?.top_scorer ?? null,
   best_goalkeeper: fetchedAwards?.best_goalkeeper ?? null,
-})
-
-const awardIds = ref<AwardIds>({
-  best_player: playerIdByName(fetchedAwards?.best_player ?? null),
-  best_young_player: playerIdByName(fetchedAwards?.best_young_player ?? null),
-  top_scorer: playerIdByName(fetchedAwards?.top_scorer ?? null),
-  best_goalkeeper: playerIdByName(fetchedAwards?.best_goalkeeper ?? null),
 })
 
 const savingAwards = ref(false)
@@ -212,10 +188,10 @@ watch(finalWinnerId, id => { awards.value.winner_team_id = id }, { immediate: tr
 
 const awardsComplete = computed(() =>
   !!awards.value.winner_team_id &&
-  !!awardIds.value.best_player &&
-  !!awardIds.value.best_young_player &&
-  !!awardIds.value.top_scorer &&
-  !!awardIds.value.best_goalkeeper
+  !!awards.value.best_player &&
+  !!awards.value.best_young_player &&
+  !!awards.value.top_scorer &&
+  !!awards.value.best_goalkeeper
 )
 
 async function saveAwards() {
@@ -227,10 +203,10 @@ async function saveAwards() {
       headers: h,
       body: {
         winner_team_id: awards.value.winner_team_id,
-        best_player: playerNameById(awardIds.value.best_player),
-        best_young_player: playerNameById(awardIds.value.best_young_player),
-        top_scorer: playerNameById(awardIds.value.top_scorer),
-        best_goalkeeper: playerNameById(awardIds.value.best_goalkeeper),
+        best_player: awards.value.best_player,
+        best_young_player: awards.value.best_young_player,
+        top_scorer: awards.value.top_scorer,
+        best_goalkeeper: awards.value.best_goalkeeper,
       },
     })
     toast.add({ title: 'Premios guardados', color: 'success' })
@@ -269,11 +245,11 @@ async function syncPlayersApi() {
   }
 }
 
-const AWARD_FIELDS: { key: keyof AwardIds, label: string, positionFilter?: string }[] = [
+const AWARD_FIELDS: { key: keyof Omit<Awards, 'winner_team_id'>, label: string }[] = [
   { key: 'best_player', label: 'Mejor jugador (MVP)' },
   { key: 'best_young_player', label: 'Mejor jugador joven' },
   { key: 'top_scorer', label: 'Máximo goleador' },
-  { key: 'best_goalkeeper', label: 'Mejor portero', positionFilter: 'GK' },
+  { key: 'best_goalkeeper', label: 'Mejor portero' },
 ]
 
 const ROUNDS = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL', 'PREMIOS']
@@ -543,7 +519,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
             </div>
             <div v-for="field in AWARD_FIELDS" :key="field.key" class="flex flex-col gap-2">
               <label class="text-sm font-medium text-foreground">{{ field.label }}</label>
-              <PlayerSelect v-model="awardIds[field.key]" :players="allPlayers ?? []" :position-filter="field.positionFilter" placeholder="Buscar jugador..." />
+              <UInput v-model="awards[field.key]" placeholder="Nombre del jugador..." />
             </div>
           </div>
         </UCard>
