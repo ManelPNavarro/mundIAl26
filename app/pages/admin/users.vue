@@ -8,6 +8,7 @@ interface AppUser {
   is_admin: boolean
   predictions_filled: number
   total_matches: number
+  awards_filled: number
 }
 
 const supabase = useSupabaseClient()
@@ -169,16 +170,24 @@ const columns = [
         </template>
 
         <template #predictions_filled-cell="{ row }">
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-medium text-foreground tabular-nums">
-              {{ row.original.predictions_filled }}/{{ row.original.total_matches }}
-            </span>
-            <div class="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-              <div
-                class="h-full rounded-full bg-primary transition-all"
-                :style="{ width: `${row.original.total_matches ? Math.round(row.original.predictions_filled / row.original.total_matches * 100) : 0}%` }"
-              />
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium text-foreground tabular-nums">
+                {{ row.original.predictions_filled }}/{{ row.original.total_matches }}
+              </span>
+              <div class="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-primary transition-all"
+                  :style="{ width: `${row.original.total_matches ? Math.round(row.original.predictions_filled / row.original.total_matches * 100) : 0}%` }"
+                />
+              </div>
             </div>
+            <span
+              class="text-xs tabular-nums"
+              :class="row.original.awards_filled === 4 ? 'text-primary font-medium' : 'text-muted'"
+            >
+              {{ row.original.awards_filled }}/4
+            </span>
           </div>
         </template>
 
