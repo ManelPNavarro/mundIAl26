@@ -20,7 +20,7 @@ const open = ref(false)
 const inputRef = ref<HTMLInputElement | null>(null)
 
 function normalize(s: string) {
-  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
 const filtered = computed(() => {
