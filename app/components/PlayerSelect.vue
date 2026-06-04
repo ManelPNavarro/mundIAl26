@@ -18,12 +18,16 @@ const query = ref('')
 const open = ref(false)
 const inputRef = ref<HTMLInputElement | null>(null)
 
+function normalize(s: string) {
+  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+}
+
 const filtered = computed(() => {
-  const q = query.value.toLowerCase().trim()
+  const q = normalize(query.value.trim())
   if (!q) return props.players
   return props.players.filter(p =>
-    p.name.toLowerCase().includes(q) ||
-    p.team?.name.toLowerCase().includes(q)
+    normalize(p.name).includes(q) ||
+    normalize(p.team?.name ?? '').includes(q)
   )
 })
 
