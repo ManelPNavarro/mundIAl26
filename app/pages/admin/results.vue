@@ -44,9 +44,12 @@ async function getAuthHeaders() {
 }
 
 const headers = await getAuthHeaders()
-const [{ data: matches, refresh }, { data: allTeams }, { data: roundLocks, refresh: refreshLocks }, fetchedAwards] = await Promise.all([
+interface Player { id: string, name: string }
+
+const [{ data: matches, refresh }, { data: allTeams }, { data: allPlayers }, { data: roundLocks, refresh: refreshLocks }, fetchedAwards] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
   useFetch<Team[]>('/api/teams'),
+  useFetch<Player[]>('/api/players'),
   useFetch<Record<string, boolean>>('/api/round-locks'),
   $fetch<Awards>('/api/admin/awards', { headers }),
 ])
@@ -499,6 +502,9 @@ function teamName(match: Match, side: 'home' | 'away'): string {
     </template>
 
     <!-- Awards -->
+    <datalist id="players-list">
+      <option v-for="p in allPlayers" :key="p.id" :value="p.name" />
+    </datalist>
     <template v-else-if="isAwardsStep">
       <div class="space-y-4 max-w-md">
         <div class="flex items-center justify-between">
@@ -519,7 +525,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
             </div>
             <div v-for="field in AWARD_FIELDS" :key="field.key" class="flex flex-col gap-2">
               <label class="text-sm font-medium text-foreground">{{ field.label }}</label>
-              <UInput v-model="awards[field.key]" placeholder="Nombre del jugador..." />
+              <UInput v-model="awards[field.key]" list="players-list" placeholder="Nombre del jugador..." />
             </div>
           </div>
         </UCard>

@@ -47,8 +47,11 @@ interface MatchSummary {
   isCorrect: boolean
 }
 
-const [{ data: allMatches }, { data: roundLocks }, savedPredictions, savedSideBets, matchSummary, officialAwards, scoringConfig, lastUpdatedRes] = await Promise.all([
+interface Player { id: string, name: string }
+
+const [{ data: allMatches }, { data: allPlayers }, { data: roundLocks }, savedPredictions, savedSideBets, matchSummary, officialAwards, scoringConfig, lastUpdatedRes] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
+  useFetch<Player[]>('/api/players'),
   useFetch<Record<string, boolean>>('/api/round-locks'),
   $fetch<Predictions>('/api/predictions', { headers }),
   $fetch<SideBets | null>('/api/side-bets', { headers }),
@@ -396,6 +399,10 @@ async function save() {
       <div v-else-if="currentRound">
         <PredictionsKnockoutRound v-model="predictions" :matches="currentRound.matches" :all-matches="allMatches ?? []" :locked="isLocked" :summary="matchSummary" />
       </div>
+      <datalist id="players-list">
+        <option v-for="p in allPlayers" :key="p.id" :value="p.name" />
+      </datalist>
+
       <div v-else-if="isAwardsStep" class="space-y-6">
         <div>
           <h2 class="text-base font-semibold text-foreground">Premios del torneo</h2>
@@ -408,7 +415,7 @@ async function save() {
               <span>{{ sideBets.best_player ?? '—' }}</span>
               <span v-if="awardResult('best_player')?.correct" class="text-xs font-semibold">+{{ awardResult('best_player')!.pts }} pts</span>
             </div>
-            <UInput v-else v-model="sideBets.best_player" placeholder="Nombre del jugador..." :disabled="isLocked" />
+            <UInput v-else v-model="sideBets.best_player" list="players-list" placeholder="Nombre del jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor jugador joven <span class="text-muted-foreground font-normal">(-21 años)</span></label>
@@ -416,7 +423,7 @@ async function save() {
               <span>{{ sideBets.best_young_player ?? '—' }}</span>
               <span v-if="awardResult('best_young_player')?.correct" class="text-xs font-semibold">+{{ awardResult('best_young_player')!.pts }} pts</span>
             </div>
-            <UInput v-else v-model="sideBets.best_young_player" placeholder="Nombre del jugador..." :disabled="isLocked" />
+            <UInput v-else v-model="sideBets.best_young_player" list="players-list" placeholder="Nombre del jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Máximo goleador</label>
@@ -424,7 +431,7 @@ async function save() {
               <span>{{ sideBets.top_scorer ?? '—' }}</span>
               <span v-if="awardResult('top_scorer')?.correct" class="text-xs font-semibold">+{{ awardResult('top_scorer')!.pts }} pts</span>
             </div>
-            <UInput v-else v-model="sideBets.top_scorer" placeholder="Nombre del jugador..." :disabled="isLocked" />
+            <UInput v-else v-model="sideBets.top_scorer" list="players-list" placeholder="Nombre del jugador..." :disabled="isLocked" />
           </div>
           <div class="flex flex-col gap-2">
             <label class="text-sm font-medium text-foreground">Mejor portero</label>
@@ -432,7 +439,7 @@ async function save() {
               <span>{{ sideBets.best_goalkeeper ?? '—' }}</span>
               <span v-if="awardResult('best_goalkeeper')?.correct" class="text-xs font-semibold">+{{ awardResult('best_goalkeeper')!.pts }} pts</span>
             </div>
-            <UInput v-else v-model="sideBets.best_goalkeeper" placeholder="Nombre del jugador..." :disabled="isLocked" />
+            <UInput v-else v-model="sideBets.best_goalkeeper" list="players-list" placeholder="Nombre del jugador..." :disabled="isLocked" />
           </div>
         </div>
       </div>
