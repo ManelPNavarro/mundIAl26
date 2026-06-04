@@ -436,6 +436,9 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <UButton v-if="!isAwardsStep" icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncingMatches" @click="syncMatches">
           Sincronizar
         </UButton>
+        <UButton icon="i-lucide-users" color="neutral" variant="outline" size="sm" :loading="syncingPlayers" @click="syncPlayers">
+          Sync jugadores
+        </UButton>
       </div>
     </div>
 
