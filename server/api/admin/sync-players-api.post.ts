@@ -5,6 +5,57 @@ const POSITION_MAP: Record<string, string> = {
   Offence: 'FWD',
 }
 
+const TEAM_NAME_MAP: Record<string, string> = {
+  'Spain': 'España',
+  'Germany': 'Alemania',
+  'France': 'Francia',
+  'Netherlands': 'Países Bajos',
+  'Belgium': 'Bélgica',
+  'Brazil': 'Brasil',
+  'Mexico': 'México',
+  'United States': 'Estados Unidos',
+  'South Korea': 'Corea del Sur',
+  'Czechia': 'República Checa',
+  'South Africa': 'Sudáfrica',
+  'Bosnia-Herzegovina': 'Bosnia y Herzegovina',
+  'Canada': 'Canadá',
+  'Qatar': 'Catar',
+  'Switzerland': 'Suiza',
+  'Scotland': 'Escocia',
+  'Haiti': 'Haití',
+  'Morocco': 'Marruecos',
+  'Australia': 'Australia',
+  'Paraguay': 'Paraguay',
+  'Turkey': 'Turquía',
+  'Ivory Coast': 'Costa de Marfil',
+  'Curaçao': 'Curazao',
+  'Ecuador': 'Ecuador',
+  'Japan': 'Japón',
+  'Sweden': 'Suecia',
+  'Tunisia': 'Túnez',
+  'Egypt': 'Egipto',
+  'Iran': 'Irán',
+  'New Zealand': 'Nueva Zelanda',
+  'Saudi Arabia': 'Arabia Saudita',
+  'Cape Verde Islands': 'Cabo Verde',
+  'Uruguay': 'Uruguay',
+  'Iraq': 'Irak',
+  'Norway': 'Noruega',
+  'Senegal': 'Senegal',
+  'Algeria': 'Argelia',
+  'Argentina': 'Argentina',
+  'Austria': 'Austria',
+  'Jordan': 'Jordania',
+  'Colombia': 'Colombia',
+  'Portugal': 'Portugal',
+  'Congo DR': 'RD Congo',
+  'Uzbekistan': 'Uzbekistán',
+  'Croatia': 'Croacia',
+  'Ghana': 'Ghana',
+  'England': 'Inglaterra',
+  'Panama': 'Panamá',
+}
+
 interface FdPlayer {
   id: number
   name: string
@@ -48,7 +99,8 @@ export default defineEventHandler(async (event) => {
   let skipped = 0
 
   for (const team of teams) {
-    const teamId = teamByName.get(team.name)
+    const dbName = TEAM_NAME_MAP[team.name] ?? team.name
+    const teamId = teamByName.get(dbName)
     if (!teamId) {
       skipped++
       continue
