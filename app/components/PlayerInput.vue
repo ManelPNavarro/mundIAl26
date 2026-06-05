@@ -1,5 +1,5 @@
 <script setup lang="ts">
-interface Player { id: string, name: string }
+interface Player { id: string, name: string, team?: { name: string } | null }
 
 const props = defineProps<{
   players: Player[]
@@ -67,10 +67,11 @@ onUnmounted(() => document.removeEventListener('mousedown', onClickOutside))
         v-for="p in suggestions"
         :key="p.id"
         type="button"
-        class="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 truncate"
+        class="w-full text-left px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 flex items-center justify-between gap-2"
         @mousedown.prevent="select(p.name)"
       >
-        {{ p.name }}
+        <span class="text-foreground truncate">{{ p.name }}</span>
+        <span v-if="p.team?.name" class="text-muted-foreground text-xs shrink-0">{{ p.team.name }}</span>
       </button>
     </div>
   </div>
