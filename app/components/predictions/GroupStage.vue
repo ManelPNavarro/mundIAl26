@@ -122,7 +122,7 @@ function filledCount(matches: Match[]) {
             </div>
             <!-- Prediction row -->
             <div class="flex items-center gap-2 px-3 py-2">
-              <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }}</span>
+              <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }} {{ getFlag(teamName(match, 'home')) }}</span>
               <div class="flex items-center gap-1 shrink-0">
                 <template v-if="isMatchLocked(match)">
                   <span class="font-mono font-bold text-sm text-foreground w-12 text-center">{{ getPrediction(match.id).home ?? '–' }}</span>
@@ -135,7 +135,7 @@ function filledCount(matches: Match[]) {
                   <UInput v-model.number="getPrediction(match.id).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="false" />
                 </template>
               </div>
-              <span class="flex-1 text-sm text-left font-medium truncate">{{ teamName(match, 'away') }}</span>
+              <span class="flex-1 text-sm text-left font-medium truncate">{{ getFlag(teamName(match, 'away')) }} {{ teamName(match, 'away') }}</span>
             </div>
 
             <!-- Real result strip -->
