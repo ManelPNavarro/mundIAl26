@@ -480,9 +480,9 @@ function teamName(match: Match, side: 'home' | 'away'): string {
                   <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }} {{ getFlag(teamName(match, 'home')) }}</span>
                   <template v-if="isEditing(match)">
                     <div class="flex items-center gap-1 shrink-0">
-                      <UInput v-model.number="getDraft(match).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
+                      <UInput v-model.number="getDraft(match).home" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
                       <span class="text-muted font-bold text-sm">–</span>
-                      <UInput v-model.number="getDraft(match).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
+                      <UInput v-model.number="getDraft(match).away" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
                     </div>
                     <span class="flex-1 text-sm text-left font-medium truncate">{{ getFlag(teamName(match, 'away')) }} {{ teamName(match, 'away') }}</span>
                     <UButton size="xs" color="success" :loading="saving === match.id" :disabled="getDraft(match).home === null || getDraft(match).away === null" icon="i-lucide-save" @click="saveResult(match)" />
@@ -538,9 +538,9 @@ function teamName(match: Match, side: 'home' | 'away'): string {
             <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }} {{ getFlag(teamName(match, 'home')) }}</span>
             <template v-if="isEditing(match)">
               <div class="flex items-center gap-1 shrink-0">
-                <UInput v-model.number="getDraft(match).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
+                <UInput v-model.number="getDraft(match).home" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
                 <span class="text-muted font-bold text-sm">–</span>
-                <UInput v-model.number="getDraft(match).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" />
+                <UInput v-model.number="getDraft(match).away" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
               </div>
               <span class="flex-1 text-sm text-left font-medium truncate">{{ getFlag(teamName(match, 'away')) }} {{ teamName(match, 'away') }}</span>
               <UButton size="xs" color="success" :loading="saving === match.id" :disabled="getDraft(match).home === null || getDraft(match).away === null" icon="i-lucide-save" @click="saveResult(match)" />

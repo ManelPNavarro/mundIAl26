@@ -130,9 +130,9 @@ function filledCount(matches: Match[]) {
                   <span class="font-mono font-bold text-sm text-foreground w-12 text-center">{{ getPrediction(match.id).away ?? '–' }}</span>
                 </template>
                 <template v-else>
-                  <UInput v-model.number="getPrediction(match.id).home" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="false" />
+                  <UInput v-model.number="getPrediction(match.id).home" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" :disabled="false" />
                   <span class="text-muted font-bold text-sm">–</span>
-                  <UInput v-model.number="getPrediction(match.id).away" type="number" min="0" max="99" class="w-12 text-center" size="sm" :disabled="false" />
+                  <UInput v-model.number="getPrediction(match.id).away" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" :disabled="false" />
                 </template>
               </div>
               <span class="flex-1 text-sm text-left font-medium truncate">{{ getFlag(teamName(match, 'away')) }} {{ teamName(match, 'away') }}</span>
