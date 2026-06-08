@@ -122,14 +122,14 @@ const AWARD_POINT_ROWS = [
                 <td class="py-3 text-foreground">{{ row.label }}</td>
                 <td class="py-3 text-center">
                   <UInput
-                    type="number" min="0" max="99" class="w-16 mx-auto text-center" size="sm"
+                    type="number" inputmode="numeric" min="0" max="99" class="w-16 mx-auto text-center" size="sm"
                     :model-value="config[row.correct]"
                     @update:model-value="updateKey(row.correct, String($event))"
                   />
                 </td>
                 <td class="py-3 text-center">
                   <UInput
-                    type="number" min="0" max="99" class="w-16 mx-auto text-center" size="sm"
+                    type="number" inputmode="numeric" min="0" max="99" class="w-16 mx-auto text-center" size="sm"
                     :model-value="config[row.exact]"
                     @update:model-value="updateKey(row.exact, String($event))"
                   />
@@ -149,7 +149,7 @@ const AWARD_POINT_ROWS = [
           <div v-for="row in AWARD_POINT_ROWS" :key="row.key" class="flex items-center justify-between gap-4">
             <span class="text-sm text-foreground">{{ row.label }}</span>
             <UInput
-              type="number" min="0" max="999" class="w-20 text-center" size="sm"
+              type="number" inputmode="numeric" min="0" max="999" class="w-20 text-center" size="sm"
               :model-value="config[row.key]"
               @update:model-value="updateKey(row.key, String($event))"
             />

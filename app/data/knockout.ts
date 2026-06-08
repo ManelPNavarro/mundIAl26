@@ -13,7 +13,7 @@ export interface KnockoutRound {
 export const KNOCKOUT_ROUNDS: KnockoutRound[] = [
   {
     key: 'r32',
-    label: 'Ronda de 32',
+    label: 'Dieciseisavos',
     matches: [
       { id: 73, slotHome: '1A', slotAway: '2B' },
       { id: 74, slotHome: '1C', slotAway: '2D' },
