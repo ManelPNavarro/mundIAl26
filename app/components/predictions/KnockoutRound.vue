@@ -34,6 +34,8 @@ const props = defineProps<{
 }>()
 const predictions = defineModel<Predictions>({ required: true })
 
+const isR32Round = computed(() => props.matches.some(m => m.round === 'R32'))
+
 function getPrediction(matchId: string): Prediction {
   if (!predictions.value[matchId]) {
     predictions.value[matchId] = { home: null, away: null, homeAdvances: null }
@@ -52,9 +54,11 @@ function scoreFor(m: Match): { home: number, away: number, homeAdvances: boolean
   if (m.round === 'GROUP') {
     if (m.home_score !== null && m.away_score !== null)
       return { home: m.home_score, away: m.away_score, homeAdvances: m.home_advances }
-    const p = predictions.value[m.id]
-    if (p?.home != null && p?.away != null)
-      return { home: p.home, away: p.away, homeAdvances: p.homeAdvances ?? null }
+    if (!isR32Round.value) {
+      const p = predictions.value[m.id]
+      if (p?.home != null && p?.away != null)
+        return { home: p.home, away: p.away, homeAdvances: p.homeAdvances ?? null }
+    }
     return null
   }
   const p = predictions.value[m.id]
