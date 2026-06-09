@@ -117,7 +117,7 @@ onMounted(() => { currentStep.value = openStepIndex.value })
 // ─── Match grouping ──────────────────────────────────────────────────────────
 const ROUND_ORDER = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
 const ROUND_LABELS: Record<string, string> = {
-  GROUP: 'Fase de grupos', R32: 'Ronda de 32', R16: 'Octavos de final',
+  GROUP: 'Fase de grupos', R32: 'Dieciseisavos', R16: 'Octavos de final',
   QF: 'Cuartos de final', SF: 'Semifinales', THIRD_PLACE: 'Tercer puesto', FINAL: 'Final',
 }
 
@@ -361,7 +361,7 @@ async function save() {
           :key="step.key"
           class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
           :class="[
-            idx === currentStep ? 'bg-primary border-primary text-white'
+            idx === currentStep ? 'bg-primary-400 border-primary-400 text-neutral-900'
             : step.complete ? 'bg-success/10 border-success/30 text-success hover:bg-success/20 cursor-pointer'
             : 'bg-muted/50 border-border text-muted hover:bg-muted cursor-pointer',
           ]"
@@ -455,6 +455,7 @@ async function save() {
           :disabled="isLocked"
           :loading="saving"
           icon="i-lucide-save"
+          class="bg-primary-400! text-neutral-900! hover:bg-primary-300!"
           @click="save"
         >
           Guardar
@@ -465,6 +466,7 @@ async function save() {
           :loading="saving"
           icon="i-lucide-check"
           color="success"
+          class="bg-primary-400! text-neutral-900! hover:bg-primary-300!"
           @click="save"
         >
           Guardar predicciones

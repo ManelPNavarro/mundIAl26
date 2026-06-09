@@ -61,7 +61,7 @@ function updateKey(key: string, val: string) {
 
 const MATCH_ROWS = [
   { label: 'Fase de grupos',   correct: 'group_correct',       exact: 'group_exact' },
-  { label: 'Ronda de 32',      correct: 'r32_correct',         exact: 'r32_exact' },
+  { label: 'Dieciseisavos',    correct: 'r32_correct',         exact: 'r32_exact' },
   { label: 'Octavos de final', correct: 'r16_correct',         exact: 'r16_exact' },
   { label: 'Cuartos de final', correct: 'qf_correct',          exact: 'qf_exact' },
   { label: 'Semifinales',      correct: 'sf_correct',          exact: 'sf_exact' },

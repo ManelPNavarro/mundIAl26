@@ -258,7 +258,7 @@ const AWARD_FIELDS: { key: keyof Omit<Awards, 'winner_team_id'>, label: string }
 const ROUNDS = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL', 'PREMIOS']
 const ROUND_LABELS: Record<string, string> = {
   GROUP: 'Grupos',
-  R32: 'Ronda de 32',
+  R32: 'Dieciseisavos',
   R16: 'Octavos',
   QF: 'Cuartos',
   SF: 'Semifinales',
