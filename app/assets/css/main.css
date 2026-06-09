@@ -1,6 +1,154 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+@theme {
+  /* Custom Green */
+  --color-green-50: #EDFFF7;
+  --color-green-100: #D1FFE9;
+  --color-green-200: #A8FFD5;
+  --color-green-300: #5EFFC3;
+  --color-green-400: #02FFA1;
+  --color-green-500: #00B36F;
+  --color-green-600: #0C8F65;
+  --color-green-700: #0A7554;
+  --color-green-800: #085C42;
+  --color-green-900: #053D2C;
+  --color-green-950: #032A1D;
+
+  /* Custom Grey (cool) */
+  --color-cool-50: #E6E6E7;
+  --color-cool-100: #DBDBE3;
+  --color-cool-200: #B8B8C3;
+  --color-cool-300: #9797A8;
+  --color-cool-400: #828297;
+  --color-cool-500: #64647C;
+  --color-cool-600: #3E3E53;
+  --color-cool-700: #242432;
+  --color-cool-800: #141426;
+  --color-cool-900: #080810;
+  --color-cool-950: #050508;
+
+  /* Custom Red */
+  --color-red-50: #FFF1F3;
+  --color-red-100: #FFE0E5;
+  --color-red-200: #FFC6D0;
+  --color-red-300: #FFA0B2;
+  --color-red-400: #F97A96;
+  --color-red-500: #F72E5A;
+  --color-red-600: #E11D48;
+  --color-red-700: #B42242;
+  --color-red-800: #9A1E3B;
+  --color-red-900: #801A33;
+  --color-red-950: #4C0D1C;
+
+  /* Custom Orange */
+  --color-orange-50: #FFF7ED;
+  --color-orange-100: #FFEDD5;
+  --color-orange-200: #FED7AA;
+  --color-orange-300: #FDBA74;
+  --color-orange-400: #FD9043;
+  --color-orange-500: #F97316;
+  --color-orange-600: #EA580C;
+  --color-orange-700: #C2410C;
+  --color-orange-800: #9A3412;
+  --color-orange-900: #7C2D12;
+  --color-orange-950: #431407;
+
+  /* Custom Blue */
+  --color-blue-50: #EFF6FF;
+  --color-blue-100: #DBEAFE;
+  --color-blue-200: #BFDBFE;
+  --color-blue-300: #93C5FD;
+  --color-blue-400: #01BAEF;
+  --color-blue-500: #1F6BFF;
+  --color-blue-600: #575CF9;
+  --color-blue-700: #473CB5;
+  --color-blue-800: #3730A3;
+  --color-blue-900: #312E81;
+  --color-blue-950: #1E1B4B;
+}
+
+/* Override Nuxt UI runtime color variables with our custom palette */
+:root {
+  /* Primary (green) */
+  --ui-color-primary-50: #EDFFF7;
+  --ui-color-primary-100: #D1FFE9;
+  --ui-color-primary-200: #A8FFD5;
+  --ui-color-primary-300: #5EFFC3;
+  --ui-color-primary-400: #02FFA1;
+  --ui-color-primary-500: #00B36F;
+  --ui-color-primary-600: #0C8F65;
+  --ui-color-primary-700: #0A7554;
+  --ui-color-primary-800: #085C42;
+  --ui-color-primary-900: #053D2C;
+  --ui-color-primary-950: #032A1D;
+
+  /* Neutral (grey) */
+  --ui-color-neutral-50: #E6E6E7;
+  --ui-color-neutral-100: #DBDBE3;
+  --ui-color-neutral-200: #B8B8C3;
+  --ui-color-neutral-300: #9797A8;
+  --ui-color-neutral-400: #828297;
+  --ui-color-neutral-500: #64647C;
+  --ui-color-neutral-600: #3E3E53;
+  --ui-color-neutral-700: #242432;
+  --ui-color-neutral-800: #141426;
+  --ui-color-neutral-900: #080810;
+  --ui-color-neutral-950: #050508;
+
+  /* Error (red) */
+  --ui-color-error-50: #FFF1F3;
+  --ui-color-error-100: #FFE0E5;
+  --ui-color-error-200: #FFC6D0;
+  --ui-color-error-300: #FFA0B2;
+  --ui-color-error-400: #F97A96;
+  --ui-color-error-500: #F72E5A;
+  --ui-color-error-600: #E11D48;
+  --ui-color-error-700: #B42242;
+  --ui-color-error-800: #9A1E3B;
+  --ui-color-error-900: #801A33;
+  --ui-color-error-950: #4C0D1C;
+
+  /* Warning (orange) */
+  --ui-color-warning-50: #FFF7ED;
+  --ui-color-warning-100: #FFEDD5;
+  --ui-color-warning-200: #FED7AA;
+  --ui-color-warning-300: #FDBA74;
+  --ui-color-warning-400: #FD9043;
+  --ui-color-warning-500: #F97316;
+  --ui-color-warning-600: #EA580C;
+  --ui-color-warning-700: #C2410C;
+  --ui-color-warning-800: #9A3412;
+  --ui-color-warning-900: #7C2D12;
+  --ui-color-warning-950: #431407;
+
+  /* Success (green) */
+  --ui-color-success-50: #EDFFF7;
+  --ui-color-success-100: #D1FFE9;
+  --ui-color-success-200: #A8FFD5;
+  --ui-color-success-300: #5EFFC3;
+  --ui-color-success-400: #02FFA1;
+  --ui-color-success-500: #00B36F;
+  --ui-color-success-600: #0C8F65;
+  --ui-color-success-700: #0A7554;
+  --ui-color-success-800: #085C42;
+  --ui-color-success-900: #053D2C;
+  --ui-color-success-950: #032A1D;
+
+  /* Info (blue) */
+  --ui-color-info-50: #EFF6FF;
+  --ui-color-info-100: #DBEAFE;
+  --ui-color-info-200: #BFDBFE;
+  --ui-color-info-300: #93C5FD;
+  --ui-color-info-400: #01BAEF;
+  --ui-color-info-500: #1F6BFF;
+  --ui-color-info-600: #575CF9;
+  --ui-color-info-700: #473CB5;
+  --ui-color-info-800: #3730A3;
+  --ui-color-info-900: #312E81;
+  --ui-color-info-950: #1E1B4B;
+}
+
 button:not(:disabled) {
   cursor: pointer;
 }

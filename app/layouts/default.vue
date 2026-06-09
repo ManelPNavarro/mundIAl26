@@ -43,11 +43,11 @@ const menuItems = computed(() => [
 <template>
   <div class="min-h-screen bg-background">
     <header class="border-b sticky top-0 z-50 backdrop-blur transition-colors"
-      :class="isAdminPage ? 'bg-purple-950/90 border-purple-800' : 'bg-background/80 border-border'"
+      :class="isAdminPage ? 'bg-neutral-900/90 border-primary-700' : 'bg-background/80 border-border'"
     >
       <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         <div class="flex items-center gap-6">
-          <NuxtLink to="/" class="font-bold text-lg tracking-tight" :class="isAdminPage ? 'text-purple-100' : 'text-foreground'">
+          <NuxtLink to="/" class="font-bold text-lg tracking-tight" :class="isAdminPage ? 'text-primary-400' : 'text-foreground'">
             mundIAl 26
           </NuxtLink>
           <nav class="hidden sm:flex items-center gap-4">
