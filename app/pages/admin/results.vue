@@ -477,20 +477,20 @@ function teamName(match: Match, side: 'home' | 'away'): string {
               <div v-for="match in group.matches.filter(m => m.matchday === day)" :key="match.id" class="space-y-1">
                 <p class="text-xs text-muted text-center">{{ formatKickoff(match.kickoff_at) }}</p>
                 <div class="flex items-center gap-3">
-                  <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }} {{ getFlag(teamName(match, 'home')) }}</span>
+                  <span class="flex-1 flex items-center justify-end gap-1 min-w-0"><span class="truncate text-sm font-medium">{{ teamName(match, 'home') }}</span><span class="shrink-0">{{ getFlag(teamName(match, 'home')) }}</span></span>
                   <template v-if="isEditing(match)">
                     <div class="flex items-center gap-1 shrink-0">
                       <UInput v-model.number="getDraft(match).home" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
                       <span class="text-muted font-bold text-sm">–</span>
                       <UInput v-model.number="getDraft(match).away" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
                     </div>
-                    <span class="flex-1 text-sm text-left font-medium truncate">{{ getFlag(teamName(match, 'away')) }} {{ teamName(match, 'away') }}</span>
+                    <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium">{{ teamName(match, 'away') }}</span></span>
                     <UButton size="xs" color="success" :loading="saving === match.id" :disabled="getDraft(match).home === null || getDraft(match).away === null" icon="i-lucide-save" @click="saveResult(match)" />
                     <UButton v-if="match.home_score !== null" size="xs" color="error" variant="outline" :loading="saving === match.id" icon="i-lucide-trash-2" @click="clearResult(match)" />
                   </template>
                   <template v-else>
                     <span class="font-mono font-bold text-sm text-foreground shrink-0">{{ match.home_score }} – {{ match.away_score }}</span>
-                    <span class="flex-1 text-sm text-left font-medium truncate">{{ getFlag(teamName(match, 'away')) }} {{ teamName(match, 'away') }}</span>
+                    <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium">{{ teamName(match, 'away') }}</span></span>
                     <UButton size="xs" color="neutral" variant="outline" icon="i-lucide-pencil" @click="startEdit(match)" />
                   </template>
                 </div>
@@ -535,21 +535,21 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <div v-for="match in currentStepData.matches" :key="match.id" class="px-4 py-3 space-y-2">
           <p class="text-xs text-muted text-center">{{ formatKickoff(match.kickoff_at) }}</p>
           <div class="flex items-center gap-3">
-            <span class="flex-1 text-sm text-right font-medium truncate">{{ teamName(match, 'home') }} {{ getFlag(teamName(match, 'home')) }}</span>
+            <span class="flex-1 flex items-center justify-end gap-1 min-w-0"><span class="truncate text-sm font-medium">{{ teamName(match, 'home') }}</span><span class="shrink-0">{{ getFlag(teamName(match, 'home')) }}</span></span>
             <template v-if="isEditing(match)">
               <div class="flex items-center gap-1 shrink-0">
                 <UInput v-model.number="getDraft(match).home" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
                 <span class="text-muted font-bold text-sm">–</span>
                 <UInput v-model.number="getDraft(match).away" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
               </div>
-              <span class="flex-1 text-sm text-left font-medium truncate">{{ getFlag(teamName(match, 'away')) }} {{ teamName(match, 'away') }}</span>
+              <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium">{{ teamName(match, 'away') }}</span></span>
               <UButton size="xs" color="success" :loading="saving === match.id" :disabled="getDraft(match).home === null || getDraft(match).away === null" icon="i-lucide-save" @click="saveResult(match)" />
               <UButton v-if="match.home_score !== null" size="xs" color="error" variant="outline" :loading="saving === match.id" icon="i-lucide-trash-2" @click="clearResult(match)" />
             </template>
             <template v-else>
               <span v-if="match.home_score !== null" class="font-mono font-bold text-sm text-foreground shrink-0">{{ match.home_score }} – {{ match.away_score }}</span>
               <UIcon v-else name="i-lucide-lock" class="size-4 text-muted shrink-0" />
-              <span class="flex-1 text-sm text-left font-medium truncate">{{ getFlag(teamName(match, 'away')) }} {{ teamName(match, 'away') }}</span>
+              <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium">{{ teamName(match, 'away') }}</span></span>
               <UButton v-if="match.home_score !== null" size="xs" color="neutral" variant="outline" icon="i-lucide-pencil" @click="startEdit(match)" />
             </template>
           </div>
