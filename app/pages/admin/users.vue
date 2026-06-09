@@ -4,7 +4,7 @@ definePageMeta({ middleware: ['auth', 'admin'] })
 interface AppUser {
   id: string
   email: string
-  created_at: string
+  last_sign_in_at: string | null
   is_admin: boolean
   predictions_filled: number
   total_matches: number
@@ -108,7 +108,7 @@ const columns = [
   { accessorKey: 'email', header: 'Correo electrónico' },
   { accessorKey: 'is_admin', header: 'Rol' },
   { accessorKey: 'predictions_filled', header: 'Partidos' },
-  { accessorKey: 'created_at', header: 'Registro' },
+  { accessorKey: 'last_sign_in_at', header: 'Última conexión' },
   { id: 'actions', header: '' },
 ]
 </script>
@@ -191,8 +191,8 @@ const columns = [
           </div>
         </template>
 
-        <template #created_at-cell="{ row }">
-          <span class="text-sm text-muted">{{ formatDate(row.original.created_at) }}</span>
+        <template #last_sign_in_at-cell="{ row }">
+          <span class="text-sm text-muted">{{ row.original.last_sign_in_at ? formatDate(row.original.last_sign_in_at) : '—' }}</span>
         </template>
 
         <template #actions-cell="{ row }">

@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
   return authData.users.sort((a, b) => (a.email ?? '').localeCompare(b.email ?? '')).map(user => ({
     id: user.id,
     email: user.email ?? '',
-    created_at: user.created_at,
+    last_sign_in_at: user.last_sign_in_at ?? null,
     is_admin: user.user_metadata?.is_admin ?? false,
     predictions_filled: countByUser.get(user.id) ?? 0,
     total_matches: totalMatches ?? 0,
