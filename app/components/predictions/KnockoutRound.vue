@@ -175,7 +175,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       </div>
       <!-- Prediction row -->
       <div class="flex items-center gap-2 px-4 py-3">
-        <span class="flex-1 text-sm text-right font-medium text-foreground truncate">{{ teamName(match, 'home') }} {{ getFlag(teamName(match, 'home')) }}</span>
+        <span class="flex-1 flex items-center justify-end gap-1 min-w-0"><span class="truncate text-sm font-medium text-foreground">{{ teamName(match, 'home') }}</span><span class="shrink-0">{{ getFlag(teamName(match, 'home')) }}</span></span>
         <div class="flex items-center gap-1 shrink-0">
           <template v-if="isMatchLocked(match)">
             <span class="font-mono font-bold text-sm text-foreground w-12 text-center">{{ getPrediction(match.id).home ?? '–' }}</span>
@@ -188,7 +188,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
             <UInput v-model.number="getPrediction(match.id).away" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" :disabled="false" />
           </template>
         </div>
-        <span class="flex-1 text-sm text-left font-medium text-foreground truncate">{{ getFlag(teamName(match, 'away')) }} {{ teamName(match, 'away') }}</span>
+        <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium text-foreground">{{ teamName(match, 'away') }}</span></span>
       </div>
 
       <!-- Penalties tiebreaker -->
