@@ -25,7 +25,7 @@ async function promoteFirstUserIfNeeded() {
 watch(user, async (newUser) => {
   if (newUser) {
     await promoteFirstUserIfNeeded()
-    await navigateTo('/')
+    await navigateTo('/predictions')
   }
 }, { immediate: true })
 

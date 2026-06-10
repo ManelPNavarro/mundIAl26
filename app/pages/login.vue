@@ -24,7 +24,7 @@ async function signIn() {
   if (authError) {
     error.value = 'Correo o contraseña incorrectos.'
   } else {
-    await navigateTo('/')
+    await navigateTo('/predictions')
   }
 }
 </script>
