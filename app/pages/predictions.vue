@@ -293,6 +293,21 @@ const currentPhaseMatchesAllPlayed = computed(() => {
   return matches.length > 0 && matches.every(m => m.home_score !== null)
 })
 
+// ─── Random fill ─────────────────────────────────────────────────────────────
+const showRandomModal = ref(false)
+
+function fillRandom() {
+  for (const id of groupMatchIds.value) {
+    const p = predictions.value[id]
+    if (p?.home != null && p?.away != null) continue
+    predictions.value[id] = {
+      home: Math.floor(Math.random() * 7),
+      away: Math.floor(Math.random() * 7),
+    }
+  }
+  showRandomModal.value = false
+}
+
 // ─── Save ────────────────────────────────────────────────────────────────────
 const saving = ref(false)
 
@@ -451,6 +466,15 @@ async function save() {
       <div class="flex items-center gap-3">
         <span class="text-xs text-muted">{{ steps[currentStep]?.description }}</span>
         <UButton
+          v-if="currentStep === 0 && !isLocked"
+          variant="outline"
+          color="neutral"
+          icon="i-lucide-shuffle"
+          @click="showRandomModal = true"
+        >
+          Rellenar al azar
+        </UButton>
+        <UButton
           v-if="!isAwardsStep"
           :disabled="isLocked"
           :loading="saving"
@@ -474,5 +498,27 @@ async function save() {
       </div>
     </div>
 
+    <!-- Random fill confirmation modal -->
+    <UModal
+      :open="showRandomModal"
+      title="Rellenar predicciones al azar"
+      @update:open="(v) => { if (!v) showRandomModal = false }"
+    >
+      <template #body>
+        <p class="text-sm text-muted">
+          Se rellenarán solo los partidos de la fase de grupos que aún no tienen predicción, con resultados aleatorios entre 0 y 6 goles. Los partidos ya rellenados no se modificarán.
+        </p>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <UButton variant="ghost" color="neutral" @click="showRandomModal = false">
+            Cancelar
+          </UButton>
+          <UButton icon="i-lucide-shuffle" @click="fillRandom">
+            Rellenar
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
