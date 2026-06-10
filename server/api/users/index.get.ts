@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const supabase = useSupabaseAdmin()
   const [{ data: authData, error }, { data: predCounts }, { count: totalMatches }, { data: sideBetsData }] = await Promise.all([
     supabase.auth.admin.listUsers(),
-    supabase.from('predictions').select('user_id').limit(100000),
+    supabase.from('user_prediction_counts').select('user_id, count'),
     supabase.from('matches').select('*', { count: 'exact', head: true }),
     supabase.from('side_bets').select('user_id, best_player, best_young_player, top_scorer, best_goalkeeper'),
   ])
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
 
   const countByUser = new Map<string, number>()
   for (const p of predCounts ?? []) {
-    countByUser.set(p.user_id, (countByUser.get(p.user_id) ?? 0) + 1)
+    countByUser.set(p.user_id, p.count)
   }
 
   const awardsByUser = new Map<string, number>()
