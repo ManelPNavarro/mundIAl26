@@ -154,7 +154,7 @@ const columns = [
       >
         <template #email-cell="{ row }">
           <div class="flex items-center gap-2">
-            <UAvatar :alt="row.original.email" size="xs" />
+            <UAvatar :src="useGravatarUrl(row.original.email).value" :alt="row.original.email" size="xs" />
             <span class="text-sm font-medium text-foreground">{{ row.original.email }}</span>
           </div>
         </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
+const headerAvatarUrl = useGravatarUrl(user.value?.email)
 
 const displayEmail = computed(() => {
   const email = user.value?.email ?? ''
@@ -91,6 +92,7 @@ const menuItems = computed(() => [
             size="sm"
           >
             <UAvatar
+              :src="headerAvatarUrl"
               :alt="user.email"
               size="xs"
               class="mr-1"
@@ -99,7 +101,7 @@ const menuItems = computed(() => [
           </UButton>
 
           <template #account-leading>
-            <UAvatar :alt="user.email" size="xs" />
+            <UAvatar :src="headerAvatarUrl" :alt="user.email" size="xs" />
           </template>
         </UDropdownMenu>
       </div>

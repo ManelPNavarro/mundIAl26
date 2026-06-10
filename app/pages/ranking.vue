@@ -67,7 +67,7 @@ const POSITION_ICONS: Record<number, string> = {
         <!-- Name -->
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2">
-            <UAvatar :alt="entry.name" size="xs" />
+            <UAvatar :src="useGravatarUrl(entry.email).value" :alt="entry.name" size="xs" />
             <span class="text-sm font-medium text-foreground truncate">
               {{ entry.name }}
             </span>
