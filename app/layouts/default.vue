@@ -16,6 +16,12 @@ const isAdmin = computed(() => user.value?.user_metadata?.is_admin === true)
 const route = useRoute()
 const isAdminPage = computed(() => route.path.startsWith('/admin'))
 
+const { data: ranking } = useLazyFetch<{ id: string, position: number }[]>('/api/ranking')
+const myPosition = computed(() => {
+  if (!ranking.value || !user.value) return null
+  return ranking.value.find(e => e.id === user.value!.id)?.position ?? null
+})
+
 const menuItems = computed(() => [
   [{
     label: user.value?.email ?? '',
@@ -60,10 +66,16 @@ const menuItems = computed(() => [
             </NuxtLink>
             <NuxtLink
               to="/ranking"
-              class="text-sm text-muted hover:text-foreground transition-colors"
+              class="text-sm text-muted hover:text-foreground transition-colors relative"
               active-class="text-foreground font-medium"
             >
               Ranking
+              <span
+                v-if="myPosition"
+                class="absolute -top-2 -right-4 size-4.5 flex items-center justify-center rounded-full bg-primary text-white text-[10px] font-bold leading-none"
+              >
+                {{ myPosition }}
+              </span>
             </NuxtLink>
           </nav>
         </div>
@@ -122,7 +134,15 @@ const menuItems = computed(() => [
           class="flex flex-col items-center gap-1 text-muted hover:text-foreground transition-colors px-4"
           active-class="text-primary"
         >
-          <UIcon name="i-lucide-trophy" class="size-5" />
+          <div class="relative">
+            <UIcon name="i-lucide-trophy" class="size-5" />
+            <span
+              v-if="myPosition"
+              class="absolute -top-1.5 -right-2.5 size-4 flex items-center justify-center rounded-full bg-primary text-white text-[9px] font-bold leading-none"
+            >
+              {{ myPosition }}
+            </span>
+          </div>
           <span class="text-xs">Ranking</span>
         </NuxtLink>
       </div>
