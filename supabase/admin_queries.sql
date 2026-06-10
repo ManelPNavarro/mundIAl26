@@ -11,6 +11,33 @@ SET home_score = NULL,
     home_advances = NULL,
     status = 'SCHEDULED';
 
+-- Count predicted matches per user
+SELECT
+  u.email,
+  COUNT(*) AS predicted_matches
+FROM predictions p
+JOIN auth.users u ON u.id = p.user_id
+GROUP BY u.email
+ORDER BY predicted_matches DESC;
+
+-- View all predictions for a specific user (replace the email below)
+SELECT
+  m.match_no,
+  m.round,
+  m.group_letter,
+  ht.name   AS home_team,
+  p.home_score,
+  p.away_score,
+  at.name   AS away_team,
+  m.home_score  AS real_home,
+  m.away_score  AS real_away
+FROM predictions p
+JOIN matches m  ON m.id = p.match_id
+LEFT JOIN teams ht ON ht.id = m.home_team_id
+LEFT JOIN teams at ON at.id = m.away_team_id
+WHERE p.user_id = (SELECT id FROM auth.users WHERE email = 'user@example.com')
+ORDER BY m.match_no;
+
 -- View all users' side bet answers (player awards) alongside official results
 SELECT
   u.email,
