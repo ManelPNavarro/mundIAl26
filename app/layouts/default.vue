@@ -53,7 +53,7 @@ const menuItems = computed(() => [
     >
       <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         <div class="flex items-center gap-6">
-          <NuxtLink to="/" class="font-bold text-lg tracking-tight" :class="isAdminPage ? 'text-primary-400' : 'text-foreground'">
+          <NuxtLink to="/predictions" class="font-bold text-lg tracking-tight" :class="isAdminPage ? 'text-primary-400' : 'text-foreground'">
             mundIAl 26
           </NuxtLink>
           <nav class="hidden sm:flex items-center gap-4">
@@ -112,15 +112,6 @@ const menuItems = computed(() => [
     <!-- Bottom nav (mobile only) -->
     <nav class="sm:hidden fixed bottom-0 inset-x-0 bg-background/90 backdrop-blur border-t border-border z-50">
       <div class="flex items-center justify-around h-16">
-        <NuxtLink
-          to="/"
-          class="flex flex-col items-center gap-1 text-muted hover:text-foreground transition-colors px-4"
-          active-class="text-primary"
-          :end="true"
-        >
-          <UIcon name="i-lucide-house" class="size-5" />
-          <span class="text-xs">Inicio</span>
-        </NuxtLink>
         <NuxtLink
           to="/predictions"
           class="flex flex-col items-center gap-1 text-muted hover:text-foreground transition-colors px-4"

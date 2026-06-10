@@ -32,7 +32,26 @@ interface SideBets {
 
 
 const supabase = useSupabaseClient()
+const user = useSupabaseUser()
 const toast = useToast()
+
+const userName = ref(user.value?.user_metadata?.name ?? '')
+const savingName = ref(false)
+const showNameModal = computed(() => !user.value?.user_metadata?.name)
+
+async function saveName() {
+  if (!userName.value.trim()) return
+  savingName.value = true
+  try {
+    const { error } = await supabase.auth.updateUser({ data: { name: userName.value.trim() } })
+    if (error) throw error
+    userName.value = userName.value.trim()
+  } catch (e: unknown) {
+    toast.add({ title: 'Error al guardar', description: e instanceof Error ? e.message : 'Error desconocido', color: 'error' })
+  } finally {
+    savingName.value = false
+  }
+}
 
 async function getAuthHeaders() {
   const { data: { session } } = await supabase.auth.getSession()
@@ -517,6 +536,36 @@ async function save() {
           <UButton icon="i-lucide-shuffle" @click="fillRandom">
             Rellenar
           </UButton>
+        </div>
+      </template>
+    </UModal>
+
+    <UModal :open="showNameModal" :prevent-close="true">
+      <template #content>
+        <div class="p-6 space-y-4 text-center">
+          <h2 class="text-xl font-bold text-foreground">mundIAl 26</h2>
+          <p class="text-sm text-muted">Porra del Mundial de Fútbol 2026</p>
+          <div class="w-full max-w-sm mx-auto space-y-3 pt-2">
+            <p class="text-sm font-medium text-foreground">¿Cómo te llamamos?</p>
+            <div class="flex gap-2">
+              <UInput
+                v-model="userName"
+                type="text"
+                placeholder="Tu nombre"
+                class="flex-1"
+                size="lg"
+                autofocus
+                @keyup.enter="saveName"
+              />
+              <UButton
+                size="lg"
+                :disabled="!userName.trim()"
+                :loading="savingName"
+                icon="i-lucide-arrow-right"
+                @click="saveName"
+              />
+            </div>
+          </div>
         </div>
       </template>
     </UModal>
