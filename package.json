@@ -12,6 +12,7 @@
   "dependencies": {
     "@nuxt/ui": "^3.0.0",
     "@nuxtjs/supabase": "^1.4.6",
+    "html-to-image": "^1.11.13",
     "nuxt": "^3.17.0"
   },
   "devDependencies": {

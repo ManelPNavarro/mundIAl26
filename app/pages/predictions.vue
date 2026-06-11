@@ -312,6 +312,27 @@ const currentPhaseMatchesAllPlayed = computed(() => {
   return matches.length > 0 && matches.every(m => m.home_score !== null)
 })
 
+// ─── Share card download ─────────────────────────────────────────────────────
+const downloading = ref(false)
+
+async function downloadShareCard() {
+  downloading.value = true
+  try {
+    const { toPng } = await import('html-to-image')
+    const el = document.getElementById('predictions-share-card')
+    if (!el) return
+    const dataUrl = await toPng(el, { pixelRatio: 2, cacheBust: true })
+    const a = document.createElement('a')
+    a.download = 'mis-predicciones-grupos.png'
+    a.href = dataUrl
+    a.click()
+  } catch {
+    toast.add({ title: 'Error al generar la imagen', color: 'error' })
+  } finally {
+    downloading.value = false
+  }
+}
+
 // ─── Random fill ─────────────────────────────────────────────────────────────
 const showRandomModal = ref(false)
 
@@ -485,6 +506,16 @@ async function save() {
       <div class="flex items-center gap-3">
         <span class="text-xs text-muted">{{ steps[currentStep]?.description }}</span>
         <UButton
+          v-if="currentStep === 0"
+          variant="outline"
+          color="neutral"
+          icon="i-lucide-image-down"
+          :loading="downloading"
+          @click="downloadShareCard"
+        >
+          Descargar
+        </UButton>
+        <UButton
           v-if="currentStep === 0 && !isLocked"
           variant="outline"
           color="neutral"
@@ -539,6 +570,9 @@ async function save() {
         </div>
       </template>
     </UModal>
+
+    <!-- Hidden share card for image generation -->
+    <PredictionsShareCard :groups="groupStageGroups" :predictions="predictions" />
 
     <UModal :open="showNameModal" :prevent-close="true">
       <template #content>
