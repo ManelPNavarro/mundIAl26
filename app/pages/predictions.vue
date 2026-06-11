@@ -500,29 +500,20 @@ async function save() {
     </div>
 
     <!-- Footer -->
-    <div class="flex items-center justify-between pt-2 border-t border-border">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2 border-t border-border">
       <UButton v-if="currentStep > 0" variant="ghost" color="neutral" icon="i-lucide-arrow-left" @click="currentStep--">
         Anterior
       </UButton>
-      <div v-else />
+      <div v-else class="hidden sm:block" />
 
-      <div class="flex items-center gap-3">
-        <span class="text-xs text-muted">{{ steps[currentStep]?.description }}</span>
-        <UButton
-          v-if="currentStep === 0"
-          variant="outline"
-          color="neutral"
-          icon="i-lucide-image-down"
-          :loading="downloading"
-          @click="downloadShareCard"
-        >
-          Descargar
-        </UButton>
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <span class="text-xs text-muted hidden sm:inline">{{ steps[currentStep]?.description }}</span>
         <UButton
           v-if="currentStep === 0 && !isLocked"
           variant="outline"
           color="neutral"
           icon="i-lucide-shuffle"
+          class="whitespace-nowrap"
           @click="showRandomModal = true"
         >
           Rellenar al azar
@@ -547,6 +538,16 @@ async function save() {
           @click="save"
         >
           Guardar predicciones
+        </UButton>
+        <UButton
+          v-if="currentStep === 0"
+          variant="outline"
+          color="neutral"
+          icon="i-lucide-image-down"
+          :loading="downloading"
+          @click="downloadShareCard"
+        >
+          Descargar
         </UButton>
       </div>
     </div>

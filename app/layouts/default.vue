@@ -8,6 +8,8 @@ const displayEmail = computed(() => {
   return email.length > 28 ? email.slice(0, 25) + '...' : email
 })
 
+const showRulesModal = ref(false)
+
 async function signOut() {
   await supabase.auth.signOut()
   await navigateTo('/login')
@@ -36,6 +38,10 @@ const menuItems = computed(() => [
     { label: 'Puntuación', icon: 'i-lucide-sliders-horizontal', to: '/admin/scoring' },
   ]] : []),
   [{
+    label: 'Reglas',
+    icon: 'i-lucide-scroll-text',
+    onSelect: () => { showRulesModal.value = true },
+  }, {
     label: 'Ajustes',
     icon: 'i-lucide-settings',
     to: '/settings',
@@ -140,5 +146,58 @@ const menuItems = computed(() => [
         </NuxtLink>
       </div>
     </nav>
+
+    <UModal
+      :open="showRulesModal"
+      title="Reglas del juego"
+      @update:open="(v: boolean) => { if (!v) showRulesModal = false }"
+    >
+      <template #body>
+        <div class="space-y-5 text-sm">
+          <section>
+            <h3 class="font-semibold text-base mb-2">Premios</h3>
+            <ul class="space-y-1">
+              <li>🥇 1r premio: <span class="font-semibold text-primary">105€</span></li>
+              <li>🥈 2º premio: <span class="font-semibold text-primary">43,75€</span></li>
+              <li>🥉 3r premio: <span class="font-semibold text-primary">26,25€</span></li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 class="font-semibold text-base mb-2">Puntuación — Partidos</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="border-b border-border text-muted">
+                    <th class="pb-1.5 font-medium">Fase</th>
+                    <th class="pb-1.5 font-medium text-right">Acierto</th>
+                    <th class="pb-1.5 font-medium text-right">Exacto</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-border">
+                  <tr><td class="py-1.5">Grupos</td><td class="text-right">1 pt</td><td class="text-right font-semibold text-primary">3 pts</td></tr>
+                  <tr><td class="py-1.5">Dieciseisavos</td><td class="text-right">2 pts</td><td class="text-right font-semibold text-primary">5 pts</td></tr>
+                  <tr><td class="py-1.5">Octavos</td><td class="text-right">3 pts</td><td class="text-right font-semibold text-primary">7 pts</td></tr>
+                  <tr><td class="py-1.5">Cuartos</td><td class="text-right">4 pts</td><td class="text-right font-semibold text-primary">9 pts</td></tr>
+                  <tr><td class="py-1.5">Semifinales</td><td class="text-right">5 pts</td><td class="text-right font-semibold text-primary">11 pts</td></tr>
+                  <tr><td class="py-1.5">3r y 4º puesto</td><td class="text-right">4 pts</td><td class="text-right font-semibold text-primary">9 pts</td></tr>
+                  <tr><td class="py-1.5">Final</td><td class="text-right">6 pts</td><td class="text-right font-semibold text-primary">13 pts</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section>
+            <h3 class="font-semibold text-base mb-2">Premios individuales</h3>
+            <ul class="space-y-1">
+              <li>Mejor jugador (MVP): <span class="font-semibold text-primary">8 pts</span></li>
+              <li>Mejor jugador joven: <span class="font-semibold text-primary">6 pts</span></li>
+              <li>Máximo goleador: <span class="font-semibold text-primary">8 pts</span></li>
+              <li>Mejor portero: <span class="font-semibold text-primary">6 pts</span></li>
+            </ul>
+          </section>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
