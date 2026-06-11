@@ -157,9 +157,9 @@ const menuItems = computed(() => [
           <section>
             <h3 class="font-semibold text-base mb-2">Premios</h3>
             <ul class="space-y-1">
-              <li>🥇 1r premio: <span class="font-semibold text-primary">105€</span></li>
-              <li>🥈 2º premio: <span class="font-semibold text-primary">43,75€</span></li>
-              <li>🥉 3r premio: <span class="font-semibold text-primary">26,25€</span></li>
+              <li>🥇 1r premio: <span class="font-semibold text-primary">108€</span></li>
+              <li>🥈 2º premio: <span class="font-semibold text-primary">45€</span></li>
+              <li>🥉 3r premio: <span class="font-semibold text-primary">27€</span></li>
             </ul>
           </section>
 
