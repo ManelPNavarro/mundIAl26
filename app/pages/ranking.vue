@@ -46,7 +46,7 @@ const POSITION_ICONS: Record<number, string> = {
       <div
         v-for="entry in ranking"
         :key="entry.id"
-        class="flex items-center gap-4 px-4 py-3 rounded-lg border transition-colors"
+        class="flex items-center gap-4 px-4 py-2 rounded-lg border transition-colors"
         :class="[
           entry.id === currentUser?.id
             ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
@@ -67,7 +67,7 @@ const POSITION_ICONS: Record<number, string> = {
         <!-- Name -->
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2">
-            <UAvatar :src="useGravatarUrl(entry.email).value" :alt="entry.name" size="xs" />
+            <UAvatar :src="useGravatarUrl(entry.email).value" :alt="entry.name" size="sm" />
             <span class="text-sm font-medium text-foreground truncate">
               {{ entry.name }}
             </span>
