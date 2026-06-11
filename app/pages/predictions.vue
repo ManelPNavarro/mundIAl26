@@ -539,16 +539,6 @@ async function save() {
         >
           Guardar predicciones
         </UButton>
-        <UButton
-          v-if="currentStep === 0"
-          variant="outline"
-          color="neutral"
-          icon="i-lucide-image-down"
-          :loading="downloading"
-          @click="downloadShareCard"
-        >
-          Descargar
-        </UButton>
       </div>
     </div>
 
