@@ -48,7 +48,7 @@ function score(matchId: string, side: 'home' | 'away'): string {
 <template>
   <div
     id="predictions-share-card"
-    style="position:fixed;top:-9999px;left:-9999px;width:900px;background:#ffffff;padding:32px;font-family:system-ui,-apple-system,sans-serif;box-sizing:border-box;"
+    style="position:fixed;top:0;left:0;z-index:-1;visibility:hidden;width:900px;background:#ffffff;padding:32px;font-family:system-ui,-apple-system,sans-serif;box-sizing:border-box;"
   >
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
       <div

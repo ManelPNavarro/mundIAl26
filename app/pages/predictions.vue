@@ -321,7 +321,10 @@ async function downloadShareCard() {
     const { toPng } = await import('html-to-image')
     const el = document.getElementById('predictions-share-card')
     if (!el) return
+    el.style.visibility = 'visible'
+    await nextTick()
     const dataUrl = await toPng(el, { pixelRatio: 2, cacheBust: true })
+    el.style.visibility = 'hidden'
     const a = document.createElement('a')
     a.download = 'mis-predicciones-grupos.png'
     a.href = dataUrl
