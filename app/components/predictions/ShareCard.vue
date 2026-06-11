@@ -21,6 +21,7 @@ type Prediction = { home: number | null, away: number | null }
 const props = defineProps<{
   groups: Group[]
   predictions: Record<string, Prediction>
+  displayName: string
 }>()
 
 function teamName(match: Match, side: 'home' | 'away'): string {
@@ -43,22 +44,42 @@ function score(matchId: string, side: 'home' | 'away'): string {
   const val = side === 'home' ? p?.home : p?.away
   return val != null ? String(val) : '–'
 }
+
+// App palette (dark mode) — hardcoded to avoid CSS variable resolution issues
+const C = {
+  bg:         '#141426', // neutral-800
+  card:       '#242432', // neutral-700
+  border:     '#3E3E53', // neutral-600
+  header:     '#080810', // neutral-900
+  text:       '#E6E6E7', // neutral-50
+  muted:      '#9797A8', // neutral-300
+  primary:    '#02FFA1', // green-400
+}
 </script>
 
 <template>
   <div
     id="predictions-share-card"
-    style="position:fixed;top:0;left:0;z-index:-1;visibility:hidden;width:900px;background:#ffffff;padding:32px;font-family:system-ui,-apple-system,sans-serif;box-sizing:border-box;"
+    :style="`position:fixed;top:0;left:0;z-index:-1;visibility:hidden;width:960px;padding:32px;font-family:system-ui,-apple-system,sans-serif;box-sizing:border-box;background:${C.bg};`"
   >
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+    <!-- Header -->
+    <div :style="`margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid ${C.border};`">
+      <p :style="`font-size:22px;font-weight:700;color:${C.text};margin:0 0 2px;`">
+        Predicciones de {{ props.displayName }}
+      </p>
+      <p :style="`font-size:13px;color:${C.muted};margin:0;`">Fase de grupos · mundIAl 26</p>
+    </div>
+
+    <!-- Groups grid -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
       <div
         v-for="group in groups"
         :key="group.letter"
-        style="border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;"
+        :style="`border:1px solid ${C.border};border-radius:10px;overflow:hidden;`"
       >
         <!-- Group header -->
-        <div style="background:#f3f4f6;padding:8px 12px;">
-          <span style="font-size:13px;font-weight:700;color:#111827;letter-spacing:0.03em;">
+        <div :style="`background:${C.header};padding:7px 12px;`">
+          <span :style="`font-size:11px;font-weight:700;color:${C.primary};letter-spacing:0.08em;`">
             GRUPO {{ group.letter }}
           </span>
         </div>
@@ -67,19 +88,19 @@ function score(matchId: string, side: 'home' | 'away'): string {
         <div
           v-for="match in group.matches"
           :key="match.id"
-          style="border-top:1px solid #f3f4f6;padding:8px 12px;"
+          :style="`border-top:1px solid ${C.border};padding:7px 12px;background:${C.card};`"
         >
-          <div style="font-size:10px;color:#9ca3af;margin-bottom:4px;text-transform:capitalize;">
+          <div :style="`font-size:9px;color:${C.muted};margin-bottom:4px;text-transform:capitalize;letter-spacing:0.02em;`">
             {{ formatKickoff(match.kickoff_at) }}
           </div>
           <div style="display:flex;align-items:center;gap:6px;">
-            <span style="flex:1;text-align:right;font-size:12px;font-weight:500;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+            <span :style="`flex:1;text-align:right;font-size:11px;font-weight:500;color:${C.text};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`">
               {{ getFlag(teamName(match, 'home')) }} {{ teamName(match, 'home') }}
             </span>
-            <span style="font-size:13px;font-weight:700;color:#111827;white-space:nowrap;font-variant-numeric:tabular-nums;min-width:36px;text-align:center;">
-              {{ score(match.id, 'home') }} – {{ score(match.id, 'away') }}
+            <span :style="`font-size:13px;font-weight:700;color:${C.primary};white-space:nowrap;min-width:40px;text-align:center;`">
+              {{ score(match.id, 'home') }}–{{ score(match.id, 'away') }}
             </span>
-            <span style="flex:1;text-align:left;font-size:12px;font-weight:500;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+            <span :style="`flex:1;text-align:left;font-size:11px;font-weight:500;color:${C.text};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`">
               {{ teamName(match, 'away') }} {{ getFlag(teamName(match, 'away')) }}
             </span>
           </div>

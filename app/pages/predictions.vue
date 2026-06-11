@@ -575,7 +575,7 @@ async function save() {
     </UModal>
 
     <!-- Hidden share card for image generation -->
-    <PredictionsShareCard :groups="groupStageGroups" :predictions="predictions" />
+    <PredictionsShareCard :groups="groupStageGroups" :predictions="predictions" :display-name="userName || user?.email || ''" />
 
     <UModal :open="showNameModal" :prevent-close="true">
       <template #content>
