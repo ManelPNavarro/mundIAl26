@@ -75,10 +75,44 @@ const AWARD_POINT_ROWS = [
   { label: 'Máximo goleador',        key: 'award_top_scorer' },
   { label: 'Mejor portero',          key: 'award_best_goalkeeper' },
 ]
+
+const recalculating = ref(false)
+
+async function recalculatePoints() {
+  recalculating.value = true
+  try {
+    const h = await getAuthHeaders()
+    const result = await $fetch<{ recalculated: number }>('/api/admin/recalculate-points', { method: 'POST', headers: h })
+    toast.add({ title: 'Puntos recalculados', description: `${result.recalculated} partidos procesados`, color: 'success' })
+  } catch {
+    toast.add({ title: 'Error al recalcular', color: 'error' })
+  } finally {
+    recalculating.value = false
+  }
+}
 </script>
 
 <template>
   <div class="space-y-10 max-w-2xl">
+
+    <!-- Recalculate points -->
+    <UCard>
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="font-medium text-foreground">Recalcular puntos</p>
+          <p class="text-sm text-muted mt-0.5">Vuelve a calcular los puntos de todos los usuarios para los partidos ya finalizados.</p>
+        </div>
+        <UButton
+          variant="outline"
+          color="neutral"
+          icon="i-lucide-refresh-cw"
+          :loading="recalculating"
+          @click="recalculatePoints"
+        >
+          Recalcular
+        </UButton>
+      </div>
+    </UCard>
 
     <!-- Match scoring -->
     <div class="space-y-4">
