@@ -248,6 +248,21 @@ async function syncPlayersApi() {
   }
 }
 
+const recalculating = ref(false)
+
+async function recalculatePoints() {
+  recalculating.value = true
+  try {
+    const h = await getAuthHeaders()
+    const result = await $fetch<{ recalculated: number }>('/api/admin/recalculate-points', { method: 'POST', headers: h })
+    toast.add({ title: 'Puntos recalculados', description: `${result.recalculated} partidos procesados`, color: 'success' })
+  } catch {
+    toast.add({ title: 'Error al recalcular', color: 'error' })
+  } finally {
+    recalculating.value = false
+  }
+}
+
 const AWARD_FIELDS: { key: keyof Omit<Awards, 'winner_team_id'>, label: string }[] = [
   { key: 'best_player', label: 'Mejor jugador (MVP)' },
   { key: 'best_young_player', label: 'Mejor jugador joven' },
@@ -408,6 +423,9 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <h1 class="text-2xl font-bold text-foreground">Resultados</h1>
         <p class="text-sm text-muted mt-1">Introduce los resultados reales de cada partido.</p>
       </div>
+      <UButton variant="outline" color="neutral" icon="i-lucide-refresh-cw" :loading="recalculating" @click="recalculatePoints">
+        Recalcular puntos
+      </UButton>
     </div>
 
     <!-- Round locks -->
