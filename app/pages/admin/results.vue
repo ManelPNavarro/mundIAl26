@@ -408,17 +408,6 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <h1 class="text-2xl font-bold text-foreground">Resultados</h1>
         <p class="text-sm text-muted mt-1">Introduce los resultados reales de cada partido.</p>
       </div>
-      <div class="flex gap-2">
-        <UButton v-if="!isAwardsStep" icon="i-lucide-clock" color="neutral" variant="outline" size="sm" :loading="seedingSchedule" @click="seedSchedule">
-          Seed horarios
-        </UButton>
-        <UButton v-if="!isAwardsStep" icon="i-lucide-refresh-cw" color="neutral" variant="outline" size="sm" :loading="syncingMatches" @click="syncMatches">
-          Sync resultados
-        </UButton>
-        <UButton icon="i-lucide-cloud-download" color="neutral" variant="outline" size="sm" :loading="syncingPlayersApi" @click="syncPlayersApi">
-          Sync jugadores
-        </UButton>
-      </div>
     </div>
 
     <!-- Round locks -->
