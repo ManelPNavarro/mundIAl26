@@ -1,5 +1,6 @@
 import { toSpanish, mapStatus } from '../../utils/football-data'
 import type { ApiMatch } from '../../utils/football-data'
+import { recalculateMatchPoints } from '../../utils/points'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
@@ -65,6 +66,9 @@ export default defineEventHandler(async (event) => {
     }
 
     await supabase.from('matches').update(update).eq('id', dbMatch.id)
+    if (isFinished && update.home_score !== undefined) {
+      await recalculateMatchPoints(dbMatch.id, supabase)
+    }
     updated++
   }
 

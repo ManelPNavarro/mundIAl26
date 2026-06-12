@@ -1,3 +1,5 @@
+import { recalculateMatchPoints } from '../../../utils/points'
+
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
 
@@ -25,6 +27,8 @@ export default defineEventHandler(async (event) => {
     .single()
 
   if (error) throw createError({ statusCode: 500, message: error.message })
+
+  await recalculateMatchPoints(id!, supabase)
 
   return data
 })
