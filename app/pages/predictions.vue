@@ -297,11 +297,25 @@ const currentRound = computed(() =>
 )
 
 const openStepIndex = computed(() => {
+  // First open round wins
   if (isRoundOpen('GROUP')) return 0
   for (let i = 0; i < knockoutRounds.value.length; i++) {
     if (isRoundOpen(knockoutRounds.value[i]!.key)) return i + 1
   }
-  return steps.value.length - 1
+  // No open round: find the latest round with predictions
+  const matchRound = (id: string) => allMatches.value?.find(m => m.id === id)?.round
+  const filledRounds = new Set(
+    Object.keys(predictions.value)
+      .filter(isFilled)
+      .map(matchRound)
+      .filter(Boolean)
+  )
+  for (let i = knockoutRounds.value.length - 1; i >= 0; i--) {
+    if (filledRounds.has(knockoutRounds.value[i]!.key)) return i + 1
+  }
+  if (filledRounds.has('GROUP')) return 0
+  // No predictions at all: fase de grupos
+  return 0
 })
 
 const currentPhaseMatchesAllPlayed = computed(() => {
