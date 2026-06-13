@@ -88,14 +88,6 @@ const AWARD_POINT_ROWS = [
           <h1 class="text-2xl font-bold text-foreground">Puntuación</h1>
           <p class="text-sm text-muted mt-1">Configura cuántos puntos vale cada acierto.</p>
         </div>
-        <div class="flex gap-2">
-          <UButton variant="outline" color="neutral" size="sm" :disabled="!isConfigDirty" @click="resetConfig">
-            Descartar
-          </UButton>
-          <UButton size="sm" :loading="savingConfig" :disabled="!isConfigDirty" icon="i-lucide-save" @click="saveConfig">
-            Guardar
-          </UButton>
-        </div>
       </div>
 
       <UCard>
@@ -125,14 +117,14 @@ const AWARD_POINT_ROWS = [
                   <UInput
                     type="number" inputmode="numeric" min="0" max="99" class="w-16 mx-auto text-center" size="sm"
                     :model-value="config[row.correct]"
-                    @update:model-value="updateKey(row.correct, String($event))"
+                    disabled
                   />
                 </td>
                 <td class="py-3 text-center">
                   <UInput
                     type="number" inputmode="numeric" min="0" max="99" class="w-16 mx-auto text-center" size="sm"
                     :model-value="config[row.exact]"
-                    @update:model-value="updateKey(row.exact, String($event))"
+                    disabled
                   />
                 </td>
               </tr>
@@ -152,7 +144,7 @@ const AWARD_POINT_ROWS = [
             <UInput
               type="number" inputmode="numeric" min="0" max="999" class="w-20 text-center" size="sm"
               :model-value="config[row.key]"
-              @update:model-value="updateKey(row.key, String($event))"
+              disabled
             />
           </div>
         </div>
