@@ -263,6 +263,11 @@ async function recalculatePoints() {
   }
 }
 
+const groupMatches = computed(() =>
+  currentStepData.value?.key === 'GROUP' ? (currentStepData.value.matches) : []
+)
+const { view: groupView, byDate: groupByDate } = useGroupStageView(() => groupMatches.value)
+
 const AWARD_FIELDS: { key: keyof Omit<Awards, 'winner_team_id'>, label: string }[] = [
   { key: 'best_player', label: 'Mejor jugador (MVP)' },
   { key: 'best_young_player', label: 'Mejor jugador joven' },
@@ -475,37 +480,86 @@ function teamName(match: Match, side: 'home' | 'away'): string {
 
     <!-- Group stage -->
     <template v-if="currentStepData?.key === 'GROUP' && groupsForCurrentStep">
-      <div v-for="group in groupsForCurrentStep" :key="group.letter" class="space-y-1">
-        <p class="text-xs font-semibold text-muted uppercase tracking-wide">Grupo {{ group.letter }}</p>
-        <div class="border border-border rounded-lg divide-y divide-border">
-          <div v-for="day in [1, 2, 3]" :key="day">
-            <div v-if="group.matches.filter(m => m.matchday === day).length > 0" class="px-4 py-3 space-y-3">
-              <p class="text-xs font-medium text-muted uppercase tracking-wide">Jornada {{ day }}</p>
-              <div v-for="match in group.matches.filter(m => m.matchday === day)" :key="match.id" class="space-y-1">
-                <p class="text-xs text-muted text-center">{{ formatKickoff(match.kickoff_at) }}</p>
-                <div class="flex items-center gap-3">
-                  <span class="flex-1 flex items-center justify-end gap-1 min-w-0"><span class="truncate text-sm font-medium">{{ teamName(match, 'home') }}</span><span class="shrink-0">{{ getFlag(teamName(match, 'home')) }}</span></span>
-                  <template v-if="isEditing(match)">
-                    <div class="flex items-center gap-1 shrink-0">
-                      <UInput v-model.number="getDraft(match).home" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
-                      <span class="text-muted font-bold text-sm">–</span>
-                      <UInput v-model.number="getDraft(match).away" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
-                    </div>
-                    <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium">{{ teamName(match, 'away') }}</span></span>
-                    <UButton size="xs" color="success" :loading="saving === match.id" :disabled="getDraft(match).home === null || getDraft(match).away === null" icon="i-lucide-save" @click="saveResult(match)" />
-                    <UButton v-if="match.home_score !== null" size="xs" color="error" variant="outline" :loading="saving === match.id" icon="i-lucide-trash-2" @click="clearResult(match)" />
-                  </template>
-                  <template v-else>
-                    <span class="font-mono font-bold text-sm text-foreground shrink-0">{{ match.home_score }} – {{ match.away_score }}</span>
-                    <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium">{{ teamName(match, 'away') }}</span></span>
-                    <UButton size="xs" color="neutral" variant="outline" icon="i-lucide-pencil" @click="startEdit(match)" />
-                  </template>
+      <!-- View toggle -->
+      <div class="flex rounded-lg border border-border p-0.5 gap-0.5 bg-muted/30 w-fit">
+        <button
+          v-for="opt in [{ value: 'dates', label: 'Fechas' }, { value: 'groups', label: 'Grupos' }]"
+          :key="opt.value"
+          class="px-3 py-1 rounded-md text-xs font-medium transition-colors"
+          :class="groupView === opt.value ? 'bg-background text-foreground shadow-sm' : 'text-muted hover:text-foreground'"
+          @click="groupView = opt.value as 'dates' | 'groups'"
+        >
+          {{ opt.label }}
+        </button>
+      </div>
+
+      <!-- Dates view -->
+      <template v-if="groupView === 'dates'">
+        <div v-for="dateGroup in groupByDate" :key="dateGroup.key" class="space-y-1">
+          <p class="text-xs font-semibold text-muted uppercase tracking-wide capitalize">{{ dateGroup.label }}</p>
+          <div class="border border-border rounded-lg divide-y divide-border">
+            <div v-for="match in dateGroup.matches" :key="match.id" class="px-4 py-3 space-y-1">
+              <div class="flex items-center justify-between text-xs text-muted">
+                <span class="font-medium">Grupo {{ match.group_letter }}</span>
+                <span>{{ formatKickoff(match.kickoff_at) }}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="flex-1 flex items-center justify-end gap-1 min-w-0"><span class="truncate text-sm font-medium">{{ teamName(match, 'home') }}</span><span class="shrink-0">{{ getFlag(teamName(match, 'home')) }}</span></span>
+                <template v-if="isEditing(match)">
+                  <div class="flex items-center gap-1 shrink-0">
+                    <UInput v-model.number="getDraft(match).home" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
+                    <span class="text-muted font-bold text-sm">–</span>
+                    <UInput v-model.number="getDraft(match).away" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
+                  </div>
+                  <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium">{{ teamName(match, 'away') }}</span></span>
+                  <UButton size="xs" color="success" :loading="saving === match.id" :disabled="getDraft(match).home === null || getDraft(match).away === null" icon="i-lucide-save" @click="saveResult(match)" />
+                  <UButton v-if="match.home_score !== null" size="xs" color="error" variant="outline" :loading="saving === match.id" icon="i-lucide-trash-2" @click="clearResult(match)" />
+                </template>
+                <template v-else>
+                  <span class="font-mono font-bold text-sm text-foreground shrink-0">{{ match.home_score !== null ? `${match.home_score} – ${match.away_score}` : '– –' }}</span>
+                  <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium">{{ teamName(match, 'away') }}</span></span>
+                  <UButton size="xs" color="neutral" variant="outline" icon="i-lucide-pencil" @click="startEdit(match)" />
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- Groups view -->
+      <template v-else>
+        <div v-for="group in groupsForCurrentStep" :key="group.letter" class="space-y-1">
+          <p class="text-xs font-semibold text-muted uppercase tracking-wide">Grupo {{ group.letter }}</p>
+          <div class="border border-border rounded-lg divide-y divide-border">
+            <div v-for="day in [1, 2, 3]" :key="day">
+              <div v-if="group.matches.filter(m => m.matchday === day).length > 0" class="px-4 py-3 space-y-3">
+                <p class="text-xs font-medium text-muted uppercase tracking-wide">Jornada {{ day }}</p>
+                <div v-for="match in group.matches.filter(m => m.matchday === day)" :key="match.id" class="space-y-1">
+                  <p class="text-xs text-muted text-center">{{ formatKickoff(match.kickoff_at) }}</p>
+                  <div class="flex items-center gap-3">
+                    <span class="flex-1 flex items-center justify-end gap-1 min-w-0"><span class="truncate text-sm font-medium">{{ teamName(match, 'home') }}</span><span class="shrink-0">{{ getFlag(teamName(match, 'home')) }}</span></span>
+                    <template v-if="isEditing(match)">
+                      <div class="flex items-center gap-1 shrink-0">
+                        <UInput v-model.number="getDraft(match).home" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
+                        <span class="text-muted font-bold text-sm">–</span>
+                        <UInput v-model.number="getDraft(match).away" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
+                      </div>
+                      <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium">{{ teamName(match, 'away') }}</span></span>
+                      <UButton size="xs" color="success" :loading="saving === match.id" :disabled="getDraft(match).home === null || getDraft(match).away === null" icon="i-lucide-save" @click="saveResult(match)" />
+                      <UButton v-if="match.home_score !== null" size="xs" color="error" variant="outline" :loading="saving === match.id" icon="i-lucide-trash-2" @click="clearResult(match)" />
+                    </template>
+                    <template v-else>
+                      <span class="font-mono font-bold text-sm text-foreground shrink-0">{{ match.home_score }} – {{ match.away_score }}</span>
+                      <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium">{{ teamName(match, 'away') }}</span></span>
+                      <UButton size="xs" color="neutral" variant="outline" icon="i-lucide-pencil" @click="startEdit(match)" />
+                    </template>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </template>
     </template>
 
     <!-- Awards -->

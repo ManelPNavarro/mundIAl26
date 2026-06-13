@@ -49,6 +49,9 @@ function teamName(match: Match, side: 'home' | 'away'): string {
   return side === 'home' ? (match.home_slot ?? '?') : (match.away_slot ?? '?')
 }
 
+const allMatches = computed(() => props.groups.flatMap(g => g.matches))
+const { view, byDate } = useGroupStageView(() => allMatches.value)
+
 const openGroups = ref<string[]>(['A'])
 
 function isMatchLocked(match: Match): boolean {
@@ -79,7 +82,77 @@ function filledCount(matches: Match[]) {
 </script>
 
 <template>
-  <div class="space-y-2">
+  <div class="space-y-4">
+    <!-- View toggle -->
+    <div class="flex rounded-lg border border-border p-0.5 gap-0.5 bg-muted/30 w-fit">
+      <button
+        v-for="opt in [{ value: 'dates', label: 'Fechas' }, { value: 'groups', label: 'Grupos' }]"
+        :key="opt.value"
+        class="px-3 py-1 rounded-md text-xs font-medium transition-colors"
+        :class="view === opt.value ? 'bg-background text-foreground shadow-sm' : 'text-muted hover:text-foreground'"
+        @click="view = opt.value as 'dates' | 'groups'"
+      >
+        {{ opt.label }}
+      </button>
+    </div>
+
+    <!-- Dates view -->
+    <div v-if="view === 'dates'" class="space-y-4">
+      <div v-for="dateGroup in byDate" :key="dateGroup.key">
+        <p class="text-xs font-semibold text-muted uppercase tracking-wide mb-2 capitalize">{{ dateGroup.label }}</p>
+        <div class="space-y-2">
+          <div
+            v-for="match in dateGroup.matches"
+            :key="match.id"
+            class="border border-border rounded-lg overflow-hidden"
+            :class="props.summary?.[match.id]
+              ? (props.summary[match.id].isCorrect ? 'bg-success/5' : 'bg-error/5')
+              : ''"
+          >
+            <div class="px-3 pt-2 flex items-center justify-between text-xs text-muted">
+              <span class="font-medium">Grupo {{ match.group_letter }}</span>
+              <span>{{ formatKickoff(match.kickoff_at) }}</span>
+            </div>
+            <div class="flex items-center gap-2 px-3 py-2">
+              <span class="flex-1 flex items-center justify-end gap-1 min-w-0"><span class="truncate text-sm font-medium">{{ teamName(match, 'home') }}</span><span class="shrink-0">{{ getFlag(teamName(match, 'home')) }}</span></span>
+              <div class="flex items-center gap-1 shrink-0">
+                <template v-if="isMatchLocked(match)">
+                  <span class="font-mono font-bold text-sm text-foreground w-12 text-center">{{ getPrediction(match.id).home ?? '–' }}</span>
+                  <span class="text-muted font-bold text-sm">–</span>
+                  <span class="font-mono font-bold text-sm text-foreground w-12 text-center">{{ getPrediction(match.id).away ?? '–' }}</span>
+                </template>
+                <template v-else>
+                  <UInput v-model.number="getPrediction(match.id).home" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
+                  <span class="text-muted font-bold text-sm">–</span>
+                  <UInput v-model.number="getPrediction(match.id).away" type="number" inputmode="numeric" min="0" max="99" class="w-12 text-center" size="sm" />
+                </template>
+              </div>
+              <span class="flex-1 flex items-center justify-start gap-1 min-w-0"><span class="shrink-0">{{ getFlag(teamName(match, 'away')) }}</span><span class="truncate text-sm font-medium">{{ teamName(match, 'away') }}</span></span>
+            </div>
+            <div
+              v-if="hasResult(match)"
+              class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium"
+              :class="props.summary?.[match.id]
+                ? (props.summary[match.id].isCorrect ? 'bg-success/10 text-success' : 'bg-error/10 text-error')
+                : 'bg-muted/30 text-muted'"
+            >
+              <span class="flex-1 text-right">Resultado real</span>
+              <div class="flex items-center gap-1 shrink-0">
+                <span class="font-mono font-bold text-sm w-12 text-center">{{ match.home_score }}</span>
+                <span class="font-bold text-sm">–</span>
+                <span class="font-mono font-bold text-sm w-12 text-center">{{ match.away_score }}</span>
+              </div>
+              <span class="flex-1 text-left">
+                {{ props.summary?.[match.id] ? (props.summary[match.id].points > 0 ? `+${props.summary[match.id].points} pts` : '0 pts') : '' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Groups view -->
+    <div v-else class="space-y-2">
     <div
       v-for="group in props.groups"
       :key="group.letter"
@@ -160,5 +233,6 @@ function filledCount(matches: Match[]) {
         </div>
       </div>
     </div>
+    </div><!-- end groups view -->
   </div>
 </template>
