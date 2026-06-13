@@ -73,6 +73,18 @@ function formatKickoff(kickoff_at: string | null): string | null {
   }).format(new Date(kickoff_at))
 }
 
+function isMatchViewable(match: Match): boolean {
+  if (!props.locked) return false
+  if (!match.kickoff_at) return false
+  const kickoff = new Date(match.kickoff_at).getTime()
+  return kickoff <= Date.now() + 24 * 60 * 60 * 1000
+}
+
+function navigateToMatch(match: Match) {
+  if (!isMatchViewable(match)) return
+  navigateTo(`/matches/${match.id}`)
+}
+
 function filledCount(matches: Match[]) {
   return matches.filter((m) => {
     const p = predictions.value[m.id]
@@ -105,13 +117,20 @@ function filledCount(matches: Match[]) {
             v-for="match in dateGroup.matches"
             :key="match.id"
             class="border border-border rounded-lg overflow-hidden"
-            :class="props.summary?.[match.id]
-              ? (props.summary[match.id].isCorrect ? 'bg-success/5' : 'bg-error/5')
-              : ''"
+            :class="[
+              props.summary?.[match.id]
+                ? (props.summary[match.id].isCorrect ? 'bg-success/5' : 'bg-error/5')
+                : '',
+              isMatchViewable(match) ? 'cursor-pointer hover:ring-1 hover:ring-primary/30 transition-all' : '',
+            ]"
+            @click="navigateToMatch(match)"
           >
             <div class="px-3 pt-2 flex items-center justify-between text-xs text-muted">
               <span class="font-medium">Grupo {{ match.group_letter }}</span>
-              <span>{{ formatKickoff(match.kickoff_at) }}</span>
+              <div class="flex items-center gap-1">
+                <span>{{ formatKickoff(match.kickoff_at) }}</span>
+                <UIcon v-if="isMatchViewable(match)" name="i-lucide-chevron-right" class="size-3.5 text-muted" />
+              </div>
             </div>
             <div class="flex items-center gap-2 px-3 py-2">
               <span class="flex-1 flex items-center justify-end gap-1 min-w-0"><span class="truncate text-sm font-medium">{{ teamName(match, 'home') }}</span><span class="shrink-0">{{ getFlag(teamName(match, 'home')) }}</span></span>
@@ -185,13 +204,18 @@ function filledCount(matches: Match[]) {
             v-for="match in group.matches.filter(m => m.matchday === day)"
             :key="match.id"
             class="rounded-lg overflow-hidden"
-            :class="props.summary?.[match.id]
-              ? (props.summary[match.id].isCorrect ? 'bg-success/5' : 'bg-error/5')
-              : ''"
+            :class="[
+              props.summary?.[match.id]
+                ? (props.summary[match.id].isCorrect ? 'bg-success/5' : 'bg-error/5')
+                : '',
+              isMatchViewable(match) ? 'cursor-pointer hover:ring-1 hover:ring-primary/30 transition-all' : '',
+            ]"
+            @click="navigateToMatch(match)"
           >
             <!-- Kickoff time -->
-            <div v-if="match.kickoff_at" class="px-3 pt-2 text-xs text-muted text-center">
-              {{ formatKickoff(match.kickoff_at) }}
+            <div v-if="match.kickoff_at || isMatchViewable(match)" class="px-3 pt-2 text-xs text-muted flex items-center justify-center gap-1">
+              <span v-if="match.kickoff_at">{{ formatKickoff(match.kickoff_at) }}</span>
+              <UIcon v-if="isMatchViewable(match)" name="i-lucide-chevron-right" class="size-3.5 text-muted" />
             </div>
             <!-- Prediction row -->
             <div class="flex items-center gap-2 px-3 py-2">
