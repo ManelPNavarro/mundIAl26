@@ -127,6 +127,18 @@ function resolveSlot(slot: string): string | null {
   return null
 }
 
+function isMatchViewable(match: Match): boolean {
+  if (!props.locked) return false
+  if (!match.kickoff_at) return false
+  const kickoff = new Date(match.kickoff_at).getTime()
+  return kickoff <= Date.now() + 24 * 60 * 60 * 1000
+}
+
+function navigateToMatch(match: Match) {
+  if (!isMatchViewable(match)) return
+  navigateTo(`/matches/${match.id}`)
+}
+
 function isMatchLocked(match: Match): boolean {
   if (props.locked) return true
   if (match.status !== 'SCHEDULED') return true
@@ -169,13 +181,18 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       v-for="match in props.matches"
       :key="match.id"
       class="rounded-lg overflow-hidden"
-      :class="props.summary?.[match.id]
-        ? (props.summary[match.id].isCorrect ? 'bg-success/5' : 'bg-error/5')
-        : ''"
+      :class="[
+        props.summary?.[match.id]
+          ? (props.summary[match.id].isCorrect ? 'bg-success/5' : 'bg-error/5')
+          : '',
+        isMatchViewable(match) ? 'cursor-pointer hover:ring-1 hover:ring-primary/30 transition-all' : '',
+      ]"
+      @click="navigateToMatch(match)"
     >
       <!-- Kickoff time -->
-      <div v-if="match.kickoff_at" class="px-4 pt-2 text-xs text-muted text-center">
-        {{ formatKickoff(match.kickoff_at) }}
+      <div v-if="match.kickoff_at || isMatchViewable(match)" class="px-4 pt-2 text-xs text-muted flex items-center justify-center gap-1">
+        <span v-if="match.kickoff_at">{{ formatKickoff(match.kickoff_at) }}</span>
+        <UIcon v-if="isMatchViewable(match)" name="i-lucide-chevron-right" class="size-3.5 text-muted" />
       </div>
       <!-- Prediction row -->
       <div class="flex items-center gap-2 px-4 py-3">
