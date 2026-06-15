@@ -79,7 +79,7 @@ const menuItems = computed(() => [
               Ranking
               <span
                 v-if="myPosition"
-                class="absolute -top-2 -right-4 size-4.5 flex items-center justify-center rounded-full bg-primary text-white text-[10px] font-bold leading-none"
+                class="absolute -top-2 -right-4 size-4.5 flex items-center justify-center rounded-full bg-primary-400 text-slate-700 dark:text-slate-200 text-[10px] font-bold leading-none"
               >
                 {{ myPosition }}
               </span>
@@ -137,7 +137,7 @@ const menuItems = computed(() => [
             <UIcon name="i-lucide-trophy" class="size-5" />
             <span
               v-if="myPosition"
-              class="absolute -top-1.5 -right-2.5 size-4 flex items-center justify-center rounded-full bg-primary text-white text-[9px] font-bold leading-none"
+              class="absolute -top-1.5 -right-2.5 size-4 flex items-center justify-center rounded-full bg-primary-400 text-slate-700 dark:text-slate-200 text-[9px] font-bold leading-none"
             >
               {{ myPosition }}
             </span>

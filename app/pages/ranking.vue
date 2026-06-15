@@ -14,6 +14,10 @@ interface RankingEntry {
 const currentUser = useSupabaseUser()
 const { data: ranking, pending } = await useFetch<RankingEntry[]>('/api/ranking')
 
+onMounted(() => nextTick(() => {
+  document.querySelector('[data-me]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}))
+
 const POSITION_STYLES: Record<number, string> = {
   1: 'text-yellow-500',
   2: 'text-slate-400',
@@ -46,6 +50,7 @@ const POSITION_ICONS: Record<number, string> = {
       <div
         v-for="entry in ranking"
         :key="entry.id"
+        :data-me="entry.id === currentUser?.id ? '' : undefined"
         class="flex items-center gap-4 px-4 py-2 rounded-lg border transition-colors"
         :class="[
           entry.id === currentUser?.id
