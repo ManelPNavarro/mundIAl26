@@ -85,6 +85,17 @@ function navigateToMatch(match: Match) {
   navigateTo(`/matches/${match.id}`)
 }
 
+const firstUnresolvedId = computed(() =>
+  byDate.value.flatMap(d => d.matches).find(m => !hasResult(m))?.id ?? null
+)
+
+onMounted(async () => {
+  if (view.value !== 'dates' || !firstUnresolvedId.value) return
+  await nextTick()
+  document.getElementById(`match-${firstUnresolvedId.value}`)
+    ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+})
+
 function filledCount(matches: Match[]) {
   return matches.filter((m) => {
     const p = predictions.value[m.id]
@@ -116,6 +127,7 @@ function filledCount(matches: Match[]) {
           <div
             v-for="match in dateGroup.matches"
             :key="match.id"
+            :id="`match-${match.id}`"
             class="border border-border rounded-lg overflow-hidden"
             :class="[
               props.summary?.[match.id]

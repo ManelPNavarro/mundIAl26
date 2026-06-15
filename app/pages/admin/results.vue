@@ -268,6 +268,17 @@ const groupMatches = computed(() =>
 )
 const { view: groupView, byDate: groupByDate } = useGroupStageView(() => groupMatches.value)
 
+const firstUnresolvedGroupId = computed(() =>
+  groupByDate.value.flatMap(d => d.matches).find(m => m.home_score === null)?.id ?? null
+)
+
+watch([() => currentStepData.value?.key, groupView], async ([key, view]) => {
+  if (key !== 'GROUP' || view !== 'dates' || !firstUnresolvedGroupId.value) return
+  await nextTick()
+  document.getElementById(`match-${firstUnresolvedGroupId.value}`)
+    ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}, { immediate: true })
+
 const AWARD_FIELDS: { key: keyof Omit<Awards, 'winner_team_id'>, label: string }[] = [
   { key: 'best_player', label: 'Mejor jugador (MVP)' },
   { key: 'best_young_player', label: 'Mejor jugador joven' },
@@ -498,7 +509,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <div v-for="dateGroup in groupByDate" :key="dateGroup.key" class="space-y-1">
           <p class="text-xs font-semibold text-muted uppercase tracking-wide capitalize">{{ dateGroup.label }}</p>
           <div class="border border-border rounded-lg divide-y divide-border">
-            <div v-for="match in dateGroup.matches" :key="match.id" class="px-4 py-3 space-y-1">
+            <div v-for="match in dateGroup.matches" :key="match.id" :id="`match-${match.id}`" class="px-4 py-3 space-y-1">
               <div class="flex items-center justify-between text-xs text-muted">
                 <span class="font-medium">Grupo {{ match.group_letter }}</span>
                 <span>{{ formatKickoff(match.kickoff_at) }}</span>
