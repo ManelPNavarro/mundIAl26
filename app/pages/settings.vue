@@ -5,6 +5,19 @@ const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const toast = useToast()
 
+const gravatarUrl = ref('')
+
+async function computeGravatarUrl() {
+  const email = (user.value?.email ?? '').trim().toLowerCase()
+  if (!email) return
+  const msgBuffer = new TextEncoder().encode(email)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
+  const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('')
+  gravatarUrl.value = `https://gravatar.com/avatar/${hashHex}?d=mp`
+}
+
+computeGravatarUrl()
+
 const name = ref(user.value?.user_metadata?.name ?? '')
 const savingName = ref(false)
 const canSaveName = computed(() => name.value.trim().length > 0 && name.value.trim() !== (user.value?.user_metadata?.name ?? ''))
@@ -65,6 +78,28 @@ async function save() {
         <UButton :disabled="!canSaveName" :loading="savingName" icon="i-lucide-user" class="w-full justify-center" @click="saveName">
           Guardar nombre
         </UButton>
+      </div>
+    </UCard>
+
+    <UCard>
+      <template #header>
+        <h2 class="font-semibold text-foreground">Avatar</h2>
+      </template>
+      <div class="space-y-4">
+        <div class="flex items-center gap-3">
+          <UAvatar :src="gravatarUrl" :alt="user?.email" size="lg" />
+          <div class="text-sm text-muted">
+            Tu avatar se obtiene de <a href="https://gravatar.com" target="_blank" rel="noopener" class="text-primary underline">gravatar.com</a>
+          </div>
+        </div>
+        <ol class="list-decimal list-inside text-sm text-muted space-y-1">
+          <li>Inicia sesión en <a href="https://gravatar.com" target="_blank" rel="noopener" class="text-primary underline">gravatar.com</a></li>
+          <li>Añade o escoge tu correo de Filmin</li>
+          <li>Sube tu avatar y guarda</li>
+        </ol>
+        <p class="text-sm text-muted">
+          <a href="https://filmin.slack.com/archives/C024LAJ61UZ/p1781106169890159" target="_blank" rel="noopener" class="text-primary underline">Ver instrucciones detalladas en Slack</a>
+        </p>
       </div>
     </UCard>
 
