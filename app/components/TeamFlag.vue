@@ -8,16 +8,19 @@ const SUBDIVISION_FLAGS: Record<string, string> = {
 }
 
 const subdivisionCode = computed(() => SUBDIVISION_FLAGS[props.team])
-const emoji = computed(() => subdivisionCode.value ? '' : getFlag(props.team))
+const emoji = computed(() => getFlag(props.team))
+
+const needsImageFallback = useSubdivisionFlagSupport()
+const useImage = computed(() => subdivisionCode.value && needsImageFallback.value)
 </script>
 
 <template>
   <img
-    v-if="subdivisionCode"
+    v-if="useImage"
     :src="`https://flagcdn.com/w40/${subdivisionCode}.png`"
     :srcset="`https://flagcdn.com/w80/${subdivisionCode}.png 2x`"
     :alt="team"
-    class="inline-block h-[1.1em] w-auto align-text-bottom"
+    class="inline-block w-[25px] h-[22px] object-contain align-text-bottom"
   >
   <span v-else>{{ emoji }}</span>
 </template>
