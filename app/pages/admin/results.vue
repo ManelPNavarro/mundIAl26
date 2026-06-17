@@ -263,22 +263,6 @@ async function recalculatePoints() {
   }
 }
 
-const groupMatches = computed(() =>
-  currentStepData.value?.key === 'GROUP' ? (currentStepData.value.matches) : []
-)
-const { view: groupView, byDate: groupByDate } = useGroupStageView(() => groupMatches.value)
-
-const firstUnresolvedGroupId = computed(() =>
-  groupByDate.value.flatMap(d => d.matches).find(m => m.home_score === null)?.id ?? null
-)
-
-watch([() => currentStepData.value?.key, groupView], async ([key, view]) => {
-  if (key !== 'GROUP' || view !== 'dates' || !firstUnresolvedGroupId.value) return
-  await nextTick()
-  document.getElementById(`match-${firstUnresolvedGroupId.value}`)
-    ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-}, { immediate: true })
-
 const AWARD_FIELDS: { key: keyof Omit<Awards, 'winner_team_id'>, label: string }[] = [
   { key: 'best_player', label: 'Mejor jugador (MVP)' },
   { key: 'best_young_player', label: 'Mejor jugador joven' },
@@ -328,6 +312,22 @@ const steps = computed(() => {
 const currentStep = ref(0)
 const isAwardsStep = computed(() => steps.value[currentStep.value]?.key === 'AWARDS')
 const currentStepData = computed(() => isAwardsStep.value ? null : (steps.value[currentStep.value] ?? null))
+
+const groupMatches = computed(() =>
+  currentStepData.value?.key === 'GROUP' ? (currentStepData.value.matches) : []
+)
+const { view: groupView, byDate: groupByDate } = useGroupStageView(() => groupMatches.value)
+
+const firstUnresolvedGroupId = computed(() =>
+  groupByDate.value.flatMap(d => d.matches).find(m => m.home_score === null)?.id ?? null
+)
+
+watch([() => currentStepData.value?.key, groupView], async ([key, view]) => {
+  if (!import.meta.client || key !== 'GROUP' || view !== 'dates' || !firstUnresolvedGroupId.value) return
+  await nextTick()
+  document.getElementById(`match-${firstUnresolvedGroupId.value}`)
+    ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}, { immediate: true })
 
 const groupsForCurrentStep = computed(() => {
   if (currentStepData.value?.key !== 'GROUP') return null
