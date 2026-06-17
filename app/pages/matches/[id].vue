@@ -140,7 +140,7 @@ const categoryGroups = computed(() => {
         <div class="flex items-center gap-4 px-6 py-5 justify-center">
           <div class="flex-1 flex items-center justify-end gap-2 min-w-0">
             <span class="text-base font-semibold text-foreground truncate">{{ teamName(match.home_team) }}</span>
-            <span class="text-xl shrink-0">{{ getFlag(teamName(match.home_team)) }}</span>
+            <TeamFlag :team="teamName(match.home_team)" class="text-xl shrink-0" />
           </div>
           <div class="shrink-0 text-center min-w-[5rem]">
             <template v-if="isFinished">
@@ -151,7 +151,7 @@ const categoryGroups = computed(() => {
             </template>
           </div>
           <div class="flex-1 flex items-center justify-start gap-2 min-w-0">
-            <span class="text-xl shrink-0">{{ getFlag(teamName(match.away_team)) }}</span>
+            <TeamFlag :team="teamName(match.away_team)" class="text-xl shrink-0" />
             <span class="text-base font-semibold text-foreground truncate">{{ teamName(match.away_team) }}</span>
           </div>
         </div>
