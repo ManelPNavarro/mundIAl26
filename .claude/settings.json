@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.worktree_path' | { read -r wt; repo=\"$(git -C \"$wt\" rev-parse --show-superproject-working-tree 2>/dev/null)\"; cp \"$repo/.env\" \"$wt/.env\" 2>/dev/null || true; cd \"$wt\" && npm install --prefer-offline; }",
+            "timeout": 120,
+            "statusMessage": "Setting up worktree (npm install + .env)..."
+          }
+        ]
+      }
+    ]
+  }
+}
