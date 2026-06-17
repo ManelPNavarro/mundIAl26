@@ -15,13 +15,15 @@ function checkSupport(): boolean {
   ctx.fillText('🏴󠁧󠁢󠁥󠁮󠁧󠁿', 0, 14)
 
   const data = ctx.getImageData(0, 0, 20, 20).data
-  const hasColor = Array.from({ length: data.length / 4 }, (_, i) => i * 4)
+  const hasChroma = Array.from({ length: data.length / 4 }, (_, i) => i * 4)
     .some(i => {
       const r = data[i]!, g = data[i + 1]!, b = data[i + 2]!
-      return !(r === 255 && g === 255 && b === 255) && !(r < 30 && g < 30 && b < 30)
+      const maxC = Math.max(r, g, b)
+      const minC = Math.min(r, g, b)
+      return (maxC - minC) > 20
     })
 
-  return !hasColor
+  return !hasChroma
 }
 
 export function useSubdivisionFlagSupport() {
