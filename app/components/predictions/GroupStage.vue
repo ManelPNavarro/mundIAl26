@@ -79,6 +79,7 @@ function formatKickoff(kickoff_at: string | null): string | null {
 
 function isMatchViewable(match: Match): boolean {
   if (!props.locked) return false
+  if (!isMatchLocked(match)) return false
   if (!match.kickoff_at) return false
   const kickoff = new Date(match.kickoff_at).getTime()
   return kickoff <= Date.now() + 24 * 60 * 60 * 1000
