@@ -126,7 +126,10 @@ const currentStepRound = computed(() => {
   return currentStep.value === 0 ? 'GROUP' : (currentRound.value?.key ?? null)
 })
 
+const TEMP_UNLOCK_USER_ID = '1a760a50-5eba-45a8-aaa0-696ac404e1b3'
+
 const isLocked = computed(() => {
+  if (user.value?.id === TEMP_UNLOCK_USER_ID && currentStep.value === 0) return false
   if (isAwardsStep.value) return !isRoundOpen('PREMIOS')
   return !currentStepRound.value || !isRoundOpen(currentStepRound.value)
 })
