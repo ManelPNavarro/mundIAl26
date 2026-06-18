@@ -514,7 +514,7 @@ async function save() {
     </div>
 
     <!-- Footer -->
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2 border-t border-border">
+    <div class="sticky bottom-0 z-10 bg-background/95 backdrop-blur flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 py-3 px-1 border-t border-border -mx-1">
       <UButton v-if="currentStep > 0" variant="ghost" color="neutral" icon="i-lucide-arrow-left" @click="currentStep--">
         Anterior
       </UButton>
