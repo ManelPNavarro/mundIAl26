@@ -49,12 +49,16 @@ function teamName(match: Match, side: 'home' | 'away'): string {
   return side === 'home' ? (match.home_slot ?? '?') : (match.away_slot ?? '?')
 }
 
+const TEMP_UNLOCK_USER_ID = '1a760a50-5eba-45a8-aaa0-696ac404e1b3'
+const currentUser = useSupabaseUser()
+
 const allMatches = computed(() => props.groups.flatMap(g => g.matches))
 const { view, byDate } = useGroupStageView(() => allMatches.value)
 
 const openGroups = ref<string[]>(['A'])
 
 function isMatchLocked(match: Match): boolean {
+  if (currentUser.value?.id === TEMP_UNLOCK_USER_ID) return match.home_score !== null
   if (props.locked) return true
   if (match.status !== 'SCHEDULED') return true
   if (match.home_score !== null) return true
