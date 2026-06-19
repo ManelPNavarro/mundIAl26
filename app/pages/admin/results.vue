@@ -439,9 +439,14 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <h1 class="text-2xl font-bold text-foreground">Resultados</h1>
         <p class="text-sm text-muted mt-1">Introduce los resultados reales de cada partido.</p>
       </div>
-      <UButton variant="outline" color="neutral" icon="i-lucide-refresh-cw" :loading="recalculating" @click="recalculatePoints">
-        Recalcular puntos
-      </UButton>
+      <div class="flex items-center gap-2">
+        <UButton variant="outline" color="neutral" icon="i-lucide-cloud-download" :loading="syncingMatches" @click="syncMatches">
+          Sync resultados
+        </UButton>
+        <UButton variant="outline" color="neutral" icon="i-lucide-refresh-cw" :loading="recalculating" @click="recalculatePoints">
+          Recalcular puntos
+        </UButton>
+      </div>
     </div>
 
     <!-- Round locks -->
