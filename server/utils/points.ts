@@ -69,23 +69,8 @@ export async function recalculateMatchPoints(matchId: string, supabase: Supabase
 }
 
 export async function syncAllUserScores(supabase: SupabaseAdmin): Promise<void> {
-  const { data: allRows } = await supabase
-    .from('user_match_points')
-    .select('user_id, points')
-    .limit(100000)
-
-  const totalByUser = new Map<string, number>()
-  for (const row of allRows ?? []) {
-    totalByUser.set(row.user_id, (totalByUser.get(row.user_id) ?? 0) + row.points)
-  }
-
-  const scoreRows = [...totalByUser.entries()].map(([user_id, match_points]) => ({
-    user_id,
-    match_points,
-    updated_at: new Date().toISOString(),
-  }))
-
-  if (scoreRows.length) {
-    await supabase.from('user_scores').upsert(scoreRows, { onConflict: 'user_id' })
-  }
+  // Aggregate in Postgres: reading user_match_points into JS is capped by the
+  // PostgREST max-rows limit (1000), which silently truncates the sum.
+  const { error } = await supabase.rpc('recalculate_user_scores')
+  if (error) throw createError({ statusCode: 500, message: error.message })
 }
