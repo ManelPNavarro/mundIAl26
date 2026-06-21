@@ -25,9 +25,7 @@ export async function recalculateMatchPoints(matchId: string, supabase: Supabase
   if (!match || !config) return
 
   if (match.home_score === null || match.away_score === null) {
-    const { data: affected } = await supabase.from('user_match_points').select('user_id').eq('match_id', matchId)
     await supabase.from('user_match_points').delete().eq('match_id', matchId)
-    if (affected?.length) await syncUserScores(affected.map(r => r.user_id), supabase)
     return
   }
 
@@ -67,26 +65,27 @@ export async function recalculateMatchPoints(matchId: string, supabase: Supabase
 
   if (rows.length) {
     await supabase.from('user_match_points').upsert(rows, { onConflict: 'user_id,match_id' })
-    await syncUserScores(rows.map(r => r.user_id), supabase)
   }
 }
 
-async function syncUserScores(userIds: string[], supabase: SupabaseAdmin): Promise<void> {
-  const { data: totals } = await supabase
+export async function syncAllUserScores(supabase: SupabaseAdmin): Promise<void> {
+  const { data: allRows } = await supabase
     .from('user_match_points')
     .select('user_id, points')
-    .in('user_id', userIds)
+    .limit(100000)
 
   const totalByUser = new Map<string, number>()
-  for (const row of totals ?? []) {
+  for (const row of allRows ?? []) {
     totalByUser.set(row.user_id, (totalByUser.get(row.user_id) ?? 0) + row.points)
   }
 
-  const scoreRows = userIds.map(user_id => ({
+  const scoreRows = [...totalByUser.entries()].map(([user_id, match_points]) => ({
     user_id,
-    match_points: totalByUser.get(user_id) ?? 0,
+    match_points,
     updated_at: new Date().toISOString(),
   }))
 
-  await supabase.from('user_scores').upsert(scoreRows, { onConflict: 'user_id' })
+  if (scoreRows.length) {
+    await supabase.from('user_scores').upsert(scoreRows, { onConflict: 'user_id' })
+  }
 }

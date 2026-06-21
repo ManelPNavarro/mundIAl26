@@ -1,4 +1,4 @@
-import { recalculateMatchPoints } from '../../utils/points'
+import { recalculateMatchPoints, syncAllUserScores } from '../../utils/points'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
@@ -14,6 +14,8 @@ export default defineEventHandler(async (event) => {
   for (const match of finishedMatches) {
     await recalculateMatchPoints(match.id, supabase)
   }
+
+  await syncAllUserScores(supabase)
 
   return { recalculated: finishedMatches.length }
 })
