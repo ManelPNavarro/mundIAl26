@@ -11,7 +11,7 @@ export default defineEventHandler(async () => {
     { data: allSideBets },
   ] = await Promise.all([
     supabase.auth.admin.listUsers(),
-    supabase.from('user_match_points').select('user_id, points'),
+    supabase.from('user_match_points').select('user_id, points').limit(100000),
     supabase.from('scoring_config').select('*').single(),
     supabase.from('official_awards').select('*').single(),
     supabase.from('side_bets').select('*'),
