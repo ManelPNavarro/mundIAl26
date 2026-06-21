@@ -1,6 +1,6 @@
 import { toSpanish, mapStatus } from '../../utils/football-data'
 import type { ApiMatch } from '../../utils/football-data'
-import { recalculateMatchPoints } from '../../utils/points'
+import { recalculateMatchPoints, syncAllUserScores } from '../../utils/points'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
@@ -71,6 +71,8 @@ export default defineEventHandler(async (event) => {
     }
     updated++
   }
+
+  await syncAllUserScores(supabase)
 
   return { updated, skipped, total: apiMatches.length }
 })
