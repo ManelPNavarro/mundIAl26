@@ -136,6 +136,23 @@ const isLocked = computed(() => {
 
 onMounted(() => { currentStep.value = openStepIndex.value })
 
+// ─── Knockout info modal ─────────────────────────────────────────────────────
+const showKnockoutInfo = ref(false)
+const KNOCKOUT_INFO_KEY = 'mundial26_knockout_info_seen_v1'
+const anyKnockoutOpen = computed(() =>
+  ['R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL'].some(r => isRoundOpen(r))
+)
+
+onMounted(() => {
+  if (!anyKnockoutOpen.value) return
+  if (localStorage.getItem(KNOCKOUT_INFO_KEY)) return
+  showKnockoutInfo.value = true
+})
+
+watch(showKnockoutInfo, (v) => {
+  if (!v) localStorage.setItem(KNOCKOUT_INFO_KEY, '1')
+})
+
 // ─── Match grouping ──────────────────────────────────────────────────────────
 const ROUND_ORDER = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
 const ROUND_LABELS: Record<string, string> = {
@@ -420,7 +437,18 @@ async function save() {
   <div class="space-y-6">
     <div class="flex items-start justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-foreground">Predicciones</h1>
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl font-bold text-foreground">Predicciones</h1>
+          <UButton
+            v-if="anyKnockoutOpen"
+            icon="i-lucide-info"
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            aria-label="Información de la fase eliminatoria"
+            @click="showKnockoutInfo = true"
+          />
+        </div>
         <p class="text-sm text-muted mt-1">Introduce tus resultados para cada fase del torneo.</p>
       </div>
       <p v-if="lastResultsUpdate" class="text-xs text-muted shrink-0 mt-1">
@@ -581,6 +609,9 @@ async function save() {
         </div>
       </template>
     </UModal>
+
+    <!-- Knockout phase info modal -->
+    <PredictionsKnockoutInfoModal v-model="showKnockoutInfo" />
 
     <!-- Hidden share card for image generation -->
     <PredictionsShareCard :groups="groupStageGroups" :predictions="predictions" :display-name="userName || user?.email || ''" />
