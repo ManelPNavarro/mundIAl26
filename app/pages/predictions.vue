@@ -390,8 +390,11 @@ const saving = ref(false)
 
 async function saveMatches() {
   const h = await getAuthHeaders()
+  const roundById = new Map((allMatches.value ?? []).map(m => [m.id, m.round]))
   const payload: Predictions = {}
   for (const [id, p] of Object.entries(predictions.value)) {
+    const round = roundById.get(id)
+    if (!round || !isRoundOpen(round)) continue
     if (p.home !== null && p.home !== undefined && p.away !== null && p.away !== undefined) {
       payload[id] = p
     }
