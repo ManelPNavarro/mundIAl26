@@ -138,7 +138,7 @@ onMounted(() => { currentStep.value = openStepIndex.value })
 
 // ─── Knockout info modal ─────────────────────────────────────────────────────
 const showKnockoutInfo = ref(false)
-const KNOCKOUT_INFO_KEY = 'mundial26_knockout_info_seen_v1'
+const KNOCKOUT_INFO_KEY = 'mundial26_knockout_info_seen_v2'
 const anyKnockoutOpen = computed(() =>
   ['R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL'].some(r => isRoundOpen(r))
 )

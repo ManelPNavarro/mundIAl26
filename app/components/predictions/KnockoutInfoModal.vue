@@ -3,16 +3,16 @@ const open = defineModel<boolean>({ required: true })
 </script>
 
 <template>
-  <UModal :open="open" title="🏆 Empieza la fase eliminatoria" @update:open="(v) => open = v">
+  <UModal :open="open" title="🏆 Fase eliminatoria" @update:open="(v) => open = v">
     <template #body>
-      <div class="space-y-4 text-sm">
-        <div>
-          <p class="font-semibold text-foreground">Rellena todo tu cuadro antes de que empiece</p>
-          <p class="text-muted mt-1">
-            Tienes que completar todas tus predicciones de la fase eliminatoria —hasta la final—
-            <span class="font-medium text-foreground">antes del primer partido de dieciseisavos: el domingo 28 de junio a las 21:00h.</span>
-            A esa hora se cierran las predicciones.
+      <div class="space-y-5 text-sm">
+        <div class="rounded-xl bg-primary-400/15 border border-primary-400/30 p-4 text-center">
+          <p class="text-xs font-semibold uppercase tracking-wide text-primary mb-1">Fecha límite</p>
+          <p class="text-xl sm:text-2xl font-bold text-foreground leading-tight">
+            Completa tus predicciones antes del<br>
+            <span class="text-primary">28 de junio a las 21:00h</span>
           </p>
+          <p class="text-xs text-muted mt-2">Hasta la final. A esa hora se cierran las predicciones.</p>
         </div>
         <div>
           <p class="font-semibold text-foreground">Los equipos que ves ahora no son definitivos</p>
