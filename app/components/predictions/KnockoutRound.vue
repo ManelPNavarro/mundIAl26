@@ -21,6 +21,7 @@ interface MatchSummary {
   points: number
   isExact: boolean
   isCorrect: boolean
+  wrongTeams?: boolean
 }
 
 type Prediction = { home: number | null, away: number | null, homeAdvances?: boolean | null }
@@ -242,6 +243,15 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         <span class="flex-1 text-left">
           {{ props.summary?.[match.id] ? (props.summary[match.id].points > 0 ? `+${props.summary[match.id].points} pts` : '0 pts') : '' }}
         </span>
+      </div>
+
+      <!-- Wrong teams explanation -->
+      <div
+        v-if="props.summary?.[match.id]?.wrongTeams"
+        class="flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium bg-error/10 text-error border-t border-error/20"
+      >
+        <UIcon name="i-lucide-triangle-alert" class="size-3.5 shrink-0" />
+        <span>Equipos incorrectos: los equipos de este cruce no coinciden con tu predicción, así que no puntúa.</span>
       </div>
     </div>
   </div>

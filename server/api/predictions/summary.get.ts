@@ -26,6 +26,7 @@ export default defineEventHandler(async (event) => {
     points: number
     isExact: boolean
     isCorrect: boolean
+    wrongTeams: boolean
   }> = {}
 
   for (const match of (allMatches ?? []).filter(m => m.home_score !== null)) {
@@ -35,13 +36,13 @@ export default defineEventHandler(async (event) => {
     const pred = predMap.get(match.id)
 
     if (!pred) {
-      summary[match.id] = { result, points: 0, isExact: false, isCorrect: false }
+      summary[match.id] = { result, points: 0, isExact: false, isCorrect: false, wrongTeams: false }
       continue
     }
 
     // Knockout matches: only score if user predicted the correct teams in this slot
     if (match.round !== 'GROUP' && !teamsMatch(match, allMatches ?? [], predMap)) {
-      summary[match.id] = { result, points: 0, isExact: false, isCorrect: false }
+      summary[match.id] = { result, points: 0, isExact: false, isCorrect: false, wrongTeams: true }
       continue
     }
 
@@ -54,7 +55,7 @@ export default defineEventHandler(async (event) => {
     const isExact = pred.home_score === match.home_score && pred.away_score === match.away_score
     const isCorrect = points > 0
 
-    summary[match.id] = { result, points, isExact, isCorrect }
+    summary[match.id] = { result, points, isExact, isCorrect, wrongTeams: false }
   }
 
   return summary

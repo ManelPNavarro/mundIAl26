@@ -64,6 +64,7 @@ interface MatchSummary {
   points: number
   isExact: boolean
   isCorrect: boolean
+  wrongTeams?: boolean
 }
 
 interface Player { id: string, name: string }
