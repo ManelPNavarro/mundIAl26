@@ -419,10 +419,15 @@ function matchSideName(m: Match, side: 'home' | 'away'): string | null {
 }
 
 function teamName(match: Match, side: 'home' | 'away'): string {
-  const resolved = matchSideName(match, side)
-  if (resolved) return resolved
+  const team = side === 'home' ? match.home_team : match.away_team
+  if (team) return team.name
   const slot = side === 'home' ? match.home_slot : match.away_slot
   if (!slot) return '?'
+  // R32: show the real team only if stored in the DB; otherwise the raw slot.
+  // Never project from current standings — avoids the best-third heuristic mismatch.
+  if (match.round === 'R32') return slot
+  const resolved = matchSideName(match, side)
+  if (resolved) return resolved
   if (slot.startsWith('W')) return `Gan. P${slot.slice(1)}`
   if (slot.startsWith('L')) return `Perd. P${slot.slice(1)}`
   const pos = parseInt(slot[0]!)
