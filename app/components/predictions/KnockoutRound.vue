@@ -164,6 +164,9 @@ function teamName(match: Match, side: 'home' | 'away'): string {
   if (team) return team.name
   const slot = side === 'home' ? match.home_slot : match.away_slot
   if (!slot) return '?'
+  // R32: show the real team only if stored in the DB; otherwise the raw slot.
+  // Never project from current standings — avoids confusing reality with predictions.
+  if (match.round === 'R32') return slot
   const resolved = resolveSlot(slot)
   if (resolved) return resolved
   // Fallback labels
