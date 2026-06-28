@@ -554,10 +554,6 @@ async function save() {
       :title="isAwardsStep ? 'Premios cerrados' : `${ROUND_LABELS[currentStepRound ?? ''] ?? 'Esta fase'} cerrada`"
       description="El administrador abrirá esta fase cuando corresponda." />
 
-    <!-- Completed banner -->
-    <UAlert v-if="steps.every(s => s.complete) && !isLocked" color="success" variant="soft"
-      icon="i-lucide-party-popper" title="¡Predicción finalizada!"
-      description="Has completado todas las fases y tus apuestas de premios. ¡Suerte!" />
 
     <!-- Premios nudge -->
     <UAlert v-if="currentStep === 0 && isRoundOpen('PREMIOS') && !sideBetsComplete" color="warning" variant="soft"
