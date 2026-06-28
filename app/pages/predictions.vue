@@ -144,14 +144,46 @@ const anyKnockoutOpen = computed(() =>
   ['R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL'].some(r => isRoundOpen(r))
 )
 
+// ─── Pending matches reminder ────────────────────────────────────────────────
+const openMatches = computed(() => (allMatches.value ?? []).filter(m => isRoundOpen(m.round)))
+const totalOpenCount = computed(() => openMatches.value.length)
+const filledOpenCount = computed(() =>
+  openMatches.value.filter((m) => {
+    const p = predictions.value[m.id]
+    return p?.home != null && p?.away != null
+  }).length,
+)
+const pendingMatchesCount = computed(() =>
+  openMatches.value.filter((m) => {
+    if (m.status !== 'SCHEDULED' || m.home_score !== null) return false
+    const p = predictions.value[m.id]
+    return !(p?.home != null && p?.away != null)
+  }).length,
+)
+
+const showPendingReminder = ref(false)
+const PENDING_REMINDER_KEY = 'mundial26_pending_reminder_session'
+
+function maybeShowPendingReminder() {
+  if (pendingMatchesCount.value <= 0) return
+  if (sessionStorage.getItem(PENDING_REMINDER_KEY)) return
+  sessionStorage.setItem(PENDING_REMINDER_KEY, '1')
+  showPendingReminder.value = true
+}
+
 onMounted(() => {
-  if (!anyKnockoutOpen.value) return
-  if (localStorage.getItem(KNOCKOUT_INFO_KEY)) return
-  showKnockoutInfo.value = true
+  if (anyKnockoutOpen.value && !localStorage.getItem(KNOCKOUT_INFO_KEY)) {
+    showKnockoutInfo.value = true
+  } else {
+    maybeShowPendingReminder()
+  }
 })
 
 watch(showKnockoutInfo, (v) => {
-  if (!v) localStorage.setItem(KNOCKOUT_INFO_KEY, '1')
+  if (!v) {
+    localStorage.setItem(KNOCKOUT_INFO_KEY, '1')
+    maybeShowPendingReminder()
+  }
 })
 
 // ─── Match grouping ──────────────────────────────────────────────────────────
@@ -460,6 +492,40 @@ async function save() {
       </p>
     </div>
 
+    <!-- Pending predictions banner -->
+    <div
+      v-if="totalOpenCount > 0"
+      class="rounded-lg border p-3"
+      :class="pendingMatchesCount > 0 ? 'border-warning/40 bg-warning/10' : 'border-success/40 bg-success/10'"
+    >
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2 min-w-0">
+          <UIcon
+            :name="pendingMatchesCount > 0 ? 'i-lucide-triangle-alert' : 'i-lucide-circle-check'"
+            :class="pendingMatchesCount > 0 ? 'text-warning' : 'text-success'"
+            class="size-5 shrink-0"
+          />
+          <p class="text-sm font-medium text-foreground">
+            <template v-if="pendingMatchesCount > 0">
+              Te {{ pendingMatchesCount === 1 ? 'queda' : 'quedan' }} <span class="font-bold">{{ pendingMatchesCount }}</span>
+              {{ pendingMatchesCount === 1 ? 'partido' : 'partidos' }} por rellenar, incluida la final.
+            </template>
+            <template v-else>
+              ¡Tienes todas tus predicciones al día! 🎉
+            </template>
+          </p>
+        </div>
+        <span class="text-xs font-semibold text-muted shrink-0 tabular-nums">{{ filledOpenCount }}/{{ totalOpenCount }}</span>
+      </div>
+      <div class="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
+        <div
+          class="h-full rounded-full transition-all"
+          :class="pendingMatchesCount > 0 ? 'bg-warning' : 'bg-success'"
+          :style="{ width: `${totalOpenCount ? Math.round(filledOpenCount / totalOpenCount * 100) : 0}%` }"
+        />
+      </div>
+    </div>
+
     <!-- Stepper -->
     <div class="flex items-start justify-between gap-4">
       <div class="flex flex-wrap gap-2 flex-1">
@@ -616,6 +682,9 @@ async function save() {
 
     <!-- Knockout phase info modal -->
     <PredictionsKnockoutInfoModal v-model="showKnockoutInfo" />
+
+    <!-- Pending predictions reminder modal -->
+    <PredictionsPendingReminderModal v-model="showPendingReminder" :count="pendingMatchesCount" />
 
     <!-- Hidden share card for image generation -->
     <PredictionsShareCard :groups="groupStageGroups" :predictions="predictions" :display-name="userName || user?.email || ''" />
