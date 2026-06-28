@@ -177,11 +177,24 @@ const columns = [
               </span>
               <div class="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
                 <div
-                  class="h-full rounded-full bg-primary transition-all"
+                  class="h-full rounded-full transition-all"
+                  :class="row.original.predictions_filled >= row.original.total_matches ? 'bg-success' : 'bg-primary'"
                   :style="{ width: `${row.original.total_matches ? Math.round(row.original.predictions_filled / row.original.total_matches * 100) : 0}%` }"
                 />
               </div>
             </div>
+            <UBadge
+              v-if="row.original.predictions_filled >= row.original.total_matches"
+              color="success"
+              variant="subtle"
+              size="xs"
+              icon="i-lucide-check"
+            >
+              Completo
+            </UBadge>
+            <UBadge v-else color="warning" variant="subtle" size="xs">
+              Faltan {{ row.original.total_matches - row.original.predictions_filled }}
+            </UBadge>
             <span
               class="text-xs tabular-nums"
               :class="row.original.awards_filled === 4 ? 'text-primary font-medium' : 'text-muted'"
