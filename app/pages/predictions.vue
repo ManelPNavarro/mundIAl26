@@ -210,6 +210,20 @@ function isFilled(id: string) {
   return p?.home !== null && p?.home !== undefined && p?.away !== null && p?.away !== undefined
 }
 
+// A match can still be filled only if it hasn't finished or started yet.
+function isStillFillable(m: Match): boolean {
+  if (m.home_score !== null) return false
+  if (m.status !== 'SCHEDULED') return false
+  if (m.kickoff_at && new Date(m.kickoff_at).getTime() <= Date.now()) return false
+  return true
+}
+
+// A round is "complete" when nothing is left to fill: every match is either
+// predicted or no longer fillable (already started/finished).
+function matchesComplete(matches: Match[]): boolean {
+  return matches.length > 0 && matches.every(m => isFilled(m.id) || !isStillFillable(m))
+}
+
 const groupMatchIds = computed(() => groupStageGroups.value.flatMap(g => g.matches.map(m => m.id)))
 const groupFilled = computed(() => groupMatchIds.value.filter(isFilled).length)
 const groupComplete = computed(() => groupMatchIds.value.length > 0 && groupFilled.value === groupMatchIds.value.length)
@@ -321,7 +335,7 @@ const steps = computed(() => [
     key: 'groups',
     title: ROUND_LABELS['GROUP']!,
     description: `${groupFilled.value}/${groupMatchIds.value.length} partidos`,
-    complete: groupComplete.value,
+    complete: matchesComplete(groupStageGroups.value.flatMap(g => g.matches)),
   },
   ...knockoutRounds.value.map((round) => {
     const filled = round.matches.filter(m => isFilled(m.id)).length
@@ -329,7 +343,7 @@ const steps = computed(() => [
       key: round.key,
       title: round.label,
       description: `${filled}/${round.matches.length} partidos`,
-      complete: round.matches.length > 0 && filled === round.matches.length,
+      complete: matchesComplete(round.matches),
     }
   }),
   {
