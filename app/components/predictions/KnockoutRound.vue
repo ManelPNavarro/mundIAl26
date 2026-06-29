@@ -185,7 +185,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
     <div
       v-for="match in props.matches"
       :key="match.id"
-      class="rounded-lg overflow-hidden"
+      class="border border-border rounded-lg overflow-hidden"
       :class="[
         props.summary?.[match.id]
           ? (props.summary[match.id].isCorrect ? 'bg-success/5' : 'bg-error/5')
@@ -195,12 +195,12 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       @click="navigateToMatch(match)"
     >
       <!-- Kickoff time -->
-      <div v-if="match.kickoff_at || isMatchViewable(match)" class="px-4 pt-2 text-xs text-muted flex items-center justify-center gap-1">
+      <div v-if="match.kickoff_at || isMatchViewable(match)" class="px-3 pt-2 text-xs text-muted flex items-center justify-center gap-1">
         <span v-if="match.kickoff_at">{{ formatKickoff(match.kickoff_at) }}</span>
         <UIcon v-if="isMatchViewable(match)" name="i-lucide-chevron-right" class="size-3.5 text-muted" />
       </div>
       <!-- Prediction row -->
-      <div class="flex items-center gap-2 px-4 py-3">
+      <div class="flex items-center gap-2 px-3 py-2">
         <span class="flex-1 flex items-center justify-end gap-1 min-w-0"><span class="truncate text-sm font-medium text-foreground">{{ teamName(match, 'home') }}</span><TeamFlag :team="teamName(match, 'home')" class="shrink-0" /></span>
         <div class="flex items-center gap-1 shrink-0">
           <template v-if="isMatchLocked(match)">
@@ -218,7 +218,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       </div>
 
       <!-- Penalties tiebreaker -->
-      <div v-if="isDraw(match.id) && !props.summary?.[match.id]" class="flex items-center justify-center gap-3 px-4 pb-3 border-t border-border pt-2">
+      <div v-if="isDraw(match.id) && !props.summary?.[match.id]" class="flex items-center justify-center gap-3 px-3 pb-3 border-t border-border pt-2">
         <p class="text-xs text-muted">¿Quién avanza en penaltis?</p>
         <div class="flex gap-2">
           <UButton size="xs" :variant="getPrediction(match.id).homeAdvances === true ? 'solid' : 'outline'" color="primary" :disabled="props.locked" @click="getPrediction(match.id).homeAdvances = true">
@@ -233,7 +233,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       <!-- Real result strip -->
       <div
         v-if="hasResult(match)"
-        class="flex items-center gap-2 px-4 py-1.5 text-xs font-medium"
+        class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium"
         :class="props.summary?.[match.id]
           ? (props.summary[match.id].isCorrect ? 'bg-success/10 text-success' : 'bg-error/10 text-error')
           : 'bg-muted/30 text-muted'"
@@ -252,7 +252,7 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       <!-- Wrong teams explanation -->
       <div
         v-if="props.summary?.[match.id]?.wrongTeams"
-        class="flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium bg-error/10 text-error border-t border-error/20"
+        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-error/10 text-error border-t border-error/20"
       >
         <UIcon name="i-lucide-triangle-alert" class="size-3.5 shrink-0" />
         <span>Equipos incorrectos: los equipos de este cruce no coinciden con tu predicción, así que no puntúa.</span>
