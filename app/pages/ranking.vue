@@ -9,6 +9,7 @@ interface RankingEntry {
   totalPoints: number
   matchPoints: number
   awardPoints: number
+  winnerTeam: string | null
 }
 
 const currentUser = useSupabaseUser()
@@ -83,13 +84,16 @@ const POSITION_ICONS: Record<number, string> = {
         </div>
 
         <!-- Points breakdown -->
-        <div class="text-right shrink-0">
-          <div class="text-lg font-bold text-foreground leading-none">
-            {{ entry.totalPoints }}
-            <span class="text-xs font-normal text-muted ml-1">pts</span>
-          </div>
-          <div v-if="entry.awardPoints > 0" class="text-xs text-muted mt-0.5">
-            {{ entry.matchPoints }} partidos + {{ entry.awardPoints }} premios
+        <div class="flex items-center gap-2 shrink-0">
+          <TeamFlag v-if="entry.winnerTeam" :team="entry.winnerTeam" class="text-lg" />
+          <div class="text-right">
+            <div class="text-lg font-bold text-foreground leading-none">
+              {{ entry.totalPoints }}
+              <span class="text-xs font-normal text-muted ml-1">pts</span>
+            </div>
+            <div v-if="entry.awardPoints > 0" class="text-xs text-muted mt-0.5">
+              {{ entry.matchPoints }} partidos + {{ entry.awardPoints }} premios
+            </div>
           </div>
         </div>
       </div>
