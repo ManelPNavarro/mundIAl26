@@ -174,7 +174,9 @@ const filledOpenCount = computed(() =>
 )
 const pendingMatchesCount = computed(() =>
   openMatches.value.filter((m) => {
-    if (m.status !== 'SCHEDULED' || m.home_score !== null) return false
+    // Only count matches the user can still fill: not finished and not yet started.
+    if (m.home_score !== null || m.status !== 'SCHEDULED') return false
+    if (m.kickoff_at && new Date(m.kickoff_at).getTime() <= Date.now()) return false
     const p = predictions.value[m.id]
     return !(p?.home != null && p?.away != null)
   }).length,
@@ -520,13 +522,13 @@ async function save() {
             </template>
           </p>
         </div>
-        <span class="text-xs font-semibold text-muted shrink-0 tabular-nums">{{ filledOpenCount }}/{{ totalOpenCount }}</span>
+        <span v-if="pendingMatchesCount > 0" class="text-xs font-semibold text-muted shrink-0 tabular-nums">{{ filledOpenCount }}/{{ totalOpenCount }}</span>
       </div>
       <div class="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
         <div
           class="h-full rounded-full transition-all"
           :class="pendingMatchesCount > 0 ? 'bg-warning' : 'bg-success'"
-          :style="{ width: `${totalOpenCount ? Math.round(filledOpenCount / totalOpenCount * 100) : 0}%` }"
+          :style="{ width: `${pendingMatchesCount > 0 && totalOpenCount ? Math.round(filledOpenCount / totalOpenCount * 100) : 100}%` }"
         />
       </div>
     </div>
