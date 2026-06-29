@@ -161,7 +161,7 @@ const isLocked = computed(() => {
   return !currentStepRound.value || !isRoundEditable(currentStepRound.value)
 })
 
-onMounted(() => { currentStep.value = openStepIndex.value })
+onMounted(() => { currentStep.value = initialStepIndex.value })
 
 // ─── Pending matches progress ────────────────────────────────────────────────
 const openMatches = computed(() => (allMatches.value ?? []).filter(m => isRoundEditable(m.round)))
@@ -363,6 +363,25 @@ const openStepIndex = computed(() => {
   if (filledRounds.has('GROUP')) return 0
   // No predictions at all: fase de grupos
   return 0
+})
+
+function stepIndexForRound(round: string | null | undefined): number {
+  if (round === 'GROUP') return 0
+  const i = knockoutRounds.value.findIndex(r => r.key === round)
+  return i >= 0 ? i + 1 : 0
+}
+
+// Initial tab: the round of the most recently kicked-off match (the one being
+// played / latest finished). Falls back to the open/predicted round when nothing
+// has started yet.
+const initialStepIndex = computed(() => {
+  const now = Date.now()
+  const started = (allMatches.value ?? []).filter(m => m.kickoff_at && new Date(m.kickoff_at).getTime() <= now)
+  if (!started.length) return openStepIndex.value
+  const latest = started.reduce((a, b) =>
+    new Date(a.kickoff_at!).getTime() >= new Date(b.kickoff_at!).getTime() ? a : b,
+  )
+  return stepIndexForRound(latest.round)
 })
 
 const currentPhaseMatchesAllPlayed = computed(() => {
