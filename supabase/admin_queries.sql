@@ -125,4 +125,16 @@ CROSS JOIN official_awards oa
 LEFT JOIN teams ot ON ot.id = oa.winner_team_id
 ORDER BY u.email;
 
-
+-- Check error in points calculation
+SELECT u.email,
+       s.match_points                AS stored_in_user_scores,
+       COALESCE(p.real_sum, 0)       AS actual_sum_user_match_points,
+       s.match_points - COALESCE(p.real_sum, 0) AS diff
+FROM user_scores s
+         JOIN auth.users u ON u.id = s.user_id
+         LEFT JOIN (
+    SELECT user_id, SUM(points) AS real_sum
+    FROM user_match_points
+    GROUP BY user_id
+) p ON p.user_id = s.user_id
+ORDER BY diff DESC, stored_in_user_scores DESC;

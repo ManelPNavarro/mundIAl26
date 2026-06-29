@@ -144,6 +144,7 @@ function isMatchLocked(match: Match): boolean {
   if (props.locked) return true
   if (match.status !== 'SCHEDULED') return true
   if (match.home_score !== null) return true
+  if (match.kickoff_at && new Date(match.kickoff_at).getTime() <= Date.now()) return true
   return false
 }
 

@@ -6,9 +6,11 @@ export default defineEventHandler(async (event) => {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token)
   if (authError || !user) throw createError({ statusCode: 401 })
 
-  const [{ data: locks }, { data: matches }] = await Promise.all([
+  const [{ data: locks }, { data: matches }, { data: settings }, { data: userPreds }] = await Promise.all([
     supabase.from('round_locks').select('round, is_open'),
     supabase.from('matches').select('id, round, home_score, kickoff_at'),
+    supabase.from('app_settings').select('catch_up_mode').eq('id', true).single(),
+    supabase.from('predictions').select('match_id').eq('user_id', user.id),
   ])
 
   const openRounds = new Set((locks ?? []).filter(l => l.is_open).map(l => l.round))
@@ -20,6 +22,19 @@ export default defineEventHandler(async (event) => {
   const isTempUnlocked = user.id === TEMP_UNLOCK_USER_ID
 
   const now = Date.now()
+
+  // Catch-up mode: while on, users who still have an unfilled fillable match may
+  // save (bypassing round locks) so they can finish late; users who already
+  // completed everything stay frozen.
+  const catchUpMode = settings?.catch_up_mode ?? false
+  const predictedIds = new Set((userPreds ?? []).map(p => p.match_id))
+  const userIncomplete = (matches ?? []).some(m =>
+    m.home_score === null
+    && (!m.kickoff_at || new Date(m.kickoff_at).getTime() > now)
+    && !predictedIds.has(m.id),
+  )
+  const bypassLock = isTempUnlocked || (catchUpMode && userIncomplete)
+
   const closedRounds = new Set<string>()
   const startedMatches = new Set<string>()
 
@@ -31,7 +46,7 @@ export default defineEventHandler(async (event) => {
       startedMatches.add(matchId)
       continue
     }
-    if (!isTempUnlocked && !openRounds.has(m.round)) closedRounds.add(m.round ?? 'desconocida')
+    if (!bypassLock && !openRounds.has(m.round)) closedRounds.add(m.round ?? 'desconocida')
   }
 
   if (startedMatches.size > 0) {

@@ -69,7 +69,7 @@ interface MatchSummary {
 
 interface Player { id: string, name: string }
 
-const [{ data: allMatches }, { data: allPlayers }, { data: roundLocks }, savedPredictions, savedSideBets, matchSummary, officialAwards, scoringConfig, lastUpdatedRes] = await Promise.all([
+const [{ data: allMatches }, { data: allPlayers }, { data: roundLocks }, savedPredictions, savedSideBets, matchSummary, officialAwards, scoringConfig, lastUpdatedRes, appSettings] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
   useFetch<Player[]>('/api/players'),
   useFetch<Record<string, boolean>>('/api/round-locks'),
@@ -79,6 +79,7 @@ const [{ data: allMatches }, { data: allPlayers }, { data: roundLocks }, savedPr
   $fetch<SideBets | null>('/api/awards'),
   $fetch<Record<string, number>>('/api/scoring-config'),
   $fetch<{ updated_at: string | null }>('/api/matches/last-updated'),
+  $fetch<{ catch_up_mode: boolean }>('/api/app-settings'),
 ])
 
 const lastResultsUpdate = lastUpdatedRes?.updated_at
@@ -118,6 +119,31 @@ function isRoundOpen(round: string): boolean {
   return roundLocks.value?.[round] === true
 }
 
+// ─── Catch-up mode ────────────────────────────────────────────────────────────
+// While on, a user who hadn't completed all their fillable predictions at page
+// load may still fill the matches they're missing (not-yet-started ones), even
+// in closed rounds. Snapshot completeness at load so the inputs don't lock
+// mid-typing as the last prediction is entered.
+const catchUpMode = appSettings?.catch_up_mode ?? false
+const wasIncompleteAtLoad = (() => {
+  const filled = new Set(
+    Object.entries(savedPredictions ?? {})
+      .filter(([, p]) => p?.home != null && p?.away != null)
+      .map(([id]) => id),
+  )
+  const now = Date.now()
+  return (allMatches.value ?? []).some(m =>
+    m.home_score === null
+    && (!m.kickoff_at || new Date(m.kickoff_at).getTime() > now)
+    && !filled.has(m.id),
+  )
+})()
+const catchUpActive = computed(() => catchUpMode && wasIncompleteAtLoad)
+
+function isRoundEditable(round: string): boolean {
+  return isRoundOpen(round) || catchUpActive.value
+}
+
 function isStepNavigable(idx: number): boolean {
   return true
 }
@@ -132,7 +158,7 @@ const TEMP_UNLOCK_USER_ID = '1a760a50-5eba-45a8-aaa0-696ac404e1b3'
 const isLocked = computed(() => {
   if (user.value?.id === TEMP_UNLOCK_USER_ID && currentStep.value === 0) return false
   if (isAwardsStep.value) return !isRoundOpen('PREMIOS')
-  return !currentStepRound.value || !isRoundOpen(currentStepRound.value)
+  return !currentStepRound.value || !isRoundEditable(currentStepRound.value)
 })
 
 onMounted(() => { currentStep.value = openStepIndex.value })
@@ -145,7 +171,7 @@ const anyKnockoutOpen = computed(() =>
 )
 
 // ─── Pending matches reminder ────────────────────────────────────────────────
-const openMatches = computed(() => (allMatches.value ?? []).filter(m => isRoundOpen(m.round)))
+const openMatches = computed(() => (allMatches.value ?? []).filter(m => isRoundEditable(m.round)))
 const totalOpenCount = computed(() => openMatches.value.length)
 const filledOpenCount = computed(() =>
   openMatches.value.filter((m) => {
@@ -423,11 +449,14 @@ const saving = ref(false)
 
 async function saveMatches() {
   const h = await getAuthHeaders()
-  const roundById = new Map((allMatches.value ?? []).map(m => [m.id, m.round]))
+  const matchById = new Map((allMatches.value ?? []).map(m => [m.id, m]))
+  const now = Date.now()
   const payload: Predictions = {}
   for (const [id, p] of Object.entries(predictions.value)) {
-    const round = roundById.get(id)
-    if (!round || !isRoundOpen(round)) continue
+    const m = matchById.get(id)
+    if (!m || !isRoundEditable(m.round)) continue
+    // Skip matches that already started or finished (server rejects them anyway).
+    if (m.home_score !== null || (m.kickoff_at && new Date(m.kickoff_at).getTime() <= now)) continue
     if (p.home !== null && p.home !== undefined && p.away !== null && p.away !== undefined) {
       payload[id] = p
     }
@@ -525,6 +554,16 @@ async function save() {
         />
       </div>
     </div>
+
+    <!-- Catch-up grace period -->
+    <UAlert
+      v-if="catchUpActive"
+      color="warning"
+      variant="soft"
+      icon="i-lucide-clock-alert"
+      title="Tienes una oportunidad extra"
+      description="Aún puedes completar las predicciones que te faltaron (solo los partidos que todavía no han empezado). Rellénalas cuanto antes, esto se cerrará pronto."
+    />
 
     <!-- Stepper -->
     <div class="flex items-start justify-between gap-4">

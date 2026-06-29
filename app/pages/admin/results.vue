@@ -46,13 +46,30 @@ async function getAuthHeaders() {
 const headers = await getAuthHeaders()
 interface Player { id: string, name: string }
 
-const [{ data: matches, refresh }, { data: allTeams }, { data: allPlayers }, { data: roundLocks, refresh: refreshLocks }, fetchedAwards] = await Promise.all([
+const [{ data: matches, refresh }, { data: allTeams }, { data: allPlayers }, { data: roundLocks, refresh: refreshLocks }, fetchedAwards, { data: appSettings, refresh: refreshAppSettings }] = await Promise.all([
   useFetch<Match[]>('/api/matches'),
   useFetch<Team[]>('/api/teams'),
   useFetch<Player[]>('/api/players'),
   useFetch<Record<string, boolean>>('/api/round-locks'),
   $fetch<Awards>('/api/admin/awards', { headers }),
+  useFetch<{ catch_up_mode: boolean }>('/api/app-settings'),
 ])
+
+const togglingCatchUp = ref(false)
+async function toggleCatchUp() {
+  togglingCatchUp.value = true
+  try {
+    const h = await getAuthHeaders()
+    const next = !appSettings.value?.catch_up_mode
+    await $fetch('/api/admin/app-settings', { method: 'PATCH', headers: h, body: { catch_up_mode: next } })
+    await refreshAppSettings()
+    toast.add({ title: `Modo recuperación ${next ? 'activado' : 'desactivado'}`, color: 'success' })
+  } catch {
+    toast.add({ title: 'Error al cambiar el modo recuperación', color: 'error' })
+  } finally {
+    togglingCatchUp.value = false
+  }
+}
 
 const togglingRound = ref<string | null>(null)
 async function toggleRound(round: string) {
@@ -465,6 +482,26 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         >
           <UIcon :name="roundLocks?.[round] ? 'i-lucide-lock-open' : 'i-lucide-lock'" class="size-3" />
           {{ ROUND_LABELS[round] }}
+        </button>
+      </div>
+
+      <div class="border-t border-border pt-3 flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="text-sm font-medium text-foreground">Modo recuperación</p>
+          <p class="text-xs text-muted">
+            Permite a los usuarios que NO completaron sus predicciones rellenar las que les faltan (solo partidos sin empezar). Los que ya completaron no pueden editar.
+          </p>
+        </div>
+        <button
+          class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors shrink-0"
+          :class="appSettings?.catch_up_mode
+            ? 'bg-warning/10 border-warning/30 text-warning hover:bg-warning/20'
+            : 'bg-muted/20 border-border text-muted hover:bg-muted/40'"
+          :disabled="togglingCatchUp"
+          @click="toggleCatchUp"
+        >
+          <UIcon :name="appSettings?.catch_up_mode ? 'i-lucide-clock-alert' : 'i-lucide-clock'" class="size-3" />
+          {{ appSettings?.catch_up_mode ? 'Activado' : 'Desactivado' }}
         </button>
       </div>
     </div>
