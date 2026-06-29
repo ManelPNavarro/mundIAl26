@@ -163,14 +163,7 @@ const isLocked = computed(() => {
 
 onMounted(() => { currentStep.value = openStepIndex.value })
 
-// ─── Knockout info modal ─────────────────────────────────────────────────────
-const showKnockoutInfo = ref(false)
-const KNOCKOUT_INFO_KEY = 'mundial26_knockout_info_seen_v2'
-const anyKnockoutOpen = computed(() =>
-  ['R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL'].some(r => isRoundOpen(r))
-)
-
-// ─── Pending matches reminder ────────────────────────────────────────────────
+// ─── Pending matches progress ────────────────────────────────────────────────
 const openMatches = computed(() => (allMatches.value ?? []).filter(m => isRoundEditable(m.round)))
 const totalOpenCount = computed(() => openMatches.value.length)
 const filledOpenCount = computed(() =>
@@ -186,31 +179,6 @@ const pendingMatchesCount = computed(() =>
     return !(p?.home != null && p?.away != null)
   }).length,
 )
-
-const showPendingReminder = ref(false)
-const PENDING_REMINDER_KEY = 'mundial26_pending_reminder_session'
-
-function maybeShowPendingReminder() {
-  if (pendingMatchesCount.value <= 0) return
-  if (sessionStorage.getItem(PENDING_REMINDER_KEY)) return
-  sessionStorage.setItem(PENDING_REMINDER_KEY, '1')
-  showPendingReminder.value = true
-}
-
-onMounted(() => {
-  if (anyKnockoutOpen.value && !localStorage.getItem(KNOCKOUT_INFO_KEY)) {
-    showKnockoutInfo.value = true
-  } else {
-    maybeShowPendingReminder()
-  }
-})
-
-watch(showKnockoutInfo, (v) => {
-  if (!v) {
-    localStorage.setItem(KNOCKOUT_INFO_KEY, '1')
-    maybeShowPendingReminder()
-  }
-})
 
 // ─── Match grouping ──────────────────────────────────────────────────────────
 const ROUND_ORDER = ['GROUP', 'R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
@@ -502,18 +470,7 @@ async function save() {
   <div class="space-y-6">
     <div class="flex items-start justify-between gap-4">
       <div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-2xl font-bold text-foreground">Predicciones</h1>
-          <UButton
-            v-if="anyKnockoutOpen"
-            icon="i-lucide-info"
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            aria-label="Información de la fase eliminatoria"
-            @click="showKnockoutInfo = true"
-          />
-        </div>
+        <h1 class="text-2xl font-bold text-foreground">Predicciones</h1>
         <p class="text-sm text-muted mt-1">Introduce tus resultados para cada fase del torneo.</p>
       </div>
       <p v-if="lastResultsUpdate" class="text-xs text-muted shrink-0 mt-1">
@@ -714,12 +671,6 @@ async function save() {
         </div>
       </template>
     </UModal>
-
-    <!-- Knockout phase info modal -->
-    <PredictionsKnockoutInfoModal v-model="showKnockoutInfo" />
-
-    <!-- Pending predictions reminder modal -->
-    <PredictionsPendingReminderModal v-model="showPendingReminder" :count="pendingMatchesCount" />
 
     <!-- Hidden share card for image generation -->
     <PredictionsShareCard :groups="groupStageGroups" :predictions="predictions" :display-name="userName || user?.email || ''" />
