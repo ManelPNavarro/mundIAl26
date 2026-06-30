@@ -13,10 +13,10 @@ async function getAuthHeaders() {
 
 const NUMERIC_KEYS = [
   'group_correct', 'group_exact',
-  'r32_correct', 'r32_exact',
-  'r16_correct', 'r16_exact',
-  'qf_correct', 'qf_exact',
-  'sf_correct', 'sf_exact',
+  'r32_correct', 'r32_exact', 'r32_advance',
+  'r16_correct', 'r16_exact', 'r16_advance',
+  'qf_correct', 'qf_exact', 'qf_advance',
+  'sf_correct', 'sf_exact', 'sf_advance',
   'third_place_correct', 'third_place_exact',
   'final_correct', 'final_exact',
   'award_best_player', 'award_best_young_player',
@@ -60,13 +60,13 @@ function updateKey(key: string, val: string) {
 }
 
 const MATCH_ROWS = [
-  { label: 'Fase de grupos',   correct: 'group_correct',       exact: 'group_exact' },
-  { label: 'Dieciseisavos',    correct: 'r32_correct',         exact: 'r32_exact' },
-  { label: 'Octavos de final', correct: 'r16_correct',         exact: 'r16_exact' },
-  { label: 'Cuartos de final', correct: 'qf_correct',          exact: 'qf_exact' },
-  { label: 'Semifinales',      correct: 'sf_correct',          exact: 'sf_exact' },
-  { label: 'Tercer y cuarto',  correct: 'third_place_correct', exact: 'third_place_exact' },
-  { label: 'Final',            correct: 'final_correct',       exact: 'final_exact' },
+  { label: 'Fase de grupos',   correct: 'group_correct',       exact: 'group_exact',       advance: null },
+  { label: 'Dieciseisavos',    correct: 'r32_correct',         exact: 'r32_exact',         advance: 'r32_advance' },
+  { label: 'Octavos de final', correct: 'r16_correct',         exact: 'r16_exact',         advance: 'r16_advance' },
+  { label: 'Cuartos de final', correct: 'qf_correct',          exact: 'qf_exact',          advance: 'qf_advance' },
+  { label: 'Semifinales',      correct: 'sf_correct',          exact: 'sf_exact',          advance: 'sf_advance' },
+  { label: 'Tercer y cuarto',  correct: 'third_place_correct', exact: 'third_place_exact', advance: null },
+  { label: 'Final',            correct: 'final_correct',       exact: 'final_exact',       advance: null },
 ]
 
 const AWARD_POINT_ROWS = [
@@ -101,6 +101,10 @@ const AWARD_POINT_ROWS = [
               <tr class="border-b border-border">
                 <th class="text-left pb-3 font-medium text-muted">Fase</th>
                 <th class="text-center pb-3 font-medium text-muted w-36">
+                  <div>Equipo que pasa</div>
+                  <div class="text-xs font-normal">(sin acertar el resultado)</div>
+                </th>
+                <th class="text-center pb-3 font-medium text-muted w-36">
                   <div>Resultado correcto</div>
                   <div class="text-xs font-normal">(quién gana o empate)</div>
                 </th>
@@ -113,6 +117,15 @@ const AWARD_POINT_ROWS = [
             <tbody class="divide-y divide-border">
               <tr v-for="row in MATCH_ROWS" :key="row.correct">
                 <td class="py-3 text-foreground">{{ row.label }}</td>
+                <td class="py-3 text-center">
+                  <UInput
+                    v-if="row.advance"
+                    type="number" inputmode="numeric" min="0" max="99" class="w-16 mx-auto text-center" size="sm"
+                    :model-value="config[row.advance]"
+                    disabled
+                  />
+                  <span v-else class="text-muted">—</span>
+                </td>
                 <td class="py-3 text-center">
                   <UInput
                     type="number" inputmode="numeric" min="0" max="99" class="w-16 mx-auto text-center" size="sm"
