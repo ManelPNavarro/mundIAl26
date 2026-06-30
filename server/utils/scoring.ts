@@ -39,19 +39,14 @@ export function calcMatchPoints(
   const predResult = matchResult(prediction.home_score, prediction.away_score)
   const realResult = matchResult(result.home_score, result.away_score)
 
-  // Correct outcome (who wins / draw). For knockout draws decided by penalties,
-  // "correct" also requires guessing the team that advances.
-  if (realResult === 'DRAW' && result.home_advances !== null) {
-    const predAdvances = prediction.home_score === prediction.away_score
-      ? prediction.home_advances
-      : predResult === 'HOME' ? true : false
-    if (predAdvances === result.home_advances) return config[keys.correct] ?? 0
-  } else if (predResult === realResult) {
-    return config[keys.correct] ?? 0
-  }
+  // Correct outcome: you matched the nature of the result — home win, away win or
+  // draw. For knockout draws decided on penalties this does NOT require naming the
+  // penalty winner: guessing the draw is enough.
+  if (predResult === realResult) return config[keys.correct] ?? 0
 
-  // Advance tier: outcome was wrong, but the predicted advancing team is the one
-  // that actually advanced (e.g. predicted a draw + win on pens, real is a win).
+  // Advance tier: wrong outcome, but the team you had going through is the one that
+  // actually advanced — e.g. you predicted a clear win but it was a penalty draw won
+  // by that team, or you predicted a draw + that team on pens but it won outright.
   const realAdvances = advancingSide(result.home_score, result.away_score, result.home_advances)
   const predAdvances = advancingSide(prediction.home_score, prediction.away_score, prediction.home_advances)
   if (realAdvances && predAdvances && realAdvances === predAdvances) return config[keys.advance] ?? 0
