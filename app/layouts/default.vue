@@ -10,6 +10,28 @@ const displayEmail = computed(() => {
 
 const showRulesModal = ref(false)
 
+const { data: scoringConfig } = useLazyFetch<Record<string, number>>('/api/scoring-config')
+function pts(key: string): number {
+  return scoringConfig.value?.[key] ?? 0
+}
+
+const SCORING_ROWS = [
+  { label: 'Grupos',         correct: 'group_correct',       exact: 'group_exact',       advance: null },
+  { label: 'Dieciseisavos',  correct: 'r32_correct',         exact: 'r32_exact',         advance: 'r32_advance' },
+  { label: 'Octavos',        correct: 'r16_correct',         exact: 'r16_exact',         advance: 'r16_advance' },
+  { label: 'Cuartos',        correct: 'qf_correct',          exact: 'qf_exact',          advance: 'qf_advance' },
+  { label: 'Semifinales',    correct: 'sf_correct',          exact: 'sf_exact',          advance: 'sf_advance' },
+  { label: '3r y 4º puesto', correct: 'third_place_correct', exact: 'third_place_exact', advance: null },
+  { label: 'Final',          correct: 'final_correct',       exact: 'final_exact',       advance: null },
+]
+
+const AWARD_ROWS = [
+  { label: 'Mejor jugador (MVP)', key: 'award_best_player' },
+  { label: 'Mejor jugador joven', key: 'award_best_young_player' },
+  { label: 'Máximo goleador',     key: 'award_top_scorer' },
+  { label: 'Mejor portero',       key: 'award_best_goalkeeper' },
+]
+
 async function signOut() {
   await supabase.auth.signOut()
   await navigateTo('/login')
@@ -170,30 +192,30 @@ const menuItems = computed(() => [
                 <thead>
                   <tr class="border-b border-border text-muted">
                     <th class="pb-1.5 font-medium">Fase</th>
+                    <th class="pb-1.5 font-medium text-right">Pasa</th>
                     <th class="pb-1.5 font-medium text-right">Acierto</th>
                     <th class="pb-1.5 font-medium text-right">Exacto</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-border">
-                  <tr><td class="py-1.5">Grupos</td><td class="text-right">1 pt</td><td class="text-right font-semibold text-primary">3 pts</td></tr>
-                  <tr><td class="py-1.5">Dieciseisavos</td><td class="text-right">2 pts</td><td class="text-right font-semibold text-primary">5 pts</td></tr>
-                  <tr><td class="py-1.5">Octavos</td><td class="text-right">3 pts</td><td class="text-right font-semibold text-primary">7 pts</td></tr>
-                  <tr><td class="py-1.5">Cuartos</td><td class="text-right">4 pts</td><td class="text-right font-semibold text-primary">9 pts</td></tr>
-                  <tr><td class="py-1.5">Semifinales</td><td class="text-right">5 pts</td><td class="text-right font-semibold text-primary">11 pts</td></tr>
-                  <tr><td class="py-1.5">3r y 4º puesto</td><td class="text-right">4 pts</td><td class="text-right font-semibold text-primary">9 pts</td></tr>
-                  <tr><td class="py-1.5">Final</td><td class="text-right">6 pts</td><td class="text-right font-semibold text-primary">13 pts</td></tr>
+                  <tr v-for="row in SCORING_ROWS" :key="row.correct">
+                    <td class="py-1.5">{{ row.label }}</td>
+                    <td class="text-right">{{ row.advance ? `${pts(row.advance)} pts` : '—' }}</td>
+                    <td class="text-right">{{ pts(row.correct) }} pts</td>
+                    <td class="text-right font-semibold text-primary">{{ pts(row.exact) }} pts</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
+            <p class="text-xs text-muted mt-2">
+              <span class="font-medium text-foreground">Pasa</span>: en eliminatorias, si no aciertas el resultado pero sí el equipo que se clasifica a la siguiente ronda.
+            </p>
           </section>
 
           <section>
             <h3 class="font-semibold text-base mb-2">Premios individuales</h3>
             <ul class="space-y-1">
-              <li>Mejor jugador (MVP): <span class="font-semibold text-primary">8 pts</span></li>
-              <li>Mejor jugador joven: <span class="font-semibold text-primary">6 pts</span></li>
-              <li>Máximo goleador: <span class="font-semibold text-primary">8 pts</span></li>
-              <li>Mejor portero: <span class="font-semibold text-primary">6 pts</span></li>
+              <li v-for="a in AWARD_ROWS" :key="a.key">{{ a.label }}: <span class="font-semibold text-primary">{{ pts(a.key) }} pts</span></li>
             </ul>
           </section>
         </div>
