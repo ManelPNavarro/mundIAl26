@@ -83,6 +83,15 @@ function teamName(team: Team | null | undefined): string {
   return team?.name ?? '?'
 }
 
+const isKnockout = computed(() => match.value?.round !== 'GROUP')
+
+function advancingTeamName(entry: MatchPrediction): string | null {
+  if (!isKnockout.value) return null
+  if (entry.homeScore === null || entry.homeScore !== entry.awayScore) return null
+  if (entry.homeAdvances === null) return null
+  return entry.homeAdvances ? teamName(match.value?.home_team) : teamName(match.value?.away_team)
+}
+
 const categoryGroups = computed(() => {
   if (!isFinished.value) return null
   const groups: { category: string, label: string, entries: MatchPrediction[] }[] = []
@@ -191,6 +200,10 @@ const categoryGroups = computed(() => {
                   {{ entry.homeScore }} – {{ entry.awayScore }}
                 </span>
                 <span v-else class="text-sm text-muted">–</span>
+                <span v-if="advancingTeamName(entry)" class="flex items-center gap-1 text-xs text-muted">
+                  <UIcon name="i-lucide-arrow-right" class="size-3" />
+                  <TeamFlag :team="advancingTeamName(entry) ?? ''" class="text-sm" />
+                </span>
                 <UBadge
                   v-if="entry.category === 'exact'"
                   color="success" variant="subtle" size="xs"
@@ -230,10 +243,16 @@ const categoryGroups = computed(() => {
                 <span class="text-sm font-medium text-foreground truncate">{{ entry.name }}</span>
                 <UBadge v-if="entry.userId === currentUser?.id" color="primary" variant="subtle" size="xs">Tú</UBadge>
               </div>
-              <span v-if="entry.homeScore !== null" class="font-mono font-bold text-sm text-foreground shrink-0">
-                {{ entry.homeScore }} – {{ entry.awayScore }}
-              </span>
-              <span v-else class="text-sm text-muted shrink-0">–</span>
+              <div class="flex items-center gap-2 shrink-0">
+                <span v-if="entry.homeScore !== null" class="font-mono font-bold text-sm text-foreground">
+                  {{ entry.homeScore }} – {{ entry.awayScore }}
+                </span>
+                <span v-else class="text-sm text-muted">–</span>
+                <span v-if="advancingTeamName(entry)" class="flex items-center gap-1 text-xs text-muted">
+                  <UIcon name="i-lucide-arrow-right" class="size-3" />
+                  <TeamFlag :team="advancingTeamName(entry) ?? ''" class="text-sm" />
+                </span>
+              </div>
             </div>
           </div>
         </template>
