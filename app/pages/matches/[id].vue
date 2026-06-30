@@ -11,7 +11,7 @@ interface MatchPrediction {
   awayScore: number | null
   homeAdvances: boolean | null
   points: number
-  category: 'exact' | 'correct' | 'wrong' | 'no_prediction'
+  category: 'exact' | 'correct' | 'advance' | 'wrong' | 'no_prediction'
 }
 
 interface MatchDetail {
@@ -39,6 +39,7 @@ const ROUND_LABELS: Record<string, string> = {
 const CATEGORY_LABELS: Record<string, string> = {
   exact: 'Resultado exacto',
   correct: 'Resultado acertado',
+  advance: 'Acertó el equipo que pasa',
   wrong: 'Resultado fallado',
   no_prediction: 'Sin predicción',
 }
@@ -178,7 +179,7 @@ const categoryGroups = computed(() => {
         <template v-if="categoryGroups">
           <div v-for="group in categoryGroups" :key="group.category" class="space-y-2">
             <p class="text-xs font-semibold uppercase tracking-wide"
-              :class="group.category === 'exact' ? 'text-success' : group.category === 'correct' ? 'text-success/70' : 'text-muted'"
+              :class="group.category === 'exact' ? 'text-success' : group.category === 'correct' ? 'text-success/70' : group.category === 'advance' ? 'text-warning' : 'text-muted'"
             >
               {{ group.label }}
             </p>
@@ -213,6 +214,12 @@ const categoryGroups = computed(() => {
                 <UBadge
                   v-else-if="entry.category === 'correct'"
                   color="success" variant="outline" size="xs"
+                >
+                  +{{ entry.points }} pts
+                </UBadge>
+                <UBadge
+                  v-else-if="entry.category === 'advance'"
+                  color="warning" variant="subtle" size="xs"
                 >
                   +{{ entry.points }} pts
                 </UBadge>

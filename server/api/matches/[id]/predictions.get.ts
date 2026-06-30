@@ -71,9 +71,19 @@ export default defineEventHandler(async (event) => {
 
   const realOutcome = isFinished ? getOutcome(match.home_score!, match.away_score!) : null
 
-  type Category = 'exact' | 'correct' | 'wrong' | 'no_prediction'
-  const categoryOrder: Record<Category, number> = { exact: 0, correct: 1, wrong: 2, no_prediction: 3 }
+  type Category = 'exact' | 'correct' | 'advance' | 'wrong' | 'no_prediction'
+  const categoryOrder: Record<Category, number> = { exact: 0, correct: 1, advance: 2, wrong: 3, no_prediction: 4 }
   const outcomeOrder: Record<Outcome | 'NONE', number> = { HOME: 0, DRAW: 1, AWAY: 2, NONE: 3 }
+
+  // Tier point values for this round, used to label each entry from its actual
+  // stored points (so the category matches real scoring, incl. the teams gate).
+  const ROUND_PREFIX: Record<string, string> = {
+    GROUP: 'group', R32: 'r32', R16: 'r16', QF: 'qf', SF: 'sf', THIRD_PLACE: 'third_place', FINAL: 'final',
+  }
+  const prefix = ROUND_PREFIX[match.round] ?? 'group'
+  const exactPts = config?.[`${prefix}_exact`] ?? 0
+  const correctPts = config?.[`${prefix}_correct`] ?? 0
+  const advancePts = config?.[`${prefix}_advance`] ?? 0
 
   const entries = [...userMap.entries()].map(([userId, { name, email }]) => {
     const pred = predMap.get(userId)
@@ -81,13 +91,10 @@ export default defineEventHandler(async (event) => {
 
     let category: Category = 'no_prediction'
     if (pred && isFinished) {
-      const isExact = pred.home_score === match.home_score && pred.away_score === match.away_score
-      if (isExact) {
-        category = 'exact'
-      } else {
-        const predOutcome = getOutcome(pred.home_score, pred.away_score)
-        category = predOutcome === realOutcome ? 'correct' : 'wrong'
-      }
+      if (points > 0 && points === exactPts) category = 'exact'
+      else if (points > 0 && points === correctPts) category = 'correct'
+      else if (points > 0 && points === advancePts) category = 'advance'
+      else category = 'wrong'
     } else if (pred) {
       category = 'wrong'
     }
