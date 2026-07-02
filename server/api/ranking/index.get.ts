@@ -1,4 +1,5 @@
-import { calcAwardPoints } from '../../utils/scoring'
+import { calcAwardPoints, missedAdvanceGuess } from '../../utils/scoring'
+import { teamsMatch } from '../../utils/bracket'
 
 function resolveWinner(
   match: { id: string, home_team_id: string | null, away_team_id: string | null, home_slot: string | null, away_slot: string | null },
@@ -53,7 +54,7 @@ export default defineEventHandler(async () => {
     supabase.from('official_awards').select('*').single(),
     supabase.from('side_bets').select('*'),
     supabase.from('teams').select('id, name'),
-    supabase.from('matches').select('id, match_no, home_team_id, away_team_id, home_slot, away_slot'),
+    supabase.from('matches').select('id, match_no, round, group_letter, home_team_id, away_team_id, home_slot, away_slot, home_score, away_score, home_advances'),
     supabase.from('predictions').select('user_id, match_id, home_score, away_score, home_advances'),
   ])
 
@@ -90,11 +91,22 @@ export default defineEventHandler(async () => {
     const userBets = (allSideBets ?? []).find(b => b.user_id === user.id) ?? null
     const awardPoints = calcAwardPoints(userBets, officialAwards ?? null, config)
 
+    const userPreds = predsByUser.get(user.id) ?? new Map()
+
     let winnerTeam: string | null = null
     if (theFinal) {
-      const userPreds = predsByUser.get(user.id) ?? new Map()
       const winnerTeamId = resolveWinner(theFinal, userPreds, matchBySlot)
       winnerTeam = winnerTeamId ? (teamById.get(winnerTeamId) ?? null) : null
+    }
+
+    let advanceFails = 0
+    for (const match of allMatches ?? []) {
+      if (match.round === 'GROUP') continue
+      if (match.home_score === null || match.away_score === null) continue
+      const pred = userPreds.get(match.id)
+      if (!pred) continue
+      if (!teamsMatch(match, allMatches ?? [], userPreds)) continue
+      if (missedAdvanceGuess(pred, { home_score: match.home_score, away_score: match.away_score, home_advances: match.home_advances })) advanceFails++
     }
 
     return {
@@ -105,6 +117,7 @@ export default defineEventHandler(async () => {
       matchPoints,
       awardPoints,
       winnerTeam,
+      advanceFails,
     }
   })
 
