@@ -27,6 +27,20 @@ function advancingSide(home: number, away: number, homeAdvances: boolean | null)
   return null
 }
 
+// Independent of scoring tiers: did the user name the wrong advancing team?
+// "Correct"/"exact" points can still be awarded while this is true, since
+// those tiers ignore home_advances (see calcMatchPoints below).
+export function missedAdvanceGuess(
+  prediction: { home_score: number, away_score: number, home_advances: boolean | null },
+  result: { home_score: number, away_score: number, home_advances: boolean | null },
+): boolean {
+  const realAdvances = advancingSide(result.home_score, result.away_score, result.home_advances)
+  // home_advances not yet set for a finished draw — treat as unresolved, no dot
+  if (!realAdvances) return false
+  const predAdvances = advancingSide(prediction.home_score, prediction.away_score, prediction.home_advances)
+  return predAdvances !== realAdvances
+}
+
 export function calcMatchPoints(
   prediction: { home_score: number, away_score: number, home_advances: boolean | null },
   result: { home_score: number, away_score: number, home_advances: boolean | null, round: string },

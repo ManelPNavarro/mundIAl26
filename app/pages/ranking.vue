@@ -10,6 +10,7 @@ interface RankingEntry {
   matchPoints: number
   awardPoints: number
   winnerTeam: string | null
+  advanceFails: number
 }
 
 const currentUser = useSupabaseUser()
@@ -85,6 +86,16 @@ const POSITION_ICONS: Record<number, string> = {
 
         <!-- Points breakdown -->
         <div class="flex items-center gap-2 shrink-0">
+          <UTooltip v-if="entry.advanceFails > 0" :text="`${entry.advanceFails} eliminatoria(s) con el equipo que avanza fallado`">
+            <div class="flex items-center gap-0.5">
+              <span
+                v-for="i in Math.min(entry.advanceFails, 5)"
+                :key="i"
+                class="size-1.5 rounded-full bg-error shrink-0"
+              />
+              <span v-if="entry.advanceFails > 5" class="text-xs text-error font-bold leading-none">+</span>
+            </div>
+          </UTooltip>
           <TeamFlag v-if="entry.winnerTeam" :team="entry.winnerTeam" class="text-lg" />
           <div class="text-right">
             <div class="text-lg font-bold text-foreground leading-none">
