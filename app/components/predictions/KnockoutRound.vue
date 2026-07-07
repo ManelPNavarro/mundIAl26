@@ -262,8 +262,8 @@ function teamName(match: Match, side: 'home' | 'away'): string {
         v-if="doomedMatchup(match)"
         class="px-3 py-1.5 text-xs font-medium bg-error/10 text-error border-t border-error/20"
       >
-        <div class="flex items-center gap-1.5">
-          <UIcon name="i-lucide-triangle-alert" class="size-3.5 shrink-0" />
+        <div class="flex items-center justify-center gap-1.5">
+          <span class="size-1.5 rounded-full bg-error shrink-0" />
           <span>Tus equipos no pasaron — este cruce será:</span>
         </div>
         <div class="flex items-center justify-center gap-2 mt-1">
@@ -296,9 +296,9 @@ function teamName(match: Match, side: 'home' | 'away'): string {
       <!-- Wrong teams explanation -->
       <div
         v-if="props.summary?.[match.id]?.wrongTeams"
-        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-error/10 text-error border-t border-error/20"
+        class="flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-error/10 text-error border-t border-error/20"
       >
-        <UIcon name="i-lucide-triangle-alert" class="size-3.5 shrink-0" />
+        <span class="size-1.5 rounded-full bg-error shrink-0" />
         <span>Equipos incorrectos: los equipos de este cruce no coinciden con tu predicción, así que no puntúa.</span>
       </div>
     </div>
