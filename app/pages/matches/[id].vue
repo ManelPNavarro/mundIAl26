@@ -12,6 +12,7 @@ interface MatchPrediction {
   homeAdvances: boolean | null
   points: number
   category: 'exact' | 'correct' | 'advance' | 'wrong' | 'no_prediction'
+  wrongTeams: boolean
 }
 
 interface MatchDetail {
@@ -27,6 +28,7 @@ interface MatchDetail {
     home_advances: boolean | null
     home_team: Team | null
     away_team: Team | null
+    current_user_doomed: boolean
   }
   predictions: MatchPrediction[]
 }
@@ -92,6 +94,10 @@ function advancingTeamName(entry: MatchPrediction): string | null {
   if (entry.homeAdvances === null) return null
   return entry.homeAdvances ? teamName(match.value?.home_team) : teamName(match.value?.away_team)
 }
+
+const myWrongTeams = computed(() =>
+  predictions.value.find(p => p.userId === currentUser.value?.id)?.wrongTeams ?? false,
+)
 
 const categoryGroups = computed(() => {
   if (!isFinished.value) return null
@@ -165,6 +171,20 @@ const categoryGroups = computed(() => {
             <span class="text-base font-semibold text-foreground truncate">{{ teamName(match.away_team) }}</span>
           </div>
         </div>
+        <div
+          v-if="match.current_user_doomed"
+          class="flex items-center justify-center gap-1.5 px-4 py-1.5 text-xs font-medium bg-error/10 text-error border-t border-error/20"
+        >
+          <span class="size-1.5 rounded-full bg-error shrink-0" />
+          <span>Tus equipos no pasaron</span>
+        </div>
+        <div
+          v-else-if="myWrongTeams"
+          class="flex items-center justify-center gap-1.5 px-4 py-1.5 text-xs font-medium bg-error/10 text-error border-t border-error/20"
+        >
+          <span class="size-1.5 rounded-full bg-error shrink-0" />
+          <span>Equipos incorrectos: los equipos de este cruce no coinciden con tu predicción, así que no puntúa.</span>
+        </div>
       </div>
 
       <!-- Predictions list -->
@@ -197,6 +217,9 @@ const categoryGroups = computed(() => {
                 <UBadge v-if="entry.userId === currentUser?.id" color="primary" variant="subtle" size="xs">Tú</UBadge>
               </div>
               <div class="flex items-center gap-3 shrink-0">
+                <UTooltip v-if="entry.wrongTeams" text="Equipos incorrectos: no coinciden con la predicción.">
+                  <span class="size-1.5 rounded-full bg-error shrink-0" />
+                </UTooltip>
                 <span v-if="entry.homeScore !== null" class="font-mono font-bold text-sm text-foreground">
                   {{ entry.homeScore }} – {{ entry.awayScore }}
                 </span>
