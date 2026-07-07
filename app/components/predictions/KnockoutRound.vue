@@ -152,6 +152,33 @@ function hasResult(match: Match): boolean {
   return match.home_score !== null && match.away_score !== null
 }
 
+// Real team on a side, resolved from actual results only (null if not yet known).
+function realTeamName(m: Match, side: 'home' | 'away'): string | null {
+  const team = side === 'home' ? m.home_team : m.away_team
+  if (team) return team.name
+  const slot = side === 'home' ? m.home_slot : m.away_slot
+  if (!slot) return null
+  if (slot.startsWith('W') || slot.startsWith('L')) {
+    const winner = slot.startsWith('W')
+    const src = props.allMatches.find(x => x.match_no === parseInt(slot.slice(1)))
+    if (!src || src.home_score === null || src.away_score === null) return null
+    const homeWins = src.home_score > src.away_score || (src.home_score === src.away_score && src.home_advances === true)
+    return realTeamName(src, (winner ? homeWins : !homeWins) ? 'home' : 'away')
+  }
+  return null
+}
+
+// A knockout match not yet played whose real participants are already known and
+// differ from the user's predicted ones → guaranteed 0 points.
+function doomedMatchup(match: Match): { home: string, away: string } | null {
+  if (hasResult(match) || match.round === 'R32') return null
+  const realHome = realTeamName(match, 'home')
+  const realAway = realTeamName(match, 'away')
+  if (!realHome || !realAway) return null
+  if (realHome === teamName(match, 'home') && realAway === teamName(match, 'away')) return null
+  return { home: realHome, away: realAway }
+}
+
 function formatKickoff(kickoff_at: string | null): string | null {
   if (!kickoff_at) return null
   return new Intl.DateTimeFormat('es-ES', {
@@ -227,6 +254,23 @@ function teamName(match: Match, side: 'home' | 'away'): string {
           <UButton size="xs" :variant="getPrediction(match.id).homeAdvances === false ? 'solid' : 'outline'" color="primary" :disabled="props.locked" @click="getPrediction(match.id).homeAdvances = false">
             {{ teamName(match, 'away') }}
           </UButton>
+        </div>
+      </div>
+
+      <!-- Doomed matchup: real teams already known and differ from prediction -->
+      <div
+        v-if="doomedMatchup(match)"
+        class="px-3 py-1.5 text-xs font-medium bg-error/10 text-error border-t border-error/20"
+      >
+        <div class="flex items-center gap-1.5">
+          <UIcon name="i-lucide-triangle-alert" class="size-3.5 shrink-0" />
+          <span>Tus equipos no pasaron — este cruce será:</span>
+        </div>
+        <div class="flex items-center justify-center gap-2 mt-1">
+          <span class="flex items-center gap-1"><TeamFlag :team="doomedMatchup(match)!.home" class="text-sm" /><span class="font-semibold">{{ doomedMatchup(match)!.home }}</span></span>
+          <span class="text-muted">vs</span>
+          <span class="flex items-center gap-1"><span class="font-semibold">{{ doomedMatchup(match)!.away }}</span><TeamFlag :team="doomedMatchup(match)!.away" class="text-sm" /></span>
+          <span class="ml-1 font-semibold">· 0 pts</span>
         </div>
       </div>
 
