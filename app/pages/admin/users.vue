@@ -13,7 +13,7 @@ interface AppUser {
 
 const supabase = useSupabaseClient()
 const currentUser = useSupabaseUser()
-const toast = useToast()
+const toast = useAppToast()
 
 async function getAuthHeaders() {
   const { data: { session } } = await supabase.auth.getSession()

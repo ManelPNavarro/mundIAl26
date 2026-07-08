@@ -3,7 +3,7 @@ definePageMeta({ middleware: 'auth' })
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-const toast = useToast()
+const toast = useAppToast()
 
 const gravatarUrl = ref('')
 

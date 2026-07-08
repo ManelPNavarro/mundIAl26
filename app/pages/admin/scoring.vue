@@ -4,7 +4,7 @@ definePageMeta({ middleware: ['auth', 'admin'] })
 type ScoringConfig = Record<string, number>
 
 const supabase = useSupabaseClient()
-const toast = useToast()
+const toast = useAppToast()
 
 async function getAuthHeaders() {
   const { data: { session } } = await supabase.auth.getSession()

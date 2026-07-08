@@ -33,7 +33,7 @@ interface SideBets {
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-const toast = useToast()
+const toast = useAppToast()
 
 const userName = ref(user.value?.user_metadata?.name ?? '')
 const savingName = ref(false)
