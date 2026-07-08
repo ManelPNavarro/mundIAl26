@@ -87,7 +87,7 @@ const POSITION_ICONS: Record<number, string> = {
 
         <!-- Points breakdown -->
         <div class="flex items-center gap-2 shrink-0">
-          <UTooltip v-if="entry.advanceFails > 0" :text="`${entry.advanceFails} fallo(s) en ${entry.advanceFailsRound}`">
+          <UTooltip v-if="entry.advanceFails > 0" :text="`${entry.advanceFails} partido(s) de ${entry.advanceFailsRound} no puntuarán`">
             <div class="flex items-center gap-0.5">
               <span
                 v-for="i in Math.min(entry.advanceFails, 5)"
