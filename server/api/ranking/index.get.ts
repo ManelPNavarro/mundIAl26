@@ -1,31 +1,21 @@
-import { calcAwardPoints, missedAdvanceGuess } from '../../utils/scoring'
-import { teamsMatch } from '../../utils/bracket'
+import { calcAwardPoints } from '../../utils/scoring'
+import { resolvedTeams } from '../../utils/bracket'
 
 const KNOCKOUT_SCAN_ORDER = ['R32', 'R16', 'QF', 'SF', 'THIRD_PLACE', 'FINAL']
-
-// THIRD_PLACE and FINAL are siblings fed by SF, not sequential to each other,
-// so this is an explicit dependency map rather than "the previous array entry."
-const PREVIOUS_KNOCKOUT_ROUND: Record<string, string | null> = {
-  R32: null,
-  R16: 'R32',
-  QF: 'R16',
-  SF: 'QF',
-  THIRD_PLACE: 'SF',
-  FINAL: 'SF',
-}
 
 const ROUND_LABELS: Record<string, string> = {
   R32: 'Dieciseisavos', R16: 'Octavos', QF: 'Cuartos', SF: 'Semifinales', THIRD_PLACE: '3er puesto', FINAL: 'Final',
 }
 
-function findPreviousKnockoutRound(
+// The knockout round currently being played/about to be played: the first
+// round (bracket order) that still has an unplayed match.
+function findCurrentKnockoutRound(
   matches: { round: string, home_score: number | null, away_score: number | null }[],
 ): string | null {
-  const currentRound = KNOCKOUT_SCAN_ORDER.find((round) => {
+  return KNOCKOUT_SCAN_ORDER.find((round) => {
     const roundMatches = matches.filter(m => m.round === round)
     return roundMatches.length > 0 && roundMatches.some(m => m.home_score === null || m.away_score === null)
-  }) ?? 'FINAL' // everything finished — keep attributing to the last round's dependency (SF)
-  return PREVIOUS_KNOCKOUT_ROUND[currentRound] ?? null
+  }) ?? 'FINAL' // everything finished — keep attributing to the last round
 }
 
 function resolveWinner(
@@ -105,7 +95,7 @@ export default defineEventHandler(async () => {
   }
 
   const theFinal = (allMatches ?? []).find(m => m.match_no === 104)
-  const previousKnockoutRound = findPreviousKnockoutRound(allMatches ?? [])
+  const currentKnockoutRound = findCurrentKnockoutRound(allMatches ?? [])
 
   // group predictions by user
   const predsByUser = new Map<string, Map<string, { home_score: number, away_score: number, home_advances: boolean | null }>>()
@@ -127,14 +117,20 @@ export default defineEventHandler(async () => {
       winnerTeam = winnerTeamId ? (teamById.get(winnerTeamId) ?? null) : null
     }
 
+    // Count of matches in the CURRENT knockout round that are already
+    // guaranteed not to score for this user — either because they've been
+    // played and the user's own bracket picks didn't match who actually
+    // played, or because they haven't been played yet but the real
+    // participants are already known (from earlier results) and differ from
+    // this user's predicted path. R32 is excluded — its slots are resolved
+    // from group standings, which this rule was never meant to project.
     let advanceFails = 0
     for (const match of allMatches ?? []) {
-      if (!previousKnockoutRound || match.round !== previousKnockoutRound) continue
-      if (match.home_score === null || match.away_score === null) continue
-      const pred = userPreds.get(match.id)
-      if (!pred) continue
-      if (!teamsMatch(match, allMatches ?? [], userPreds)) continue
-      if (missedAdvanceGuess(pred, { home_score: match.home_score, away_score: match.away_score, home_advances: match.home_advances })) advanceFails++
+      if (!currentKnockoutRound || match.round !== currentKnockoutRound || match.round === 'R32') continue
+      const { real, predicted } = resolvedTeams(match, allMatches ?? [], userPreds)
+      if (!real.home || !real.away) continue
+      if (predicted.home === real.home && predicted.away === real.away) continue
+      advanceFails++
     }
 
     return {
@@ -146,7 +142,7 @@ export default defineEventHandler(async () => {
       awardPoints,
       winnerTeam,
       advanceFails,
-      advanceFailsRound: previousKnockoutRound ? (ROUND_LABELS[previousKnockoutRound] ?? null) : null,
+      advanceFailsRound: currentKnockoutRound ? (ROUND_LABELS[currentKnockoutRound] ?? null) : null,
     }
   })
 
